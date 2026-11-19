@@ -1,0 +1,32 @@
+services:
+  # 1. FastAPI Python Backend Service
+  - type: web
+    name: clipforge-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: PROJECT_NAME
+        value: "ClipForge AI"
+      - key: DATABASE_URL
+        value: "sqlite:///./clipforge.db"
+
+  # 2. Next.js Frontend Service
+  - type: web
+    name: clipforge-frontend
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.0.0
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: clipforge-backend
+          property: host
