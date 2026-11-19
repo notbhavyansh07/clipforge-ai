@@ -4,11 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Scissors, Youtube, CheckCircle2, ShieldCheck, X, Loader2, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
+import { INITIAL_CHANNEL } from '@/lib/seedData';
 
 export default function Navbar() {
-  const [channelStatus, setChannelStatus] = useState<{ connected: boolean; channel_title?: string }>({
-    connected: false,
-  });
+  const [channelStatus, setChannelStatus] = useState<{ connected: boolean; channel_title?: string }>(INITIAL_CHANNEL);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelInput, setChannelInput] = useState('salviashu02');
   const [connecting, setConnecting] = useState(false);

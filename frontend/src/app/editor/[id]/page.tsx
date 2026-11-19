@@ -34,14 +34,21 @@ import ClipCard from '@/components/ClipCard';
 import MultiTrackTimeline from '@/components/MultiTrackTimeline';
 import ComparisonPlayer from '@/components/ComparisonPlayer';
 import CinematicControls from '@/components/CinematicControls';
+import { INITIAL_VIDEOS, INITIAL_CLIPS } from '@/lib/seedData';
 
 export default function ClipEditorPage() {
   const { id } = useParams<{ id: string }>();
 
-  const [video, setVideo] = useState<Video | null>(null);
-  const [clips, setClips] = useState<Clip[]>([]);
-  const [selectedClip, setSelectedClip] = useState<Clip | null>(null);
-  const [loading, setLoading] = useState(true);
+  const initialVid = INITIAL_VIDEOS.find((v) => v.id === id) || null;
+  const initialClipsList = INITIAL_CLIPS.filter((c) => c.video_id === id);
+  const initialSelected = initialClipsList.length > 0
+    ? [...initialClipsList].sort((a, b) => b.virality_score - a.virality_score)[0]
+    : null;
+
+  const [video, setVideo] = useState<Video | null>(initialVid);
+  const [clips, setClips] = useState<Clip[]>(initialClipsList);
+  const [selectedClip, setSelectedClip] = useState<Clip | null>(initialSelected);
+  const [loading, setLoading] = useState(!initialVid);
   const [rendering, setRendering] = useState(false);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
@@ -61,9 +68,14 @@ export default function ClipEditorPage() {
   const [promptQuery, setPromptQuery] = useState('');
   const [searchingMoment, setSearchingMoment] = useState(false);
 
-  // Auto-edit options including FilmCraft & HyperFrames
+  // Auto-edit options including FilmCraft & HyperFrames & GTA-Auto-Clipper
   const [renderOptions, setRenderOptions] = useState<RenderOptions>({
     aspect_ratio: '9:16',
+    framing_mode: 'fill_player_track',
+    lead_in_seconds: 6,
+    enable_swear_masking: true,
+    caption_language: 'auto',
+    caption_position: 'lower_third',
     enable_face_tracking: true,
     enable_animated_captions: true,
     enable_silence_trim: true,
@@ -77,15 +89,16 @@ export default function ClipEditorPage() {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const vidData = await api.getVideo(id);
-      setVideo(vidData);
+      if (vidData) setVideo(vidData);
 
       const clipsData = await api.getClipsForVideo(id);
-      setClips(clipsData);
-      if (clipsData.length > 0 && !selectedClip) {
-        const sorted = [...clipsData].sort((a, b) => b.virality_score - a.virality_score);
-        setSelectedClip(sorted[0]);
+      if (Array.isArray(clipsData) && clipsData.length > 0) {
+        setClips(clipsData);
+        if (!selectedClipRef.current) {
+          const sorted = [...clipsData].sort((a, b) => b.virality_score - a.virality_score);
+          setSelectedClip(sorted[0]);
+        }
       }
     } catch (e) {
       console.error('Error loading clip editor data:', e);
@@ -340,6 +353,27 @@ export default function ClipEditorPage() {
             )}
           </div>
         )}
+      </div>
+
+      {/* 🎮 GTA-AUTO-CLIPPER SYSTEM STATUS BANNER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-purple-500/10 to-emerald-500/10 border border-yellow-500/30 text-xs">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 font-bold border border-yellow-400/30 text-[11px]">
+            🎮 GTA GAMEPLAY VERIFIED
+          </span>
+          <span className="text-gray-300 text-xs">
+            YOLOX 9:16 Player-Centric Crop &bull; Facecam Evasion &bull; 6s Lead-In &bull; Swear-Masked Hinglish Subtitles
+          </span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800 text-emerald-400 font-mono text-[10px] font-bold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            REACH SAFE
+          </span>
+          <span className="font-mono text-[10px] text-yellow-400 bg-yellow-950/40 px-2 py-0.5 rounded border border-yellow-800">
+            BURST RADAR ACTIVE
+          </span>
+        </div>
       </div>
 
       {/* 🚀 QUICK INCIDENT SWITCHER BAR (All 11 Moments) */}

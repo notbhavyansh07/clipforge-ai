@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Play, Sparkles, Youtube, CheckCircle, Clock, Zap, ArrowRight, MapPin, AlertCircle, Timer } from 'lucide-react';
+import { Play, Sparkles, Youtube, CheckCircle, Clock, Zap, ArrowRight, MapPin, AlertCircle, Timer, MessageSquare, ShieldCheck, Crosshair } from 'lucide-react';
 import { Clip } from '@/lib/types';
 
 interface ClipCardProps {
@@ -55,23 +55,32 @@ export default function ClipCard({ clip, isChampion, onSelect, onPublishClick }:
           </div>
         </div>
 
-        {/* Location & Incident Badges */}
-        {(clip.location || clip.incident_type) && (
-          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-            {clip.location && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-900 border border-gray-800 text-gray-300">
-                <MapPin className="w-3 h-3 text-red-400 shrink-0" />
-                <span className="truncate max-w-[150px]">{clip.location}</span>
-              </span>
-            )}
-            {clip.incident_type && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-950/30 border border-amber-800/40 text-amber-300">
-                <AlertCircle className="w-3 h-3 text-amber-400 shrink-0" />
-                <span className="truncate max-w-[150px]">{clip.incident_type}</span>
-              </span>
-            )}
-          </div>
-        )}
+        {/* Location, Incident, and GTA-Auto-Clipper Signals */}
+        <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+          {clip.location && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-900 border border-gray-800 text-gray-300">
+              <MapPin className="w-3 h-3 text-red-400 shrink-0" />
+              <span className="truncate max-w-[140px]">{clip.location}</span>
+            </span>
+          )}
+          {clip.incident_type && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-950/30 border border-amber-800/40 text-amber-300">
+              <AlertCircle className="w-3 h-3 text-amber-400 shrink-0" />
+              <span className="truncate max-w-[140px]">{clip.incident_type}</span>
+            </span>
+          )}
+          {clip.chat_burst_score && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-950/40 border border-purple-800/50 text-purple-300">
+              <MessageSquare className="w-2.5 h-2.5 text-purple-400" />
+              <span>{clip.chat_burst_score}x Chat Burst</span>
+              {clip.reaction_emojis && <span>{clip.reaction_emojis.join('')}</span>}
+            </span>
+          )}
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-950/40 border border-emerald-800/50 text-emerald-300">
+            <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+            <span>Safe Reach</span>
+          </span>
+        </div>
 
         {/* Title and Hook */}
         <div>
@@ -117,6 +126,11 @@ export default function ClipCard({ clip, isChampion, onSelect, onPublishClick }:
             <CheckCircle className="w-3.5 h-3.5" />
             <span>{clip.youtube_video_id && !clip.youtube_video_id.startsWith('CF_') ? 'Shorts Live' : 'Studio Ready'}</span>
           </a>
+        ) : clip.status === 'scheduled' ? (
+          <span className="py-1.5 px-3 rounded-xl text-xs font-bold bg-blue-600/20 border border-blue-500/40 text-blue-300 transition flex items-center gap-1 shadow-sm">
+            <Timer className="w-3.5 h-3.5 text-blue-400" />
+            <span>Scheduled (6:00 PM)</span>
+          </span>
         ) : clip.status === 'rendered' ? (
           <button
             onClick={() => onPublishClick(clip)}
@@ -130,4 +144,3 @@ export default function ClipCard({ clip, isChampion, onSelect, onPublishClick }:
     </div>
   );
 }
-

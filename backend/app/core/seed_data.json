@@ -3,7 +3,7 @@
     {
       "id": "b65fb2a6-436a-4a5b-a509-fe1a4b85a6c4",
       "platform": "youtube",
-      "channel_title": "Connected YouTube Account",
+      "channel_title": "@salviashu02",
       "channel_id": null,
       "access_token": null,
       "refresh_token": null,
@@ -15,7 +15,7 @@
   "videos": [
     {
       "id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-      "title": "Imported from Youtube",
+      "title": "CARRYMINATI PLAYS GTA VI | NO PROMOTIONS",
       "source_type": "youtube",
       "source_url": "https://www.youtube.com/live/irNhWMG560k?si=qWtEd2xbt04vT89D",
       "file_path": "uploads/a5d7460f-90e1-4e4e-9051-210d35430446/video_master.mp4",
@@ -88,7 +88,16 @@
       "location": "Ocean Drive / South Beach",
       "incident_type": "World Premiere Opening",
       "stream_time_formatted": "00:14:20 (Hour 1)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 8.9,
+      "peak_chatters": 210,
+      "reaction_emojis": [
+        "\ud83d\udd25",
+        "\ud83c\udf34"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-02-chase",
@@ -117,7 +126,16 @@
       "location": "Downtown Vice City Express",
       "incident_type": "5-Star Police Pursuit",
       "stream_time_formatted": "01:32:00 (Hour 2)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 9.4,
+      "peak_chatters": 340,
+      "reaction_emojis": [
+        "\ud83d\udea8",
+        "\ud83d\udc80"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-03-nitro",
@@ -146,7 +164,16 @@
       "location": "Interstate I-95 Highway",
       "incident_type": "250MPH Nitro Speed Test",
       "stream_time_formatted": "02:45:18 (Hour 3)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 8.6,
+      "peak_chatters": 180,
+      "reaction_emojis": [
+        "\ud83c\udfce\ufe0f",
+        "\ud83d\udca8"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-04-crash",
@@ -175,7 +202,16 @@
       "location": "Biscayne Bay Bridge",
       "incident_type": "200MPH Highway Car Crash",
       "stream_time_formatted": "03:58:40 (Hour 4)",
-      "scheduled_publish_time": "2026-11-19 18:00:00"
+      "scheduled_publish_time": "2026-11-19 18:00:00",
+      "chat_burst_score": 10.2,
+      "peak_chatters": 490,
+      "reaction_emojis": [
+        "\ud83d\udca5",
+        "\ud83d\ude31"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-05-map",
@@ -204,7 +240,16 @@
       "location": "Everglades Swamps & Islands",
       "incident_type": "Secret Map Leak & Easter Egg",
       "stream_time_formatted": "05:12:15 (Hour 5)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 9.1,
+      "peak_chatters": 260,
+      "reaction_emojis": [
+        "\ud83d\uddfa\ufe0f",
+        "\ud83d\udc40"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-06-freakout",
@@ -233,7 +278,17 @@
       "location": "CarryisLive Streamer Facecam",
       "incident_type": "Streamer Scream Freakout",
       "stream_time_formatted": "06:24:50 (Hour 6)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 11.8,
+      "peak_chatters": 620,
+      "reaction_emojis": [
+        "\ud83d\udc51",
+        "\ud83d\udd25",
+        "\ud83d\ude02"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-07-shootout",
@@ -262,7 +317,16 @@
       "location": "Starlet Boulevard Boardwalk",
       "incident_type": "Beach SWAT Tactical Shootout",
       "stream_time_formatted": "07:18:30 (Hour 7)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 9.0,
+      "peak_chatters": 230,
+      "reaction_emojis": [
+        "\ud83d\udd2b",
+        "\ud83d\udea8"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-08-ai",
@@ -291,7 +355,16 @@
       "location": "Vice City Promenade",
       "incident_type": "Emergent Crowd AI Panic",
       "stream_time_formatted": "07:54:12 (Hour 8)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 8.2,
+      "peak_chatters": 160,
+      "reaction_emojis": [
+        "\ud83e\udd2f",
+        "\ud83d\udc80"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-09-heist",
@@ -320,7 +393,16 @@
       "location": "Little Haiti Bank Vault",
       "incident_type": "Co-op Story Heist Raid",
       "stream_time_formatted": "08:35:40 (Hour 9)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 9.5,
+      "peak_chatters": 310,
+      "reaction_emojis": [
+        "\ud83c\udf34",
+        "\ud83d\udcb0"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-10-graphics",
@@ -349,7 +431,16 @@
       "location": "Port Gellhorn Industrial Strip",
       "incident_type": "60FPS Raytracing Night Storm",
       "stream_time_formatted": "09:14:10 (Hour 9)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 8.7,
+      "peak_chatters": 195,
+      "reaction_emojis": [
+        "\u26a1",
+        "\u2728"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-inc-11-stunt",
@@ -378,7 +469,16 @@
       "location": "Mile-High Skyscraper Tower",
       "incident_type": "500ft Ramp Stunt Finale",
       "stream_time_formatted": "09:45:00 (Hour 10)",
-      "scheduled_publish_time": null
+      "scheduled_publish_time": null,
+      "chat_burst_score": 9.9,
+      "peak_chatters": 410,
+      "reaction_emojis": [
+        "\ud83d\ude80",
+        "\ud83d\udca5"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     },
     {
       "id": "clip-speed-01-crash",
@@ -407,7 +507,17 @@
       "location": "Los Santos Freeway",
       "incident_type": "300MPH Supercar Highway Collision",
       "stream_time_formatted": "01:36:00",
-      "scheduled_publish_time": "2026-11-19 13:00:00"
+      "scheduled_publish_time": "2026-11-19 13:00:00",
+      "chat_burst_score": 10.8,
+      "peak_chatters": 550,
+      "reaction_emojis": [
+        "\ud83d\ude31",
+        "\ud83d\udca5",
+        "\ud83d\udc80"
+      ],
+      "framing_mode": "fill_player_track",
+      "swear_masked": true,
+      "caption_position": "lower_third"
     }
   ]
 }

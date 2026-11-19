@@ -36,7 +36,7 @@ export interface Clip {
   virality_score: number;
   score_breakdown?: ScoreBreakdown;
   virality_reason?: string;
-  status: 'candidate' | 'rendering' | 'rendered' | 'published' | 'failed';
+  status: 'candidate' | 'rendering' | 'rendered' | 'published' | 'scheduled' | 'failed';
   output_path?: string;
   thumbnail_path?: string;
   location?: string;
@@ -45,9 +45,19 @@ export interface Clip {
   caption_style?: Record<string, any>;
   tags: string[];
   youtube_video_id?: string;
+  youtube_publish_time?: string | null;
   views_count: number;
   retention_rate: number;
   created_at: string;
+  chat_burst_score?: number;
+  peak_chatters?: number;
+  reaction_emojis?: string[];
+  framing_mode?: string;
+  swear_masked?: boolean;
+  caption_position?: string;
+  scheduled_publish_time?: string | null;
+  captions_data?: any;
+  updated_at?: string;
 }
 
 export interface Video {
@@ -55,6 +65,7 @@ export interface Video {
   title: string;
   source_type: 'upload' | 'youtube' | 'twitch' | 'livestream';
   source_url?: string;
+  file_path?: string;
   duration: number;
   fps: number;
   width: number;
@@ -68,6 +79,10 @@ export interface Video {
   created_at: string;
   transcript?: TranscriptSegment[];
   clips?: Clip[];
+  audio_metrics?: any;
+  scene_cuts?: any;
+  stream_chunk_count?: number;
+  updated_at?: string;
 }
 
 export interface RenderOptions {
@@ -83,6 +98,12 @@ export interface RenderOptions {
   split_screen?: boolean;
   split_layout?: string;
   hook_headline?: string;
+  framing_mode?: 'fill_player_track' | 'fit_blurred' | 'split_facecam';
+  lead_in_seconds?: number;
+  enable_swear_masking?: boolean;
+  caption_language?: 'auto' | 'en' | 'hinglish';
+  caption_position?: 'lower_third' | 'middle' | 'bottom';
+  gta_cams_evasion?: boolean;
 }
 
 export interface PublishPayload {

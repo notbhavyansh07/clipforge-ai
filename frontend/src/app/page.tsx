@@ -6,22 +6,22 @@ import { PlusCircle, Film, Radio, Clock, ArrowRight, Sparkles, RefreshCw, Trash2
 import IngestModal from '@/components/IngestModal';
 import { api } from '@/lib/api';
 import { Video } from '@/lib/types';
+import { INITIAL_VIDEOS } from '@/lib/seedData';
 
 export default function DashboardPage() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState<Video[]>(INITIAL_VIDEOS);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [retryingId, setRetryingId] = useState<string | null>(null);
 
   const fetchVideos = async () => {
     try {
-      setLoading(true);
       const data = await api.listVideos();
-      setVideos(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setVideos(data);
+      }
     } catch (e) {
       console.error('Error fetching videos:', e);
-    } finally {
-      setLoading(false);
     }
   };
 

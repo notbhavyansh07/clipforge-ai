@@ -95,3 +95,4 @@ def seed_database_if_empty():
         logger.error(f"Error seeding database: {e}")
     finally:
         db.close()
+
