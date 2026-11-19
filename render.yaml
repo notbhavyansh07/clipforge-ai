@@ -21,11 +21,15 @@ services:
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: npx next start -p $PORT
     envVars:
       - key: NODE_VERSION
         value: 20.0.0
+      - key: PORT
+        value: 10000
       - key: NEXT_PUBLIC_API_URL
+        value: https://clipforge-backend.onrender.com
+      - key: BACKEND_INTERNAL_URL
         fromService:
           type: web
           name: clipforge-backend
