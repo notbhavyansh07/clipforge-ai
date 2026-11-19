@@ -45,6 +45,17 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
 
   const downloadUrl = api.getClipStreamUrl(clip.id);
 
+  const handleSetPeakTime = (hours: number, minutes: number) => {
+    const d = new Date();
+    d.setHours(hours, minutes, 0, 0);
+    if (d.getTime() <= Date.now()) {
+      d.setDate(d.getDate() + 1);
+    }
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const formatted = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    setScheduledAt(formatted);
+  };
+
   const handleCopyTitle = () => {
     navigator.clipboard.writeText(title);
     setCopiedTitle(true);
@@ -225,17 +236,61 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
               </div>
             )}
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 mb-1 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                Schedule Publish Time (Optional)
-              </label>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Automated Peak Traffic Scheduler</span>
+                </label>
+                {scheduledAt && (
+                  <button
+                    type="button"
+                    onClick={() => setScheduledAt('')}
+                    className="text-[10px] text-gray-400 hover:text-white"
+                  >
+                    Clear schedule (Publish Now)
+                  </button>
+                )}
+              </div>
+
+              {/* 1-Click Peak Algorithmic Traffic Windows */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSetPeakTime(18, 0)}
+                  className="px-3 py-2 rounded-xl text-left bg-[#181b28] hover:bg-[#202438] border border-gray-700/80 hover:border-purple-500/60 transition group"
+                >
+                  <div className="text-[11px] font-bold text-white flex items-center justify-between">
+                    <span>🔥 6:00 PM IST</span>
+                    <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950 px-1 rounded">PEAK</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">Prime Evening Traffic Window</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSetPeakTime(20, 30)}
+                  className="px-3 py-2 rounded-xl text-left bg-[#181b28] hover:bg-[#202438] border border-gray-700/80 hover:border-purple-500/60 transition group"
+                >
+                  <div className="text-[11px] font-bold text-white flex items-center justify-between">
+                    <span>🌙 8:30 PM IST</span>
+                    <span className="text-[9px] font-mono text-purple-300 bg-purple-950 px-1 rounded">GAMING</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">Night Viral Engagement Rush</div>
+                </button>
+              </div>
+
               <input
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                className="w-full bg-[#181b28] border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white"
+                className="w-full bg-[#181b28] border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-500 transition"
               />
+              <p className="text-[10px] text-gray-400 leading-tight">
+                {scheduledAt
+                  ? `⚡ Autopilot daemon will upload this Short automatically at your selected time.`
+                  : `Publishing immediately without schedule.`}
+              </p>
             </div>
 
             {error && (
@@ -265,10 +320,20 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 transition flex items-center gap-2 shadow-lg shadow-red-600/30"
+                  className={`px-5 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition flex items-center gap-2 shadow-lg ${
+                    scheduledAt
+                      ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/30'
+                      : 'bg-red-600 hover:bg-red-700 shadow-red-600/30'
+                  }`}
                 >
                   {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>{loading ? 'Uploading Short...' : 'One-Click Publish'}</span>
+                  <span>
+                    {loading
+                      ? 'Processing...'
+                      : scheduledAt
+                      ? '📅 Schedule Autopilot Upload'
+                      : 'One-Click Publish Now'}
+                  </span>
                 </button>
               </div>
             </div>
