@@ -52,6 +52,10 @@ def update_clip(clip_id: str, payload: ClipUpdate, db: Session = Depends(get_db)
         clip.caption_style = payload.caption_style
     if payload.tags is not None:
         clip.tags = payload.tags
+    if payload.status is not None:
+        clip.status = payload.status
+    if payload.scheduled_publish_time is not None:
+        clip.scheduled_publish_time = payload.scheduled_publish_time
 
     db.commit()
     db.refresh(clip)

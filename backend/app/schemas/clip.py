@@ -45,6 +45,8 @@ class ClipUpdate(BaseModel):
     description: Optional[str] = None
     caption_style: Optional[Dict[str, Any]] = None
     tags: Optional[List[str]] = None
+    status: Optional[str] = None
+    scheduled_publish_time: Optional[str] = None
 
 class ClipRenderRequest(BaseModel):
     aspect_ratio: str = "9:16"
