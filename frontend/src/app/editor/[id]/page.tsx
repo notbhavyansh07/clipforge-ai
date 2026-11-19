@@ -21,6 +21,7 @@ import {
   Crop,
   Type,
   CheckCircle2,
+  Calendar,
   Eye,
   Sliders,
   Share2,
@@ -88,13 +89,111 @@ export default function ClipEditorPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const selectedClipRef = useRef<Clip | null>(null);
 
+  // Autopilot Video Scheduling state
+  const [isScheduleEnabled, setIsScheduleEnabled] = useState(false);
+  const [scheduledTimeInput, setScheduledTimeInput] = useState('');
+
   useEffect(() => {
     selectedClipRef.current = selectedClip;
     if (selectedClip) {
       setClipTitle(selectedClip.title || '');
       setClipHook(selectedClip.hook_text || '');
+
+      const isSched = selectedClip.status === 'scheduled' || !!selectedClip.scheduled_publish_time;
+      setIsScheduleEnabled(isSched);
+      if (selectedClip.scheduled_publish_time) {
+        const t = selectedClip.scheduled_publish_time.replace(' ', 'T').slice(0, 16);
+        setScheduledTimeInput(t);
+      } else {
+        const d = new Date();
+        d.setHours(18, 0, 0, 0);
+        if (d.getTime() <= Date.now()) d.setDate(d.getDate() + 1);
+        const pad = (n: number) => String(n).padStart(2, '0');
+        setScheduledTimeInput(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T18:00`);
+      }
     }
   }, [selectedClip]);
+
+  const handleToggleSchedule = async () => {
+    if (!selectedClip) return;
+    const nextState = !isScheduleEnabled;
+    setIsScheduleEnabled(nextState);
+    if (!nextState) {
+      const updated = await api.updateClip(selectedClip.id, {
+        status: 'rendered',
+        scheduled_publish_time: null,
+      });
+      setSelectedClip(updated);
+      setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    } else {
+      const timeStr = scheduledTimeInput.replace('T', ' ') + ':00';
+      const updated = await api.updateClip(selectedClip.id, {
+        status: 'scheduled',
+        scheduled_publish_time: timeStr,
+      });
+      setSelectedClip(updated);
+      setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    }
+  };
+
+  const handleSetScheduledPreset = async (hours: number, minutes: number) => {
+    if (!selectedClip) return;
+    const d = new Date();
+    d.setHours(hours, minutes, 0, 0);
+    if (d.getTime() <= Date.now()) d.setDate(d.getDate() + 1);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const inputVal = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(hours)}:${pad(minutes)}`;
+    setScheduledTimeInput(inputVal);
+    setIsScheduleEnabled(true);
+    const timeStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(hours)}:${pad(minutes)}:00`;
+    const updated = await api.updateClip(selectedClip.id, {
+      status: 'scheduled',
+      scheduled_publish_time: timeStr,
+    });
+    setSelectedClip(updated);
+    setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
+
+  const handleNudgeSchedule = async (deltaMinutes: number) => {
+    if (!selectedClip) return;
+    const current = scheduledTimeInput ? new Date(scheduledTimeInput) : new Date();
+    current.setMinutes(current.getMinutes() + deltaMinutes);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const inputVal = `${current.getFullYear()}-${pad(current.getMonth() + 1)}-${pad(current.getDate())}T${pad(current.getHours())}:${pad(current.getMinutes())}`;
+    setScheduledTimeInput(inputVal);
+    setIsScheduleEnabled(true);
+    const timeStr = `${current.getFullYear()}-${pad(current.getMonth() + 1)}-${pad(current.getDate())} ${pad(current.getHours())}:${pad(current.getMinutes())}:00`;
+    const updated = await api.updateClip(selectedClip.id, {
+      status: 'scheduled',
+      scheduled_publish_time: timeStr,
+    });
+    setSelectedClip(updated);
+    setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
+
+  const handleCustomTimeChange = async (val: string) => {
+    setScheduledTimeInput(val);
+    if (!selectedClip || !val) return;
+    setIsScheduleEnabled(true);
+    const timeStr = val.replace('T', ' ') + ':00';
+    const updated = await api.updateClip(selectedClip.id, {
+      status: 'scheduled',
+      scheduled_publish_time: timeStr,
+    });
+    setSelectedClip(updated);
+    setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
+
+  const handleTurnOffSchedule = async () => {
+    if (!selectedClip) return;
+    setIsScheduleEnabled(false);
+    const updated = await api.updateClip(selectedClip.id, {
+      status: 'rendered',
+      scheduled_publish_time: null,
+    });
+    setSelectedClip(updated);
+    setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+  };
 
   const handleSelectClip = (c: Clip) => {
     setSelectedClip(c);
@@ -664,6 +763,155 @@ export default function ClipEditorPage() {
               </div>
               <span className="text-emerald-400 font-mono text-[10px]">60FPS LANCZOS</span>
             </div>
+          </div>
+
+          {/* 3. Autopilot Video Scheduling & Traffic Window (Web On/Off & Time Adjuster) */}
+          <div className="bg-[#12141e] border border-gray-800/80 rounded-2xl p-5 space-y-4 shadow-lg">
+            <div className="flex items-center justify-between border-b border-gray-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-purple-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                  Autopilot Video Scheduling
+                </h3>
+              </div>
+
+              {/* Master Web Switch Toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold text-gray-400">
+                  {isScheduleEnabled ? (
+                    <span className="text-emerald-400">ON</span>
+                  ) : (
+                    <span className="text-gray-500">OFF</span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleToggleSchedule}
+                  className={`w-11 h-6 rounded-full transition-colors relative p-0.5 border ${
+                    isScheduleEnabled
+                      ? 'bg-purple-600 border-purple-400 shadow-md shadow-purple-600/30'
+                      : 'bg-gray-800 border-gray-700'
+                  }`}
+                  title={isScheduleEnabled ? 'Turn OFF scheduling' : 'Turn ON scheduling'}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white transition-transform ${
+                      isScheduleEnabled ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {!isScheduleEnabled ? (
+              <div className="p-3.5 rounded-xl bg-[#161824] border border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gray-500" />
+                    <span>Manual Mode (No Scheduling Active)</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400">
+                    Video scheduling is turned off. Clips publish or export immediately when you click Publish.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleToggleSchedule()}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white border border-purple-500/40 transition whitespace-nowrap self-start sm:self-auto"
+                >
+                  Enable Scheduling
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-300 font-semibold">Peak High-Traffic Windows:</span>
+                  <span className="text-emerald-400 font-mono text-[10px] font-bold bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded">
+                    AUTOPILOT UPLOAD QUEUE
+                  </span>
+                </div>
+
+                {/* 1-Click Peak Traffic Presets */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSetScheduledPreset(18, 0)}
+                    className="p-3 rounded-xl border border-gray-800 hover:border-purple-500/60 bg-[#161824] hover:bg-[#1f2235] text-left transition"
+                  >
+                    <div className="text-xs font-bold text-white flex items-center justify-between">
+                      <span>🔥 6:00 PM IST</span>
+                      <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950 px-1 py-0.5 rounded">PRIME</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400 mt-1">Evening Peak Audience Traffic</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSetScheduledPreset(20, 30)}
+                    className="p-3 rounded-xl border border-gray-800 hover:border-purple-500/60 bg-[#161824] hover:bg-[#1f2235] text-left transition"
+                  >
+                    <div className="text-xs font-bold text-white flex items-center justify-between">
+                      <span>🌙 8:30 PM IST</span>
+                      <span className="text-[9px] font-mono text-purple-300 bg-purple-950 px-1 py-0.5 rounded">GAMING</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400 mt-1">Night Live Session Engagement</div>
+                  </button>
+                </div>
+
+                {/* Custom Time Adjuster Input with Nudge Buttons */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between text-[11px] text-gray-400">
+                    <span className="font-semibold text-gray-300">Adjust Custom Schedule Time:</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleNudgeSchedule(-30)}
+                        className="px-2 py-0.5 rounded bg-[#1f2235] hover:bg-purple-600 text-gray-300 hover:text-white text-[10px] font-mono border border-gray-700/80 transition"
+                        title="Move back 30 minutes"
+                      >
+                        -30m
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleNudgeSchedule(30)}
+                        className="px-2 py-0.5 rounded bg-[#1f2235] hover:bg-purple-600 text-gray-300 hover:text-white text-[10px] font-mono border border-gray-700/80 transition"
+                        title="Move forward 30 minutes"
+                      >
+                        +30m
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleNudgeSchedule(60)}
+                        className="px-2 py-0.5 rounded bg-[#1f2235] hover:bg-purple-600 text-gray-300 hover:text-white text-[10px] font-mono border border-gray-700/80 transition"
+                        title="Move forward 1 hour"
+                      >
+                        +1h
+                      </button>
+                    </div>
+                  </div>
+
+                  <input
+                    type="datetime-local"
+                    value={scheduledTimeInput}
+                    onChange={(e) => handleCustomTimeChange(e.target.value)}
+                    className="w-full bg-[#181a27] border border-gray-700 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition font-mono"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-gray-800/80">
+                  <button
+                    type="button"
+                    onClick={handleTurnOffSchedule}
+                    className="text-xs font-semibold text-red-400 hover:text-red-300 transition"
+                  >
+                    Turn Off Scheduling (Cancel)
+                  </button>
+                  <span className="text-[10px] font-mono text-emerald-400">
+                    ● Autopilot Daemon Active
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 3. Word-Level Transcript Trimmer */}
