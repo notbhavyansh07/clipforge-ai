@@ -86,19 +86,47 @@ def stream_clip_video(clip_id: str, db: Session = Depends(get_db)):
     clip = db.query(Clip).filter(Clip.id == clip_id).first()
     if not clip:
         raise HTTPException(status_code=404, detail="Clip not found")
-        
-    if not clip.output_path or not os.path.exists(clip.output_path):
+
+    candidates = [
+        clip.output_path,
+        os.path.join("frontend", "public", clip.output_path.lstrip("/\\")) if clip.output_path else None,
+        os.path.join("clips", f"{clip_id}.mp4"),
+        os.path.join("frontend", "public", "clips", f"{clip_id}.mp4"),
+    ]
+    
+    found_path = None
+    for cand in candidates:
+        if cand and os.path.exists(cand):
+            found_path = cand
+            break
+
+    if not found_path:
         raise HTTPException(status_code=404, detail="Rendered clip file not found")
 
-    return FileResponse(clip.output_path, media_type="video/mp4", filename=f"{clip.title}.mp4")
+    return FileResponse(found_path, media_type="video/mp4", filename=f"{clip.title}.mp4")
 
 @router.get("/{clip_id}/thumbnail")
 def stream_clip_thumbnail(clip_id: str, db: Session = Depends(get_db)):
     clip = db.query(Clip).filter(Clip.id == clip_id).first()
-    if not clip or not clip.thumbnail_path or not os.path.exists(clip.thumbnail_path):
+    if not clip:
+        raise HTTPException(status_code=404, detail="Clip not found")
+
+    candidates = [
+        clip.thumbnail_path,
+        os.path.join("frontend", "public", clip.thumbnail_path.lstrip("/\\")) if clip.thumbnail_path else None,
+        os.path.join("clips", f"{clip_id}_thumb.jpg"),
+        os.path.join("frontend", "public", "clips", f"{clip_id}_thumb.jpg"),
+    ]
+    found_path = None
+    for cand in candidates:
+        if cand and os.path.exists(cand):
+            found_path = cand
+            break
+
+    if not found_path:
         raise HTTPException(status_code=404, detail="Thumbnail not found")
 
-    return FileResponse(clip.thumbnail_path, media_type="image/jpeg")
+    return FileResponse(found_path, media_type="image/jpeg")
 
 @router.post("/video/{video_id}/find-moment", response_model=ClipBase)
 def find_moment_by_prompt(video_id: str, payload: FindMomentRequest, db: Session = Depends(get_db)):

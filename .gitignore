@@ -52,7 +52,7 @@ clipforge.db
 
 # Heavy Media Files & Render Cache (Keep repo lightweight < 50MB)
 uploads/
-clips/
+/clips/
 scratch/
 temp/
 *.mp4

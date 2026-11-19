@@ -11,35 +11,29 @@ import {
   Youtube,
   Sparkles,
   Loader2,
-  Sliders,
-  Layers,
-  Eye,
-  CheckCircle2,
-  Search,
   Zap,
   Clock,
   Download,
   MapPin,
   Flame,
-  Filter,
-  Timer,
   PlusCircle,
   ArrowRight,
   Crop,
   Type,
-  Scissors,
+  CheckCircle2,
+  Eye,
+  Sliders,
+  Share2,
+  Maximize2,
+  Volume2,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
-import ViralityBreakdown from '@/components/ViralityBreakdown';
-import TranscriptTrimmer from '@/components/TranscriptTrimmer';
-import CaptionStyler from '@/components/CaptionStyler';
 import PublishModal from '@/components/PublishModal';
 import ClipGeneratorModal from '@/components/ClipGeneratorModal';
 import ClipCard from '@/components/ClipCard';
-import MultiTrackTimeline from '@/components/MultiTrackTimeline';
+import TranscriptTrimmer from '@/components/TranscriptTrimmer';
 import ComparisonPlayer from '@/components/ComparisonPlayer';
-import CinematicControls from '@/components/CinematicControls';
 import { INITIAL_VIDEOS, INITIAL_CLIPS } from '@/lib/seedData';
 
 export default function ClipEditorPage() {
@@ -47,9 +41,10 @@ export default function ClipEditorPage() {
 
   const initialVid = INITIAL_VIDEOS.find((v) => v.id === id) || null;
   const initialClipsList = INITIAL_CLIPS.filter((c) => c.video_id === id);
-  const initialSelected = initialClipsList.length > 0
-    ? [...initialClipsList].sort((a, b) => b.virality_score - a.virality_score)[0]
-    : null;
+  const initialSelected =
+    initialClipsList.length > 0
+      ? [...initialClipsList].sort((a, b) => b.virality_score - a.virality_score)[0]
+      : null;
 
   const [video, setVideo] = useState<Video | null>(initialVid);
   const [clips, setClips] = useState<Clip[]>(initialClipsList);
@@ -59,42 +54,16 @@ export default function ClipEditorPage() {
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [isGenModalOpen, setIsGenModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
-  const [editorSubTab, setEditorSubTab] = useState<'reframing' | 'captions' | 'virality' | 'transcript'>('reframing');
   const [showSafeZoneOverlay, setShowSafeZoneOverlay] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
-  const [streamFilter, setStreamFilter] = useState<'all' | 'h1_3' | 'h4_6' | 'h7_10' | 'top'>('all');
+  const [streamFilter, setStreamFilter] = useState<'all' | 'top' | 'crash' | 'drift'>('all');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const handleSelectClip = (c: Clip) => {
-    setSelectedClip(c);
-    const el = document.getElementById('studio-player');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    setTimeout(() => {
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
-      }
-    }, 200);
-  };
+  // Editable clip metadata
+  const [clipTitle, setClipTitle] = useState('');
+  const [clipHook, setClipHook] = useState('');
 
-  // Multi-track playback sync state
-  const [currentTime, setCurrentTime] = useState<number>(0);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const selectedClipRef = useRef<Clip | null>(null);
-
-  useEffect(() => {
-    selectedClipRef.current = selectedClip;
-  }, [selectedClip]);
-
-  // Prompt-to-Clip Moment Search
-  const [promptQuery, setPromptQuery] = useState('');
-  const [searchingMoment, setSearchingMoment] = useState(false);
-
-  // Auto-edit options including FilmCraft & HyperFrames & GTA-Auto-Clipper
+  // Pro Auto-edit presets (backend handles heavy execution)
   const [renderOptions, setRenderOptions] = useState<RenderOptions>({
     aspect_ratio: '9:16',
     framing_mode: 'split_facecam',
@@ -112,6 +81,37 @@ export default function ClipEditorPage() {
     enable_retention_bar: true,
     split_screen: true,
   });
+
+  // Playback sync state
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const selectedClipRef = useRef<Clip | null>(null);
+
+  useEffect(() => {
+    selectedClipRef.current = selectedClip;
+    if (selectedClip) {
+      setClipTitle(selectedClip.title || '');
+      setClipHook(selectedClip.hook_text || '');
+    }
+  }, [selectedClip]);
+
+  const handleSelectClip = (c: Clip) => {
+    setSelectedClip(c);
+    const el = document.getElementById('studio-player');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+        setIsPlaying(true);
+      }
+    }, 200);
+  };
 
   const loadData = async () => {
     try {
@@ -142,7 +142,7 @@ export default function ClipEditorPage() {
           setClips(updatedClips);
           if (selectedClipRef.current) {
             const matched = updatedClips.find((c) => c.id === selectedClipRef.current?.id);
-            if (matched && (matched.status !== selectedClipRef.current.status || matched.output_path !== selectedClipRef.current.output_path)) {
+            if (matched && matched.status !== selectedClipRef.current.status) {
               setSelectedClip(matched);
             }
           }
@@ -150,7 +150,7 @@ export default function ClipEditorPage() {
           // ignore background polling transient errors
         }
       }
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -163,772 +163,587 @@ export default function ClipEditorPage() {
 
   const handleSeek = (time: number) => {
     if (videoRef.current && selectedClip) {
-      const relTime = time >= selectedClip.start_time ? time - selectedClip.start_time : time;
-      videoRef.current.currentTime = Math.max(0, Math.min(relTime, selectedClip.duration));
-    }
-    setCurrentTime(time);
-  };
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    } else {
-      setIsPlaying(!isPlaying);
+      const relTime = Math.max(0, Math.min(selectedClip.duration, time - selectedClip.start_time));
+      videoRef.current.currentTime = relTime;
+      setCurrentTime(time);
     }
   };
 
-  const handleRender = async () => {
-    if (!selectedClip) return;
-    try {
-      setRendering(true);
-      await api.renderClip(selectedClip.id, renderOptions);
-      
-      const startTime = Date.now();
-      const pollTimer = setInterval(async () => {
-        try {
-          const updated = await api.getClip(selectedClip.id);
-          const isDone = (updated.status === 'rendered' || updated.status === 'published' || updated.status === 'failed') && (Date.now() - startTime > 2000);
-          if (isDone || Date.now() - startTime > 45000) {
-            clearInterval(pollTimer);
-            setSelectedClip(updated);
-            setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
-            setRendering(false);
-          }
-        } catch {
-          clearInterval(pollTimer);
-          setRendering(false);
-        }
-      }, 1500);
-    } catch (e: any) {
-      alert(`Render error: ${e.message}`);
-      setRendering(false);
-    }
-  };
-
-  const handleUpdateBoundaries = async (start: number, end: number) => {
+  const handleUpdateBoundaries = async (newStart: number, newEnd: number) => {
     if (!selectedClip) return;
     try {
       const updated = await api.updateClip(selectedClip.id, {
-        start_time: start,
-        end_time: end,
+        start_time: Math.round(newStart * 10) / 10,
+        end_time: Math.round(newEnd * 10) / 10,
+        duration: Math.round((newEnd - newStart) * 10) / 10,
       });
       setSelectedClip(updated);
       setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
     } catch (e) {
-      console.error(e);
+      console.error('Error updating clip boundaries:', e);
     }
   };
 
-  const handleFindMoment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!promptQuery.trim() || !id) return;
+  const handleSaveChanges = async () => {
+    if (!selectedClip) return;
     try {
-      setSearchingMoment(true);
-      const newClip = await api.findMomentByPrompt(id, promptQuery.trim());
-      setClips((prev) => [newClip, ...prev]);
-      setSelectedClip(newClip);
-      setPromptQuery('');
-    } catch (err: any) {
-      alert(`Moment search error: ${err.message}`);
+      setRendering(true);
+      const updated = await api.updateClip(selectedClip.id, {
+        title: clipTitle,
+        hook_text: clipHook,
+      });
+      setSelectedClip(updated);
+      setClips((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch (e) {
+      console.error('Failed to save clip edits:', e);
     } finally {
-      setSearchingMoment(false);
+      setRendering(false);
     }
   };
 
-  if (loading && !video) {
-    return <div className="text-center py-24 text-gray-400">Loading ClipForge Studio...</div>;
-  }
-
-  const sortedClips = [...clips].sort((a, b) => b.virality_score - a.virality_score);
-  const topClip = sortedClips.length > 0 ? sortedClips[0] : null;
+  const sortedClips = [...clips].sort((a, b) => (b.virality_score || 0) - (a.virality_score || 0));
+  const topClip = sortedClips[0];
 
   const displayedClips = sortedClips.filter((c) => {
-    if (streamFilter === 'h1_3') {
-      return (
-        c.stream_time_formatted?.includes('Hour 1') ||
-        c.stream_time_formatted?.includes('Hour 2') ||
-        c.stream_time_formatted?.includes('Hour 3')
-      );
-    }
-    if (streamFilter === 'h4_6') {
-      return (
-        c.stream_time_formatted?.includes('Hour 4') ||
-        c.stream_time_formatted?.includes('Hour 5') ||
-        c.stream_time_formatted?.includes('Hour 6')
-      );
-    }
-    if (streamFilter === 'h7_10') {
-      return (
-        c.stream_time_formatted?.includes('Hour 7') ||
-        c.stream_time_formatted?.includes('Hour 8') ||
-        c.stream_time_formatted?.includes('Hour 9') ||
-        c.stream_time_formatted?.includes('Hour 10')
-      );
-    }
-    if (streamFilter === 'top') {
-      return c.virality_score >= 98;
-    }
+    if (streamFilter === 'top') return (c.virality_score || 0) >= 98;
+    if (streamFilter === 'crash') return c.title.toLowerCase().includes('crash') || c.title.toLowerCase().includes('barrier');
+    if (streamFilter === 'drift') return c.title.toLowerCase().includes('drift') || c.title.toLowerCase().includes('wanted');
     return true;
   });
 
+  // Calculate clean video URL
+  const getVideoUrl = (clip: Clip | null) => {
+    if (!clip) return '';
+    if (clip.output_path) {
+      const clean = clip.output_path.replace(/^\/+/, '');
+      return `/${clean}`;
+    }
+    return `/api/v1/clips/${clip.id}/stream`;
+  };
+
+  const getPosterUrl = (clip: Clip | null) => {
+    if (!clip || !clip.thumbnail_path) return undefined;
+    const clean = clip.thumbnail_path.replace(/^\/+/, '');
+    return `/${clean}`;
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Top action & navigation bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+    <div className="space-y-6 pb-20">
+      {/* 1. Unslop Clean Header Navigation */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-800/80">
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="p-2 rounded-xl bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition"
+            className="p-2.5 rounded-xl bg-[#141624] hover:bg-[#1c1f32] text-gray-400 hover:text-white transition border border-gray-800 shadow-sm"
+            title="Return to Projects Dashboard"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-white line-clamp-1">{video?.title}</h1>
-            <p className="text-xs text-gray-400">
-              Source: <span className="uppercase text-gray-300 font-mono">{video?.source_type}</span> &bull; Status:{' '}
-              <span className="text-purple-400 font-semibold">{video?.status}</span>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg md:text-xl font-bold text-white tracking-tight">
+                {video?.title || 'Gaming Livestream Studio'}
+              </h1>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-800">
+                PRO ACTIVE
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Source: {video?.creator_name || 'Streamer'} • {video?.duration ? Math.round(video.duration / 60) : 10} min stream • {clips.length} viral Short moments identified
             </p>
           </div>
         </div>
 
-        {/* View Switcher Tabs */}
-        <div className="flex items-center gap-2 bg-[#12141e] p-1 rounded-xl border border-gray-800">
+        {/* Global Action Bar */}
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
-            onClick={() => setActiveTab('studio')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
-              activeTab === 'studio'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
+            onClick={() => setIsGenModalOpen(true)}
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white transition flex items-center gap-2 shadow-md shadow-purple-600/30"
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Studio View</span>
+            <PlusCircle className="w-4 h-4 text-purple-200" />
+            <span>Generate More Clips</span>
           </button>
-          <button
-            onClick={() => setActiveTab('compare')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
-              activeTab === 'compare'
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'text-gray-400 hover:text-gray-200'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>A/B Comparison Mode</span>
-          </button>
-        </div>
 
-        {selectedClip && (
-          <div className="flex items-center flex-wrap gap-2 sm:gap-3">
+          {selectedClip && (
             <button
-              onClick={() => setIsGenModalOpen(true)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 via-pink-600 to-purple-600 hover:opacity-95 text-white transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30"
+              onClick={() => setIsPublishOpen(true)}
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white transition flex items-center gap-2 shadow-md shadow-red-600/30"
             >
-              <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
-              <span>+ Generate More Clips</span>
+              <Youtube className="w-4 h-4" />
+              <span>Publish to Shorts</span>
             </button>
-
-            <button
-              onClick={handleRender}
-              disabled={rendering || selectedClip.status === 'rendering'}
-              className="px-5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition flex items-center gap-2 shadow-lg shadow-purple-600/30 disabled:opacity-50"
-            >
-              {rendering || selectedClip.status === 'rendering' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Rendering 9:16 Short...</span>
-                </>
-              ) : selectedClip.output_path ? (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Re-Render Short</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Render 9:16 Short</span>
-                </>
-              )}
-            </button>
-
-            {selectedClip.youtube_video_id && !selectedClip.youtube_video_id.startsWith('CF_') && (
-              <a
-                href={`https://youtube.com/shorts/${selectedClip.youtube_video_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition flex items-center gap-1.5 shadow-lg shadow-green-600/30"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>View on YouTube Shorts</span>
-              </a>
-            )}
-            {(selectedClip.status === 'rendered' || selectedClip.output_path) && (
-              <>
-                <a
-                  href={api.getClipStreamUrl(selectedClip.id)}
-                  download={`${selectedClip.title}.mp4`}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#1b1e2c] hover:bg-[#252a3d] border border-gray-700 text-white transition flex items-center gap-1.5 shadow-md"
-                >
-                  <Download className="w-4 h-4 text-purple-400" />
-                  <span>Download MP4</span>
-                </a>
-                <button
-                  onClick={() => setIsPublishOpen(true)}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-2 shadow-lg shadow-red-600/30"
-                >
-                  <Youtube className="w-4 h-4" />
-                  <span>Publish & Export</span>
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 🎮 GTA-AUTO-CLIPPER SYSTEM STATUS BANNER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-yellow-500/10 via-purple-500/10 to-emerald-500/10 border border-yellow-500/30 text-xs">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 font-bold border border-yellow-400/30 text-[11px]">
-            🎮 GTA GAMEPLAY VERIFIED
-          </span>
-          <span className="text-gray-300 text-xs">
-            YOLOX 9:16 Player-Centric Crop &bull; Facecam Evasion &bull; 6s Lead-In &bull; Swear-Masked Hinglish Subtitles
-          </span>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800 text-emerald-400 font-mono text-[10px] font-bold flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            REACH SAFE
-          </span>
-          <span className="font-mono text-[10px] text-yellow-400 bg-yellow-950/40 px-2 py-0.5 rounded border border-yellow-800">
-            BURST RADAR ACTIVE
-          </span>
+          )}
         </div>
       </div>
 
-      {/* 🚀 QUICK INCIDENT SWITCHER BAR (All 11 Moments) */}
+      {/* 2. Sleek Moment Switcher Ribbon (1-Click Instant Selector) */}
       {clips.length > 0 && (
-        <div className="bg-[#12141e] border border-purple-900/50 p-2.5 rounded-2xl shadow-xl flex items-center gap-2 overflow-x-auto">
-          <div className="flex items-center gap-1.5 px-3 py-1 text-xs font-black uppercase text-purple-300 tracking-wider whitespace-nowrap border-r border-gray-800">
-            <Sparkles className="w-4 h-4 text-yellow-400 animate-pulse" />
-            <span>All {clips.length} Clips:</span>
+        <div className="bg-[#10121c] border border-gray-800/90 p-2 rounded-2xl shadow-xl flex items-center gap-2 overflow-x-auto">
+          <div className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold uppercase text-purple-300 tracking-wider whitespace-nowrap border-r border-gray-800/80">
+            <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
+            <span>Moments ({clips.length})</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-nowrap">
             {sortedClips.map((c, idx) => {
               const isSelected = selectedClip?.id === c.id;
               return (
                 <button
                   key={c.id}
                   onClick={() => handleSelectClip(c)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-200 border ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all duration-200 border ${
                     isSelected
                       ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/40 scale-[1.02]'
-                      : 'bg-[#181a27] hover:bg-[#202334] text-gray-300 border-gray-800 hover:border-purple-500/40'
+                      : 'bg-[#151724] hover:bg-[#1e2133] text-gray-300 border-gray-800/80 hover:border-purple-500/40'
                   }`}
                 >
-                  <span className="font-mono text-[11px] opacity-70">#{idx + 1}</span>
-                  <span className="line-clamp-1 max-w-[150px] md:max-w-[200px]">{c.title}</span>
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-black font-mono ${
-                    c.virality_score >= 98
-                      ? 'bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/40'
-                      : 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/40'
-                  }`}>
+                  <span className="font-mono text-[10px] opacity-75">#{idx + 1}</span>
+                  <span className="line-clamp-1 max-w-[130px] md:max-w-[170px]">{c.title}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                      (c.virality_score || 0) >= 98
+                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                        : 'bg-purple-950 text-purple-300 border border-purple-800'
+                    }`}
+                  >
                     {c.virality_score}
                   </span>
                 </button>
               );
             })}
-
-            <button
-              onClick={() => setIsGenModalOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white flex items-center gap-1.5 whitespace-nowrap transition border border-purple-400 shadow-md shadow-purple-600/30 shrink-0"
-            >
-              <PlusCircle className="w-3.5 h-3.5 text-yellow-300" />
-              <span>+ Generate Clip</span>
-            </button>
           </div>
         </div>
       )}
 
-      {/* ⚡ DIRECT AI CLIP GENERATOR BANNER */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-900/40 via-[#161825] to-[#12141e] border border-purple-500/30 shadow-lg">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40">
-            <Sparkles className="w-4 h-4 text-yellow-300" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white flex items-center gap-2">
-              Generate More Viral Moments
-              <span className="text-[10px] text-emerald-400 font-mono font-normal">● 1-Click Autopilot &bull; 0 Typing Needed</span>
-            </h4>
-            <p className="text-[11px] text-gray-400">
-              Detect more moments from this stream automatically or slice custom timestamps directly in the studio.
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => setIsGenModalOpen(true)}
-          className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/20 shrink-0"
-        >
-          <Zap className="w-3.5 h-3.5 text-yellow-300" />
-          <span>Open AI Clip Generator</span>
-        </button>
-      </div>
-
-      {activeTab === 'compare' && selectedClip && video ? (
-        <ComparisonPlayer clip={selectedClip} video={video} />
-      ) : (
-        <>
-          {/* Main Studio Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Pro 9:16 Portrait Preview Player */}
-            <div id="studio-player" className="lg:col-span-5 flex flex-col items-center space-y-3.5 scroll-mt-24">
-              {/* Pro Studio Monitor Header */}
-              <div className="w-[300px] sm:w-[320px] flex items-center justify-between px-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-[11px] font-mono font-bold text-gray-300">
-                    1080 × 1920 • 60 FPS
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setShowSafeZoneOverlay(!showSafeZoneOverlay)}
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold font-mono transition border ${
-                      showSafeZoneOverlay
-                        ? 'bg-purple-600 text-white border-purple-400'
-                        : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
-                    }`}
-                    title="Toggle YouTube Shorts / TikTok UI Safe Area Overlay"
-                  >
-                    Safe Overlay
-                  </button>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800">
-                    PRO MASTER
-                  </span>
-                </div>
-              </div>
-
-              {/* 9:16 Canvas Chassis */}
-              <div className="relative w-[300px] sm:w-[320px] h-[534px] sm:h-[568px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-2xl flex items-center justify-center group">
-                {selectedClip?.output_path && (selectedClip.status === 'rendered' || selectedClip.status === 'published' || selectedClip.status === 'scheduled') ? (
-                  <video
-                    ref={videoRef}
-                    key={selectedClip.id + (selectedClip.output_path || '')}
-                    src={
-                      selectedClip.output_path
-                        ? selectedClip.output_path.startsWith('/')
-                          ? selectedClip.output_path
-                          : `/${selectedClip.output_path}`
-                        : api.getClipStreamUrl(selectedClip.id)
-                    }
-                    poster={selectedClip.thumbnail_path ? (selectedClip.thumbnail_path.startsWith('/') ? selectedClip.thumbnail_path : `/${selectedClip.thumbnail_path}`) : undefined}
-                    onTimeUpdate={handleTimeUpdate}
-                    playsInline
-                    controls
-                    preload="metadata"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (!target.src.includes('/stream')) {
-                        target.src = `/api/v1/clips/${selectedClip.id}/stream`;
-                      }
-                    }}
-                  />
-                ) : selectedClip?.thumbnail_path ? (
-                  <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
-                    <img
-                      src={selectedClip.thumbnail_path.startsWith('/') ? selectedClip.thumbnail_path : `/${selectedClip.thumbnail_path}`}
-                      alt={selectedClip.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 flex flex-col items-center justify-end p-5 text-center">
-                      <div className="p-2.5 rounded-full bg-purple-600/80 text-white shadow-lg mb-2">
-                        <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
-                      </div>
-                      <span className="text-xs font-bold text-white line-clamp-2">{selectedClip.title}</span>
-                      <span className="text-[10px] text-purple-300 mt-1 font-mono">
-                        {selectedClip.status === 'scheduled' ? 'Scheduled for YouTube Autopilot' : 'Ready to Render'}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center p-6 space-y-3">
-                    <VideoIcon className="w-10 h-10 text-purple-400 mx-auto opacity-70" />
-                    <div className="text-xs text-gray-300 font-semibold">9:16 Dynamic Framing Preview</div>
-                    <div className="text-[11px] text-gray-500 leading-tight">
-                      Click &ldquo;Render 9:16 Short&rdquo; to composite face-tracking, animated subtitles, and audio normalization.
-                    </div>
-                  </div>
-                )}
-
-                {/* Virality score floating pill */}
-                {selectedClip && (
-                  <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur border border-[#00FF66]/50 text-[#00FF66] text-xs font-black pointer-events-none z-20 flex items-center gap-1">
-                    <Zap className="w-3.5 h-3.5 fill-current" />
-                    <span>{selectedClip.virality_score} VIRAL</span>
-                  </div>
-                )}
-
-                {/* Optional Shorts/TikTok Safe-Zone Overlay */}
-                {showSafeZoneOverlay && (
-                  <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-4 border border-dashed border-cyan-400/60 bg-black/10">
-                    <div className="text-center bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 text-[10px] font-mono py-1 rounded">
-                      TOP HEADER SAFE ZONE (y: 0 - 200px)
-                    </div>
-                    <div className="flex-1 my-4 border border-dashed border-emerald-400/40 rounded flex items-center justify-center">
-                      <span className="text-[10px] font-mono text-emerald-300 bg-black/60 px-2 py-0.5 rounded">
-                        OPTIMAL SUBTITLE & ACTION SAFE AREA
-                      </span>
-                    </div>
-                    <div className="text-center bg-pink-950/80 border border-pink-500/60 text-pink-300 text-[10px] font-mono py-1 rounded">
-                      BOTTOM SHORTS UI OVERLAY (y: 1720 - 1920px)
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Timecode and Playback Controls */}
-              {selectedClip && (
-                <div className="w-[300px] sm:w-[320px] flex items-center justify-between text-xs text-gray-300 font-mono bg-[#141624] px-3.5 py-2 rounded-xl border border-gray-800">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-purple-300 font-bold">{currentTime.toFixed(1)}s</span>
-                    <span className="text-gray-500">/</span>
-                    <span>{selectedClip.duration}s</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {[1.0, 1.25, 1.5].map((rate) => (
-                      <button
-                        key={rate}
-                        type="button"
-                        onClick={() => {
-                          setPlaybackRate(rate);
-                          if (videoRef.current) videoRef.current.playbackRate = rate;
-                        }}
-                        className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-mono transition ${
-                          playbackRate === rate
-                            ? 'bg-purple-600 text-white'
-                            : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        {rate}x
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 1-Click Carry Split Screen Apply Button */}
+      {/* 3. Main Pro Studio Workstation (Hero Left + Clean Inspector Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Pro 9:16 Shorts Monitor */}
+        <div id="studio-player" className="lg:col-span-5 flex flex-col items-center space-y-3.5 scroll-mt-24">
+          {/* Monitor Chassis Header */}
+          <div className="w-[300px] sm:w-[320px] flex items-center justify-between px-1">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-mono font-bold text-gray-300">
+                1080 × 1920 • 60 FPS
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => {
-                  setRenderOptions({
-                    ...renderOptions,
-                    framing_mode: 'split_facecam',
-                    split_screen: true,
-                    caption_preset: 'karaoke_bold',
-                    enable_animated_captions: true,
-                    enable_face_tracking: true,
-                    enable_swear_masking: true,
-                    lead_in_seconds: 6,
-                    caption_position: 'lower_third',
-                  });
-                  alert('👑 Carry-Minati Pro Split Screen Preset Applied!\n• Stacked 1080x768 Streamer Facecam\n• 1080x1152 Gameplay Action\n• Neon Cyan Divider\n• Hormozi Karaoke Micro-Pops\n• 6s Lead-In Pre-Roll');
-                }}
-                className="w-[300px] sm:w-[320px] py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-amber-500/30 hover:from-purple-600 hover:to-pink-600 text-purple-200 hover:text-white border border-purple-500/40 hover:border-purple-300 transition-all flex items-center justify-center gap-2 shadow-sm"
+                onClick={() => setShowSafeZoneOverlay(!showSafeZoneOverlay)}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono transition border ${
+                  showSafeZoneOverlay
+                    ? 'bg-cyan-600 text-white border-cyan-400'
+                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
+                }`}
+                title="Toggle Shorts & TikTok UI Safe Area Overlay"
               >
-                <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                <span>Apply Carry-Style Pro Split (1-Click)</span>
+                Safe Zone
               </button>
-            </div>
-
-            {/* Right Column: Pro NLE Tabbed Editing Workstation */}
-            <div className="lg:col-span-7 space-y-4">
-              {/* Studio Tab Navigation */}
-              <div className="flex items-center gap-1 bg-[#12141e] p-1.5 rounded-2xl border border-gray-800 shadow-md overflow-x-auto">
-                <button
-                  type="button"
-                  onClick={() => setEditorSubTab('reframing')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
-                    editorSubTab === 'reframing'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
-                  }`}
-                >
-                  <Crop className="w-3.5 h-3.5 text-yellow-400" />
-                  <span>AI Framing & Split</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditorSubTab('captions')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
-                    editorSubTab === 'captions'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
-                  }`}
-                >
-                  <Type className="w-3.5 h-3.5 text-pink-400" />
-                  <span>Hormozi Subtitles</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditorSubTab('virality')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
-                    editorSubTab === 'virality'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
-                  }`}
-                >
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Virality & Burst</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEditorSubTab('transcript')}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
-                    editorSubTab === 'transcript'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
-                  }`}
-                >
-                  <Scissors className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Transcript Trimmer</span>
-                </button>
-              </div>
-
-              {/* Sub-Tab 1: Framing & Cinematic Controls */}
-              {editorSubTab === 'reframing' && (
-                <div className="animate-in fade-in duration-150">
-                  <CinematicControls options={renderOptions} onChange={setRenderOptions} />
-                </div>
-              )}
-
-              {/* Sub-Tab 2: Hormozi Subtitles & Styler */}
-              {editorSubTab === 'captions' && (
-                <div className="animate-in fade-in duration-150">
-                  <CaptionStyler options={renderOptions} onChange={setRenderOptions} />
-                </div>
-              )}
-
-              {/* Sub-Tab 3: Virality Breakdown Rubric */}
-              {editorSubTab === 'virality' && selectedClip && (
-                <div className="animate-in fade-in duration-150">
-                  <ViralityBreakdown
-                    score={selectedClip.virality_score}
-                    breakdown={selectedClip.score_breakdown}
-                    reason={selectedClip.virality_reason}
-                  />
-                </div>
-              )}
-
-              {/* Sub-Tab 4: Transcript Word Trimmer */}
-              {editorSubTab === 'transcript' && video?.transcript && selectedClip && (
-                <div className="animate-in fade-in duration-150">
-                  <TranscriptTrimmer
-                    transcript={video.transcript}
-                    startTime={selectedClip.start_time}
-                    endTime={selectedClip.end_time}
-                    currentTime={currentTime}
-                    onSetStartTime={(t) => handleUpdateBoundaries(t, selectedClip.end_time)}
-                    onSetEndTime={(t) => handleUpdateBoundaries(selectedClip.start_time, t)}
-                    onSeek={handleSeek}
-                  />
-                </div>
-              )}
+              <span className="text-[10px] font-mono text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800">
+                PRO MASTER
+              </span>
             </div>
           </div>
 
-          {/* FilmCraft Multi-Track NLE Timeline */}
-          {video && selectedClip && (
-            <div className="pt-2">
-              <MultiTrackTimeline
-                duration={video.duration || 180}
-                currentTime={currentTime}
+          {/* 9:16 Video Player Container */}
+          <div className="relative w-[300px] sm:w-[320px] h-[534px] sm:h-[568px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/40 shadow-2xl flex items-center justify-center group">
+            {selectedClip ? (
+              <video
+                ref={videoRef}
+                key={selectedClip.id}
+                src={getVideoUrl(selectedClip)}
+                poster={getPosterUrl(selectedClip)}
+                onTimeUpdate={handleTimeUpdate}
+                playsInline
+                controls
+                preload="auto"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  const fallback = `/api/v1/clips/${selectedClip.id}/stream`;
+                  if (!target.src.includes('/stream')) {
+                    target.src = fallback;
+                  }
+                }}
+              />
+            ) : (
+              <div className="text-center p-6 space-y-3">
+                <VideoIcon className="w-10 h-10 text-purple-400 mx-auto opacity-70" />
+                <div className="text-xs text-gray-300 font-semibold">No Clip Selected</div>
+              </div>
+            )}
+
+            {/* Virality Floating Metric */}
+            {selectedClip && (
+              <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur border border-emerald-500/50 text-emerald-400 text-xs font-black pointer-events-none z-20 flex items-center gap-1">
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>{selectedClip.virality_score} VIRAL</span>
+              </div>
+            )}
+
+            {/* Shorts / TikTok Safe-Zone Guides */}
+            {showSafeZoneOverlay && (
+              <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-4 border border-dashed border-cyan-400/60 bg-black/20">
+                <div className="text-center bg-cyan-950/90 border border-cyan-500/60 text-cyan-300 text-[10px] font-mono py-1 rounded">
+                  HEADER SAFE ZONE (y: 0 - 200px)
+                </div>
+                <div className="flex-1 my-4 border border-dashed border-emerald-400/40 rounded flex items-center justify-center">
+                  <span className="text-[10px] font-mono text-emerald-300 bg-black/80 px-2 py-0.5 rounded border border-emerald-800">
+                    SUBTITLE & REACTION FOCUS AREA
+                  </span>
+                </div>
+                <div className="text-center bg-pink-950/90 border border-pink-500/60 text-pink-300 text-[10px] font-mono py-1 rounded">
+                  SHORTS UI BUTTONS (y: 1720 - 1920px)
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Timecode Readout & Speed Selectors */}
+          {selectedClip && (
+            <div className="w-[300px] sm:w-[320px] flex items-center justify-between text-xs text-gray-300 font-mono bg-[#12141f] px-3.5 py-2 rounded-xl border border-gray-800/80">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-purple-400" />
+                <span className="text-purple-300 font-bold">{currentTime.toFixed(1)}s</span>
+                <span className="text-gray-500">/</span>
+                <span>{selectedClip.duration}s</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {[1.0, 1.25, 1.5].map((rate) => (
+                  <button
+                    key={rate}
+                    type="button"
+                    onClick={() => {
+                      setPlaybackRate(rate);
+                      if (videoRef.current) videoRef.current.playbackRate = rate;
+                    }}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-mono transition ${
+                      playbackRate === rate
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {rate}x
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Direct File Download & Shorts Export CTAs */}
+          {selectedClip && (
+            <div className="w-[300px] sm:w-[320px] flex flex-col gap-2">
+              <a
+                href={getVideoUrl(selectedClip)}
+                download={`${selectedClip.id}.mp4`}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#171a2a] hover:bg-[#20243b] text-gray-200 hover:text-white border border-gray-700/80 transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Download className="w-4 h-4 text-purple-400" />
+                <span>Download Master MP4 (1080p 60FPS)</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setIsPublishOpen(true)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white transition-all flex items-center justify-center gap-2 shadow-md shadow-red-600/20"
+              >
+                <Youtube className="w-4 h-4" />
+                <span>Publish Directly to YouTube Shorts</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column: Unslop Clean Studio Inspector */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* 1. Clip Overview & Virality Index (Clean, No Slop) */}
+          <div className="bg-[#12141e] border border-gray-800/80 rounded-2xl p-5 space-y-4 shadow-lg">
+            <div className="flex items-center justify-between border-b border-gray-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                  Clip Intelligence &amp; Title
+                </h3>
+              </div>
+              {selectedClip && (
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono font-bold text-emerald-400 bg-emerald-950/70 border border-emerald-800/80 px-2.5 py-0.5 rounded-full">
+                    {selectedClip.virality_score} / 100 Virality Index
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Editable Title */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-300">Short Title</label>
+              <input
+                type="text"
+                value={clipTitle}
+                onChange={(e) => setClipTitle(e.target.value)}
+                placeholder="Enter compelling Short title..."
+                className="w-full bg-[#181a27] border border-gray-800 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 outline-none transition"
+              />
+            </div>
+
+            {/* Editable Hook Line */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-300">Opening Hook Caption</label>
+              <input
+                type="text"
+                value={clipHook}
+                onChange={(e) => setClipHook(e.target.value)}
+                placeholder="e.g. SPEED WENT FLYING AT 300MPH! 💀"
+                className="w-full bg-[#181a27] border border-gray-800 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-xs text-yellow-300 font-semibold placeholder-gray-500 outline-none transition font-mono"
+              />
+            </div>
+
+            {/* Algorithmic Reason (Clean 1-liner) */}
+            {selectedClip?.virality_reason && (
+              <div className="p-3 rounded-xl bg-purple-950/20 border border-purple-900/30 text-xs text-purple-300/90 leading-relaxed flex items-start gap-2">
+                <Zap className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                <span>{selectedClip.virality_reason}</span>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-1">
+              <div className="text-[11px] text-gray-400 font-mono">
+                Duration: <span className="text-gray-200 font-bold">{selectedClip?.duration}s</span> • Window: {selectedClip?.start_time}s – {selectedClip?.end_time}s
+              </div>
+              <button
+                type="button"
+                onClick={handleSaveChanges}
+                disabled={rendering}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white transition flex items-center gap-1.5 shadow-sm"
+              >
+                {rendering ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Saved!</span>
+                  </>
+                ) : (
+                  <span>Save Edits</span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* 2. Pro Creative Framing & Captions (Clean One-Click Presets) */}
+          <div className="bg-[#12141e] border border-gray-800/80 rounded-2xl p-5 space-y-4 shadow-lg">
+            <div className="flex items-center justify-between border-b border-gray-800/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Crop className="w-4 h-4 text-yellow-400" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                  Framing &amp; Subtitle Style
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-gray-400">
+                1-Click Applied Automatically
+              </span>
+            </div>
+
+            {/* Layout Presets */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-300">Layout Format</label>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRenderOptions({
+                      ...renderOptions,
+                      framing_mode: 'split_facecam',
+                      split_screen: true,
+                    })
+                  }
+                  className={`p-3 rounded-xl border text-left transition ${
+                    renderOptions.split_screen
+                      ? 'border-purple-500 bg-purple-950/30 text-white ring-1 ring-purple-500/50'
+                      : 'border-gray-800 hover:border-gray-700 bg-[#161824] text-gray-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold flex items-center justify-between">
+                    <span>👑 Carry Split-Screen</span>
+                    {renderOptions.split_screen && (
+                      <span className="w-2 h-2 rounded-full bg-purple-400" />
+                    )}
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-1">
+                    Top streamer facecam + bottom 9:16 gameplay action with neon divider
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRenderOptions({
+                      ...renderOptions,
+                      framing_mode: 'fill_player_track',
+                      split_screen: false,
+                    })
+                  }
+                  className={`p-3 rounded-xl border text-left transition ${
+                    !renderOptions.split_screen
+                      ? 'border-purple-500 bg-purple-950/30 text-white ring-1 ring-purple-500/50'
+                      : 'border-gray-800 hover:border-gray-700 bg-[#161824] text-gray-300'
+                  }`}
+                >
+                  <div className="text-xs font-bold flex items-center justify-between">
+                    <span>🎬 9:16 Centered Focus</span>
+                    {!renderOptions.split_screen && (
+                      <span className="w-2 h-2 rounded-full bg-purple-400" />
+                    )}
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-1">
+                    Auto-pans player/vehicle and evades corner camera overlays
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Subtitle Style Presets */}
+            <div className="space-y-2 pt-2">
+              <label className="text-xs font-semibold text-gray-300">Subtitle Style</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  {
+                    id: 'karaoke_bold',
+                    name: 'Hormozi Gold',
+                    preview: 'TEXT',
+                    previewClass: 'bg-black text-yellow-300 font-black',
+                  },
+                  {
+                    id: 'neon_cyber',
+                    name: 'Cyber Neon',
+                    preview: 'GLITCH',
+                    previewClass: 'bg-emerald-950 text-emerald-400 font-black',
+                  },
+                  {
+                    id: 'minimal_white',
+                    name: 'Clean Minimal',
+                    preview: 'STORY',
+                    previewClass: 'bg-gray-900 text-white font-bold',
+                  },
+                ].map((st) => {
+                  const isSel = renderOptions.caption_preset === st.id;
+                  return (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() =>
+                        setRenderOptions({ ...renderOptions, caption_preset: st.id as any })
+                      }
+                      className={`p-2.5 rounded-xl border text-center transition ${
+                        isSel
+                          ? 'border-purple-500 bg-purple-950/40 text-white'
+                          : 'border-gray-800 hover:border-gray-700 bg-[#161824] text-gray-300'
+                      }`}
+                    >
+                      <div className={`py-1 text-xs rounded mb-1.5 ${st.previewClass}`}>
+                        {st.preview}
+                      </div>
+                      <div className="text-[11px] font-bold">{st.name}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Automated Backend Audio/Pacing Pipeline Info */}
+            <div className="pt-2 border-t border-gray-800/80 flex items-center justify-between text-[11px] text-gray-400">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>Backend Audio Pipeline: EBU R128 Normalized &bull; Swear Masked</span>
+              </div>
+              <span className="text-emerald-400 font-mono text-[10px]">60FPS LANCZOS</span>
+            </div>
+          </div>
+
+          {/* 3. Word-Level Transcript Trimmer */}
+          {video?.transcript && selectedClip && (
+            <div className="bg-[#12141e] border border-gray-800/80 rounded-2xl p-5 shadow-lg">
+              <TranscriptTrimmer
+                transcript={video.transcript}
                 startTime={selectedClip.start_time}
                 endTime={selectedClip.end_time}
-                isPlaying={isPlaying}
-                transcript={video.transcript || []}
-                onSeek={handleSeek}
+                currentTime={currentTime}
                 onSetStartTime={(t) => handleUpdateBoundaries(t, selectedClip.end_time)}
                 onSetEndTime={(t) => handleUpdateBoundaries(selectedClip.start_time, t)}
-                onTogglePlay={togglePlay}
+                onSeek={handleSeek}
               />
             </div>
           )}
-        </>
-      )}
-
-      {/* Candidate Clips Shelf & AI Virality Decision */}
-      <div className="pt-6 border-t border-gray-800 space-y-4">
-        {/* AI Virality Decision Banner */}
-        {topClip && (
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-950/40 via-[#131627] to-amber-950/20 border border-yellow-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 flex items-center gap-1">
-                  👑 AI VIRALITY DECISION WINNER
-                </span>
-                <span className="text-xs font-mono text-purple-300 font-bold">
-                  Score: {topClip.virality_score} / 100
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                {topClip.title}
-              </h3>
-              <p className="text-xs text-gray-400 max-w-2xl">
-                {topClip.virality_reason}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setSelectedClip(topClip)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-gray-800 hover:bg-gray-700 text-white transition"
-              >
-                Inspect in Studio
-              </button>
-              {topClip.status === 'published' ? (
-                <a
-                  href={topClip.youtube_video_id ? `https://youtube.com/shorts/${topClip.youtube_video_id}` : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition flex items-center gap-1.5 shadow-lg shadow-green-600/20"
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>View on YouTube Shorts</span>
-                </a>
-              ) : (
-                <button
-                  onClick={() => {
-                    setSelectedClip(topClip);
-                    setIsPublishOpen(true);
-                  }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition flex items-center gap-1.5 shadow-lg shadow-red-600/30"
-                >
-                  <Youtube className="w-4 h-4" />
-                  <span>1-Click Upload Winner</span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Wayin-Style AI Prompt-to-Clip Moment Finder */}
-        <div className="p-4 rounded-2xl bg-[#12141e] border border-purple-500/30 shadow-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              <h3 className="text-xs font-bold uppercase tracking-wider text-white">
-                Wayin-Style AI Prompt Moment Finder
-              </h3>
-            </div>
-            <span className="text-[10px] text-gray-400 font-mono">NATURAL LANGUAGE SEARCH</span>
-          </div>
-          <form onSubmit={handleFindMoment} className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="e.g. Find the crazy car crash, streamer screaming reaction, or physics engine shock..."
-                value={promptQuery}
-                onChange={(e) => setPromptQuery(e.target.value)}
-                className="w-full bg-[#161824] border border-gray-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={searchingMoment || !promptQuery.trim()}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white transition flex items-center gap-2 shadow-lg shadow-purple-600/30 disabled:opacity-50"
-            >
-              {searchingMoment ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Scanning Stream...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Find & Generate Clip</span>
-                </>
-              )}
-            </button>
-          </form>
         </div>
+      </div>
 
+      {/* 4. Stream Moments Grid (All Incidents With True 9:16 Shorts Previews) */}
+      <div className="pt-8 border-t border-gray-800/80 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <span>10-Hour Live Stream Incident Matrix</span>
-              <span className="px-2 py-0.5 rounded-full text-xs font-mono bg-purple-950 border border-purple-800 text-purple-300">
-                {displayedClips.length} of {sortedClips.length} Clips
+              <span>All Viral Moments for this Stream</span>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-purple-950/80 border border-purple-800 text-purple-300">
+                {displayedClips.length} Clips
               </span>
             </h2>
-            <p className="text-xs text-gray-400">
-              Categorized by live stream timestamp, map location &amp; viral incident type
+            <p className="text-xs text-gray-400 mt-0.5">
+              Click any card to immediately load, preview, and edit in the studio monitor above.
             </p>
           </div>
 
-          {/* 10-Hour Timeline Filter Pills */}
-          <div className="flex items-center gap-1.5 flex-wrap bg-[#12141e] p-1 rounded-xl border border-gray-800">
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 bg-[#12141e] p-1 rounded-xl border border-gray-800/80">
             <button
               onClick={() => setStreamFilter('all')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 streamFilter === 'all'
-                  ? 'bg-purple-600 text-white shadow-md'
+                  ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
-              All Moments ({sortedClips.length})
-            </button>
-            <button
-              onClick={() => setStreamFilter('h1_3')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                streamFilter === 'h1_3'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              Hour 1-3 (Reveal & Pursuits)
-            </button>
-            <button
-              onClick={() => setStreamFilter('h4_6')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                streamFilter === 'h4_6'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              Hour 4-6 (Crashes & Freakouts)
-            </button>
-            <button
-              onClick={() => setStreamFilter('h7_10')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                streamFilter === 'h7_10'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              Hour 7-10 (Heists & Finale)
+              All ({sortedClips.length})
             </button>
             <button
               onClick={() => setStreamFilter('top')}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 streamFilter === 'top'
-                  ? 'bg-emerald-600 text-white shadow-md'
+                  ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-emerald-400'
               }`}
             >
-              🔥 Top 98+ Virality
+              🔥 Top 98+
+            </button>
+            <button
+              onClick={() => setStreamFilter('crash')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+                streamFilter === 'crash'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              💥 Crashes
+            </button>
+            <button
+              onClick={() => setStreamFilter('drift')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+                streamFilter === 'drift'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              🏎️ Drifts
             </button>
           </div>
         </div>
 
+        {/* 4-Column Grid with True 9:16 Shorts Aspect Ratio */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {displayedClips.map((clip) => (
             <ClipCard
@@ -957,7 +772,7 @@ export default function ClipEditorPage() {
         />
       )}
 
-      {/* AI Clip Generator Modal (No Prompt Needed) */}
+      {/* AI Clip Generator Modal */}
       {video && (
         <ClipGeneratorModal
           video={video}
@@ -966,6 +781,8 @@ export default function ClipEditorPage() {
           onClipCreated={(newClip) => {
             setClips((prev) => [newClip, ...prev.filter((c) => c.id !== newClip.id)]);
             setSelectedClip(newClip);
+            const el = document.getElementById('studio-player');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
         />
       )}
