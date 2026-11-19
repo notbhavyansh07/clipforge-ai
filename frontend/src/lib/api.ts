@@ -246,7 +246,7 @@ export const api = {
   },
 
   getClipStreamUrl(clipId: string): string {
-    return `${BASE_URL}/clips/${clipId}/stream`;
+    return `/clips/${clipId}.mp4`;
   },
 
   async findMomentByPrompt(videoId: string, query: string): Promise<Clip> {

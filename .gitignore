@@ -67,6 +67,7 @@ temp/
 *.png
 !frontend/public/**
 !frontend/public/clips/**
+!frontend/public/clips/*.mp4
 
 # Binary Executables
 ffmpeg.exe

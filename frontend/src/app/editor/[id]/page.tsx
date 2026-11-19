@@ -431,8 +431,14 @@ export default function ClipEditorPage() {
                     onTimeUpdate={handleTimeUpdate}
                     playsInline
                     controls
-                    autoPlay
+                    preload="metadata"
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.includes('/stream')) {
+                        target.src = `/api/v1/clips/${selectedClip.id}/stream`;
+                      }
+                    }}
                   />
                 ) : selectedClip?.thumbnail_path ? (
                   <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
