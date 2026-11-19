@@ -792,7 +792,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "location": "Biscayne Bay Bridge",
     "incident_type": "200MPH Highway Car Crash",
     "stream_time_formatted": "03:58:40 (Hour 4)",
-    "scheduled_publish_time": "2026-11-19 18:00:00",
+    "scheduled_publish_time": null,
     "chat_burst_score": 10.2,
     "peak_chatters": 490,
     "reaction_emojis": [
@@ -1203,11 +1203,12 @@ export const INITIAL_CLIPS: Clip[] = [
       "trend": 100.0
     },
     "virality_reason": "Peak viral scream and violent vehicle ragdoll ejection with explosive emotional reaction.",
-    "status": "rendered",
+    "status": "published",
     "output_path": "clips/clip-speed-01-crash.mp4",
     "thumbnail_path": "/clips/clip-speed-01-crash_thumb.jpg",
     "captions_data": "[{\"word\": \"WATCH OUT\", \"start\": 0.0, \"end\": 1.0}, {\"word\": \"HE IS FLYING\", \"start\": 1.0, \"end\": 2.0}, {\"word\": \"AT 300 MPH!\", \"start\": 2.0, \"end\": 3.0}, {\"word\": \"BOOOOOM!\", \"start\": 4.2, \"end\": 5.5}, {\"word\": \"WHAT DID I DO?!\", \"start\": 5.5, \"end\": 7.0}]",
-    "youtube_video_id": "CF_SPEED_01",
+    "youtube_video_id": "9HCuh7AmGzQ",
+    "youtube_publish_time": "2026-11-19T13:06:41Z",
     "location": "High-Speed Oval Circuit",
     "incident_type": "300MPH Violent Vehicle Crash",
     "stream_time_formatted": "01:36:00 (Minute 96)",

@@ -414,7 +414,7 @@ export const api = {
 
     const allClips = getStoredClips();
     const idx = allClips.findIndex((c) => c.id === payload.clip_id);
-    const defaultYtId = payload.clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : 'bzN0Z8dzUu8';
+    const defaultYtId = payload.clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : '9HCuh7AmGzQ';
 
     if (idx !== -1) {
       allClips[idx].status = 'published';

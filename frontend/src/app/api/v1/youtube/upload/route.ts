@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const clipIndex = INITIAL_CLIPS.findIndex((c) => c.id === clip_id);
     const existing = clipIndex !== -1 ? INITIAL_CLIPS[clipIndex] : null;
 
-    const ytId = existing?.youtube_video_id || (clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : 'bzN0Z8dzUu8');
+    const ytId = existing?.youtube_video_id || (clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : '9HCuh7AmGzQ');
     const ytUrl = `https://youtube.com/shorts/${ytId}`;
 
     if (existing) {
