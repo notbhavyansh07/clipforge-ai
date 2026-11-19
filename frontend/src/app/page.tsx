@@ -19,9 +19,12 @@ export default function DashboardPage() {
       const data = await api.listVideos();
       if (Array.isArray(data) && data.length > 0) {
         setVideos(data);
+      } else {
+        setVideos(INITIAL_VIDEOS);
       }
     } catch (e) {
       console.error('Error fetching videos:', e);
+      setVideos(INITIAL_VIDEOS);
     }
   };
 
