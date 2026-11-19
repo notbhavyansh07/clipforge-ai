@@ -1,6 +1,16 @@
 import { Video, Clip, RenderOptions, PublishPayload } from './types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// In the browser, use relative '/api/v1' so Next.js proxies cleanly without CORS issues.
+// On the server, use BACKEND_INTERNAL_URL or fallback to localhost.
+const BASE_URL = typeof window !== 'undefined'
+  ? '/api/v1'
+  : (process.env.BACKEND_INTERNAL_URL
+      ? (process.env.BACKEND_INTERNAL_URL.startsWith('http') 
+          ? process.env.BACKEND_INTERNAL_URL.replace(/\/$/, '') 
+          : `http://${process.env.BACKEND_INTERNAL_URL}`) + '/api/v1'
+      : (process.env.NEXT_PUBLIC_API_URL 
+          ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
+          : 'http://localhost:8000/api/v1'));
 
 export const api = {
   // Video endpoints

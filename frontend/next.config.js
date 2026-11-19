@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
-const backendUrl = process.env.BACKEND_INTERNAL_URL 
-  ? (process.env.BACKEND_INTERNAL_URL.startsWith('http') ? process.env.BACKEND_INTERNAL_URL : `http://${process.env.BACKEND_INTERNAL_URL}`)
-  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000');
+const rawBackend = process.env.BACKEND_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const backendUrl = rawBackend.startsWith('http://') || rawBackend.startsWith('https://') 
+  ? rawBackend.replace(/\/$/, '') 
+  : `http://${rawBackend.replace(/\/$/, '')}`;
 
 const nextConfig = {
   reactStrictMode: true,
@@ -16,4 +17,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
-
