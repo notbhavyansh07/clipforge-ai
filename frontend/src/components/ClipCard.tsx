@@ -82,6 +82,27 @@ export default function ClipCard({ clip, isChampion, onSelect, onPublishClick }:
           </span>
         </div>
 
+        {/* High-Resolution Thumbnail Preview Banner */}
+        {clip.thumbnail_path && (
+          <div
+            onClick={() => onSelect(clip)}
+            className="relative w-full h-32 rounded-xl overflow-hidden bg-black/60 border border-gray-800 group-hover:border-purple-500/50 transition cursor-pointer"
+          >
+            <img
+              src={clip.thumbnail_path.startsWith('/') ? clip.thumbnail_path : `/${clip.thumbnail_path}`}
+              alt={clip.title}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] font-bold text-white">
+              <span className="truncate max-w-[200px] text-yellow-300">{clip.hook_text || clip.title}</span>
+              <span className="bg-purple-950/80 border border-purple-700/60 backdrop-blur px-2 py-0.5 rounded text-[10px] text-purple-300 font-mono">
+                {clip.duration}s
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Title and Hook */}
         <div>
           <h4 className="font-bold text-sm text-white line-clamp-2 group-hover:text-purple-300 transition-colors">

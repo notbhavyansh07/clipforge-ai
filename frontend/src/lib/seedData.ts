@@ -607,7 +607,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Immediate high-dopamine trailer hook featuring Vice City neon palm trees and massive initial viewer curiosity.",
     "status": "rendered",
     "output_path": "clips/clip-inc-01-reveal.mp4",
-    "thumbnail_path": "clips/clip-inc-01-reveal_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-01-reveal_thumb.jpg",
     "captions_data": "[{\"word\": \"FINALLY\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"AAYA REVEAL! \\ud83d\\udd25\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"BHAI DEKHO\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"VICE CITY! \\ud83c\\udf34\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"PURA SYSTEM\", \"start\": 3.3, \"end\": 4.2}, {\"word\": \"HILA DIYA!\", \"start\": 4.2, \"end\": 5.1}, {\"word\": \"12 YEARS KA\", \"start\": 5.1, \"end\": 6.0}, {\"word\": \"WAIT OVER! \\u23f3\", \"start\": 6.0, \"end\": 7.0}, {\"word\": \"GRAPHICS IS\", \"start\": 7.0, \"end\": 8.0}, {\"word\": \"SUPER REAL!\", \"start\": 8.0, \"end\": 9.0}, {\"word\": \"NEON LIGHTS\", \"start\": 9.0, \"end\": 10.2}, {\"word\": \"4K DETAIL! \\u2728\", \"start\": 10.2, \"end\": 11.2}, {\"word\": \"ROCKSTAR LEVEL\", \"start\": 11.2, \"end\": 12.5}, {\"word\": \"HISTORY MADE! \\ud83d\\udc51\", \"start\": 12.5, \"end\": 13.8}, {\"word\": \"SUBSCRIBE NOW\", \"start\": 13.8, \"end\": 14.5}, {\"word\": \"FOR MORE! \\ud83d\\udc4d\", \"start\": 14.5, \"end\": 15.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -661,7 +661,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "High-velocity 5-star police evasion with tight corner drift and near-miss crashes.",
     "status": "rendered",
     "output_path": "clips/clip-inc-02-chase.mp4",
-    "thumbnail_path": "clips/clip-inc-02-chase_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-02-chase_thumb.jpg",
     "captions_data": "[{\"word\": \"5-STAR\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"WANTED LEVEL! \\ud83d\\udea8\", \"start\": 0.7, \"end\": 1.4}, {\"word\": \"PURA POLICE\", \"start\": 1.4, \"end\": 2.3}, {\"word\": \"PEECHE HAI! \\ud83d\\ude93\", \"start\": 2.3, \"end\": 3.2}, {\"word\": \"BHAI GADI\", \"start\": 3.2, \"end\": 4.1}, {\"word\": \"DRIFT CHECK! \\u26a1\", \"start\": 4.1, \"end\": 5.0}, {\"word\": \"ALMOST THOK\", \"start\": 5.0, \"end\": 6.0}, {\"word\": \"DIYA THA! \\ud83d\\ude31\", \"start\": 6.0, \"end\": 7.0}, {\"word\": \"SURVIVE KAISE\", \"start\": 7.0, \"end\": 8.2}, {\"word\": \"KIYA BHAI?! \\ud83e\\udd2f\", \"start\": 8.2, \"end\": 9.5}, {\"word\": \"POLICE CLOWNED\", \"start\": 9.5, \"end\": 11.0}, {\"word\": \"COMPLETELY! \\ud83d\\ude02\", \"start\": 11.0, \"end\": 12.5}, {\"word\": \"PRO DRIVER\", \"start\": 12.5, \"end\": 14.5}, {\"word\": \"VIBES ALWAYS! \\ud83d\\udd76\\ufe0f\", \"start\": 14.5, \"end\": 16.0}, {\"word\": \"DROP A LIKE\", \"start\": 16.0, \"end\": 16.8}, {\"word\": \"AND SHARE! \\u2764\\ufe0f\", \"start\": 16.8, \"end\": 17.5}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -715,7 +715,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Speedometer max-out test with realistic motion blur, engine roar, and near-miss vehicle overtakes.",
     "status": "rendered",
     "output_path": "clips/clip-inc-03-nitro.mp4",
-    "thumbnail_path": "clips/clip-inc-03-nitro_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-03-nitro_thumb.jpg",
     "captions_data": "[{\"word\": \"SPEEDOMETER\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"DEKHO BHAI!\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"250 SPEED\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"PAR GADI! \\ud83c\\udfce\\ufe0f\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"NITRO BOOST\", \"start\": 3.3, \"end\": 4.2}, {\"word\": \"ACTIVATED! \\u26a1\", \"start\": 4.2, \"end\": 5.2}, {\"word\": \"ENGINE SOUND\", \"start\": 5.2, \"end\": 6.2}, {\"word\": \"EAR CANDY! \\ud83d\\udd0a\", \"start\": 6.2, \"end\": 7.3}, {\"word\": \"INCH CLOSE\", \"start\": 7.3, \"end\": 8.5}, {\"word\": \"DODGE KIYA! \\ud83d\\ude31\", \"start\": 8.5, \"end\": 9.8}, {\"word\": \"HANDLING IS\", \"start\": 9.8, \"end\": 11.2}, {\"word\": \"PURE BUTTER! \\ud83e\\uddc8\", \"start\": 11.2, \"end\": 13.0}, {\"word\": \"VICE CITY\", \"start\": 13.0, \"end\": 14.2}, {\"word\": \"ROAD RULER! \\ud83d\\udc51\", \"start\": 14.2, \"end\": 15.5}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -769,7 +769,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Unprecedented 200MPH collision showing realistic vehicle deformation and ragdoll physics.",
     "status": "scheduled",
     "output_path": "clips/clip-inc-04-crash.mp4",
-    "thumbnail_path": "clips/clip-inc-04-crash_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-04-crash_thumb.jpg",
     "captions_data": "[{\"word\": \"200 KI SPEED\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"PE UDAYA! \\ud83c\\udfce\\ufe0f\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"SAMNE DEKHO\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"SAMNE DEKHO! \\ud83d\\udea8\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"BRAKE MAAR\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"OH BHAI GAYA! \\ud83d\\udc80\", \"start\": 4.3, \"end\": 5.4}, {\"word\": \"BOOOOOM!\", \"start\": 5.4, \"end\": 6.5}, {\"word\": \"CRASH HO GAYA! \\ud83d\\udca5\", \"start\": 6.5, \"end\": 7.6}, {\"word\": \"CAR HAWA MEIN\", \"start\": 7.6, \"end\": 8.8}, {\"word\": \"3 FLIPS LIYE! \\ud83c\\udf2a\\ufe0f\", \"start\": 8.8, \"end\": 10.0}, {\"word\": \"BODY DAMAGE\", \"start\": 10.0, \"end\": 11.5}, {\"word\": \"MODEL DEKHO! \\ud83d\\ude97\", \"start\": 11.5, \"end\": 13.2}, {\"word\": \"KAISE BACHA\", \"start\": 13.2, \"end\": 14.5}, {\"word\": \"BHAI AAKHIR?! \\ud83d\\ude31\", \"start\": 14.5, \"end\": 15.8}, {\"word\": \"RATE CRASH\", \"start\": 15.8, \"end\": 16.5}, {\"word\": \"1 TO 10! \\ud83d\\udc47\", \"start\": 16.5, \"end\": 17.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -823,7 +823,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Curiosity gap breakdown revealing Vice City map scale 2.5x larger than Los Santos with secret islands.",
     "status": "rendered",
     "output_path": "clips/clip-inc-05-map.mp4",
-    "thumbnail_path": "clips/clip-inc-05-map_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-05-map_thumb.jpg",
     "captions_data": "[{\"word\": \"MAP DEKHO\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"PURAY STATE KA! \\ud83d\\uddfa\\ufe0f\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"2.5X LARGER\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"THAN GTA 5! \\ud83e\\udd2f\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"SECRET ISLANDS\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"CONFIRMED HAI! \\ud83c\\udfdd\\ufe0f\", \"start\": 4.3, \"end\": 5.3}, {\"word\": \"BUILDINGS OPEN\", \"start\": 5.3, \"end\": 6.4}, {\"word\": \"TO ENTER! \\ud83c\\udfe2\", \"start\": 6.4, \"end\": 7.6}, {\"word\": \"EVERGLADES MEIN\", \"start\": 7.6, \"end\": 8.9}, {\"word\": \"ALLIGATORS HAI! \\ud83d\\udc0a\", \"start\": 8.9, \"end\": 10.2}, {\"word\": \"DETAIL LEVEL\", \"start\": 10.2, \"end\": 11.8}, {\"word\": \"IS UNMATCHED! \\u26a1\", \"start\": 11.8, \"end\": 13.2}, {\"word\": \"ARE YOU\", \"start\": 13.2, \"end\": 14.2}, {\"word\": \"READY FOR THIS?! \\ud83d\\udd25\", \"start\": 14.2, \"end\": 15.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -877,7 +877,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "#1 HIGHEST VIRAL MOMENT: Ear-splitting reaction burst with hands on head, pure emotional entertainment.",
     "status": "published",
     "output_path": "clips/clip-inc-06-freakout.mp4",
-    "thumbnail_path": "clips/clip-inc-06-freakout_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-06-freakout_thumb.jpg",
     "captions_data": "[{\"word\": \"BHAI BHAI BHAI\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"YEH KYA HAI?! \\ud83d\\ude31\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"ARE YOU\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"SERIOUS BRO?! \\ud83d\\udd25\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"ROCKSTAR NE\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"COOK KAR DIYA! \\ud83d\\udc68\\u200d\\ud83c\\udf73\", \"start\": 4.3, \"end\": 5.3}, {\"word\": \"GRAPHICS DEKHO\", \"start\": 5.3, \"end\": 6.3}, {\"word\": \"YAAR ISKE! \\u2728\", \"start\": 6.3, \"end\": 7.4}, {\"word\": \"REALITY SE\", \"start\": 7.4, \"end\": 8.6}, {\"word\": \"BHI ZYADA REAL! \\ud83c\\udf34\", \"start\": 8.6, \"end\": 10.0}, {\"word\": \"MY JAW\", \"start\": 10.0, \"end\": 11.5}, {\"word\": \"DROPPED BC! \\ud83d\\udc80\", \"start\": 11.5, \"end\": 13.2}, {\"word\": \"GAME OF THE\", \"start\": 13.2, \"end\": 15.0}, {\"word\": \"DECADE HAI YEH! \\ud83d\\udc51\", \"start\": 15.0, \"end\": 16.5}, {\"word\": \"DROP A LIKE\", \"start\": 16.5, \"end\": 17.2}, {\"word\": \"RIGHT NOW! \\ud83d\\udc4d\", \"start\": 17.2, \"end\": 18.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -935,7 +935,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Dynamic cover-shooting mechanics, muzzle flash lighting reflections, and tactical swat team AI.",
     "status": "rendered",
     "output_path": "clips/clip-inc-07-shootout.mp4",
-    "thumbnail_path": "clips/clip-inc-07-shootout_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-07-shootout_thumb.jpg",
     "captions_data": "[{\"word\": \"SWAT TEAM\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"ARRIVED HERE! \\ud83d\\udea8\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"FIRING STARTED\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"ON BEACH! \\ud83d\\udd2b\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"MUZZLE FLASH\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"LIGHTING DEKHO! \\u2728\", \"start\": 4.3, \"end\": 5.4}, {\"word\": \"COVER SYSTEM\", \"start\": 5.4, \"end\": 6.6}, {\"word\": \"REVOLUTIONARY! \\ud83d\\udee1\\ufe0f\", \"start\": 6.6, \"end\": 8.0}, {\"word\": \"BULLETS TEAR\", \"start\": 8.0, \"end\": 9.5}, {\"word\": \"THROUGH WALLS! \\ud83d\\udca5\", \"start\": 9.5, \"end\": 11.0}, {\"word\": \"TACTICAL AI\", \"start\": 11.0, \"end\": 12.5}, {\"word\": \"SURROUNDED US! \\ud83d\\ude31\", \"start\": 12.5, \"end\": 13.3}, {\"word\": \"COMMENT YOUR\", \"start\": 13.3, \"end\": 14.0}, {\"word\": \"FAVORITE GUN! \\ud83d\\udcac\", \"start\": 14.0, \"end\": 14.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -989,7 +989,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Revolutionary pedestrian crowd panic AI responding dynamically with unique ragdoll escapes and calling 911.",
     "status": "rendered",
     "output_path": "clips/clip-inc-08-ai.mp4",
-    "thumbnail_path": "clips/clip-inc-08-ai_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-08-ai_thumb.jpg",
     "captions_data": "[{\"word\": \"NPCS KA\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"REACTION DEKHO! \\ud83d\\udc40\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"BHAG RAHE HAI\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"SARE LOG! \\ud83c\\udfc3\\u200d\\u2642\\ufe0f\\ud83d\\udca8\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"LITERAL FEAR\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"ENGINE ACTIVE! \\ud83d\\ude31\", \"start\": 4.3, \"end\": 5.4}, {\"word\": \"PURA BEACH\", \"start\": 5.4, \"end\": 6.6}, {\"word\": \"KHALI HO GAYA! \\ud83c\\udfd6\\ufe0f\", \"start\": 6.6, \"end\": 8.0}, {\"word\": \"KISI NE 911\", \"start\": 8.0, \"end\": 9.5}, {\"word\": \"CALL KAR DIYA! \\ud83d\\udcf1\", \"start\": 9.5, \"end\": 11.0}, {\"word\": \"REAL-TIME SAND\", \"start\": 11.0, \"end\": 12.5}, {\"word\": \"FOOTPRINTS DEKHO!\", \"start\": 12.5, \"end\": 13.8}, {\"word\": \"EVERY NPC HAS\", \"start\": 13.8, \"end\": 14.8}, {\"word\": \"A BRAIN! \\ud83e\\udde0\", \"start\": 14.8, \"end\": 15.4}, {\"word\": \"SHARE THIS\", \"start\": 15.4, \"end\": 16.0}, {\"word\": \"CLIP NOW! \\ud83d\\ude80\", \"start\": 16.0, \"end\": 16.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -1043,7 +1043,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Co-op protagonist swapping mechanics inspired by Bonnie & Clyde during a convenience store raid.",
     "status": "rendered",
     "output_path": "clips/clip-inc-09-heist.mp4",
-    "thumbnail_path": "clips/clip-inc-09-heist_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-09-heist_thumb.jpg",
     "captions_data": "[{\"word\": \"JASON AND LUCIA\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"IN ACTION! \\ud83c\\udf34\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"BONNIE AND CLYDE\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"OF VICE CITY! \\ud83d\\udcb0\", \"start\": 2.4, \"end\": 3.4}, {\"word\": \"INSTANT SWAP\", \"start\": 3.4, \"end\": 4.4}, {\"word\": \"MECHANIC DEKHO! \\u26a1\", \"start\": 4.4, \"end\": 5.5}, {\"word\": \"CASH BAG WEIGHT\", \"start\": 5.5, \"end\": 6.8}, {\"word\": \"PHYSICS REAL! \\ud83d\\udcb5\", \"start\": 6.8, \"end\": 8.2}, {\"word\": \"STORE ALARM\", \"start\": 8.2, \"end\": 9.8}, {\"word\": \"RINGING HARD! \\ud83d\\udea8\", \"start\": 9.8, \"end\": 11.5}, {\"word\": \"GETAWAY CAR\", \"start\": 11.5, \"end\": 13.0}, {\"word\": \"IS ROARING! \\ud83c\\udfce\\ufe0f\", \"start\": 13.0, \"end\": 14.5}, {\"word\": \"VOTE JASON OR\", \"start\": 14.5, \"end\": 15.3}, {\"word\": \"LUCIA! \\ud83d\\udc47\", \"start\": 15.3, \"end\": 16.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -1097,7 +1097,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Buttery smooth 60 FPS gameplay showcase with hyper-realistic puddle reflections and volumetric neon fog.",
     "status": "rendered",
     "output_path": "clips/clip-inc-10-graphics.mp4",
-    "thumbnail_path": "clips/clip-inc-10-graphics_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-10-graphics_thumb.jpg",
     "captions_data": "[{\"word\": \"60 FPS PAR\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"RUNNING CONFIRMED! \\u26a1\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"WATER PUDDLE\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"REFLECTIONS 4K! \\ud83c\\udf0a\", \"start\": 2.4, \"end\": 3.4}, {\"word\": \"RAYTRACING ON\", \"start\": 3.4, \"end\": 4.5}, {\"word\": \"POINT BRO! \\ud83d\\udc8e\", \"start\": 4.5, \"end\": 5.8}, {\"word\": \"VOLUMETRIC FOG\", \"start\": 5.8, \"end\": 7.0}, {\"word\": \"VICE CITY NIGHT! \\ud83c\\udf03\", \"start\": 7.0, \"end\": 8.5}, {\"word\": \"NEON LIGHTING\", \"start\": 8.5, \"end\": 10.0}, {\"word\": \"EVERYWHERE! \\ud83d\\udc9c\", \"start\": 10.0, \"end\": 12.0}, {\"word\": \"SMOOTH AS\", \"start\": 12.0, \"end\": 13.5}, {\"word\": \"BUTTER CHAL RAHA! \\ud83e\\uddc8\", \"start\": 13.5, \"end\": 15.0}, {\"word\": \"PC GAMERS READY\", \"start\": 15.0, \"end\": 16.5}, {\"word\": \"HO JAO! \\ud83d\\udcbb\\ud83d\\udd25\", \"start\": 16.5, \"end\": 18.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -1151,7 +1151,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Epic motorcycle ramp jump off a Vice City skyscraper ending in a parachute deployment above Ocean Drive.",
     "status": "rendered",
     "output_path": "clips/clip-inc-11-stunt.mp4",
-    "thumbnail_path": "clips/clip-inc-11-stunt_thumb.jpg",
+    "thumbnail_path": "/clips/clip-inc-11-stunt_thumb.jpg",
     "captions_data": "[{\"word\": \"RAMP DEKHO\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"SAMNE SKYSCRAPER! \\ud83c\\udfe2\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"500 FEET KA\", \"start\": 1.5, \"end\": 2.5}, {\"word\": \"MEGA JUMP! \\ud83d\\ude80\", \"start\": 2.5, \"end\": 3.6}, {\"word\": \"BIKE HAWA MEIN\", \"start\": 3.6, \"end\": 4.8}, {\"word\": \"UDI PURA! \\ud83d\\ude31\", \"start\": 4.8, \"end\": 6.2}, {\"word\": \"PARACHUTE DEPLOY\", \"start\": 6.2, \"end\": 7.6}, {\"word\": \"TIME PAR! \\ud83e\\ude82\", \"start\": 7.6, \"end\": 9.2}, {\"word\": \"OCEAN DRIVE KA\", \"start\": 9.2, \"end\": 11.0}, {\"word\": \"INSANE VIEW! \\ud83c\\udf34\", \"start\": 11.0, \"end\": 13.0}, {\"word\": \"PERFECT LANDING\", \"start\": 13.0, \"end\": 15.0}, {\"word\": \"RESPECT +++ \\ud83d\\udd76\\ufe0f\", \"start\": 15.0, \"end\": 16.5}, {\"word\": \"LIKE AND SUBSCRIBE\", \"start\": 16.5, \"end\": 17.5}, {\"word\": \"FOR PART 2! \\u2764\\ufe0f\", \"start\": 17.5, \"end\": 18.0}]",
     "caption_style": {
       "preset": "karaoke_bold",
@@ -1205,7 +1205,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Peak viral scream and violent vehicle ragdoll ejection with explosive emotional reaction.",
     "status": "scheduled",
     "output_path": "clips/clip-speed-01-crash.mp4",
-    "thumbnail_path": "clips/clip-speed-01-crash_thumb.jpg",
+    "thumbnail_path": "/clips/clip-speed-01-crash_thumb.jpg",
     "captions_data": "[{\"word\": \"WATCH OUT\", \"start\": 0.0, \"end\": 0.6}, {\"word\": \"BRO! \\ud83d\\udea8\", \"start\": 0.6, \"end\": 1.2}, {\"word\": \"HE IS FLYING\", \"start\": 1.2, \"end\": 2.0}, {\"word\": \"AT 300 MPH! \\ud83c\\udfce\\ufe0f\", \"start\": 2.0, \"end\": 2.8}, {\"word\": \"NO NO NO\", \"start\": 2.8, \"end\": 3.6}, {\"word\": \"WAIT WAIT! \\ud83d\\ude31\", \"start\": 3.6, \"end\": 4.5}, {\"word\": \"BOOOOOM!\", \"start\": 4.5, \"end\": 5.5}, {\"word\": \"WHAT DID I DO?! \\ud83d\\udc80\", \"start\": 5.5, \"end\": 6.8}, {\"word\": \"HE FLEW OUT\", \"start\": 6.8, \"end\": 7.8}, {\"word\": \"THE WINDSHIELD! \\ud83d\\udca5\", \"start\": 7.8, \"end\": 9.2}, {\"word\": \"ARE YOU SERIOUS?!\", \"start\": 9.2, \"end\": 10.5}, {\"word\": \"OH MY GOD! \\ud83d\\udd25\", \"start\": 10.5, \"end\": 12.0}, {\"word\": \"SPEED BROKE HIS PC\", \"start\": 12.0, \"end\": 13.5}, {\"word\": \"AGAIN! \\ud83d\\ude2d\", \"start\": 13.5, \"end\": 14.5}, {\"word\": \"SUBSCRIBE FOR MORE! \\ud83d\\udc47\", \"start\": 14.5, \"end\": 15.5}]",
     "caption_style": {
       "preset": "karaoke_bold",

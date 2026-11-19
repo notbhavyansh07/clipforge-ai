@@ -422,17 +422,35 @@ export default function ClipEditorPage() {
             {/* Left Column: 9:16 Portrait Preview Player */}
             <div className="lg:col-span-4 flex flex-col items-center">
               <div className="relative w-[280px] h-[498px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/40 shadow-2xl flex items-center justify-center group">
-                {selectedClip?.output_path && (selectedClip.status === 'rendered' || selectedClip.status === 'published') ? (
+                {selectedClip?.output_path && (selectedClip.status === 'rendered' || selectedClip.status === 'published' || selectedClip.status === 'scheduled') ? (
                   <video
                     ref={videoRef}
                     key={selectedClip.id + (selectedClip.output_path || '')}
                     src={api.getClipStreamUrl(selectedClip.id)}
+                    poster={selectedClip.thumbnail_path ? (selectedClip.thumbnail_path.startsWith('/') ? selectedClip.thumbnail_path : `/${selectedClip.thumbnail_path}`) : undefined}
                     onTimeUpdate={handleTimeUpdate}
                     playsInline
                     controls
                     autoPlay
                     className="w-full h-full object-cover"
                   />
+                ) : selectedClip?.thumbnail_path ? (
+                  <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
+                    <img
+                      src={selectedClip.thumbnail_path.startsWith('/') ? selectedClip.thumbnail_path : `/${selectedClip.thumbnail_path}`}
+                      alt={selectedClip.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 flex flex-col items-center justify-end p-5 text-center">
+                      <div className="p-2.5 rounded-full bg-purple-600/80 text-white shadow-lg mb-2">
+                        <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+                      </div>
+                      <span className="text-xs font-bold text-white line-clamp-2">{selectedClip.title}</span>
+                      <span className="text-[10px] text-purple-300 mt-1 font-mono">
+                        {selectedClip.status === 'scheduled' ? 'Scheduled for YouTube Autopilot' : 'Ready to Render'}
+                      </span>
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center p-6 space-y-3">
                     <VideoIcon className="w-10 h-10 text-purple-400 mx-auto opacity-70" />
