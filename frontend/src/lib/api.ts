@@ -245,6 +245,55 @@ export const api = {
     return { message: 'Clip rendering scheduled' };
   },
 
+  async createClip(clipData: Partial<Clip>): Promise<Clip> {
+    const id = clipData.id || `clip-gen-${Date.now()}`;
+    const newClip: Clip = {
+      id,
+      video_id: clipData.video_id || '',
+      title: clipData.title || '🔥 New Viral Moment',
+      hook_text: clipData.hook_text || 'WAIT TILL THE END! 😱',
+      description: clipData.description || 'Auto-generated viral moment from livestream.',
+      start_time: clipData.start_time ?? 10.0,
+      end_time: clipData.end_time ?? 25.0,
+      duration: Math.round(((clipData.end_time ?? 25.0) - (clipData.start_time ?? 10.0)) * 10) / 10,
+      virality_score: clipData.virality_score ?? 98.0,
+      score_breakdown: clipData.score_breakdown || { hook: 98, emotion: 98, pacing: 97, story: 95, trend: 99 },
+      virality_reason: clipData.virality_reason || 'High emotional peak and fast-paced gameplay.',
+      status: clipData.status || 'rendered',
+      output_path: clipData.output_path || 'clips/clip-speed-01-crash.mp4',
+      thumbnail_path: clipData.thumbnail_path || '/clips/clip-speed-01-crash_thumb.jpg',
+      location: clipData.location || 'Livestream Action',
+      incident_type: clipData.incident_type || 'Streamer Highlight',
+      stream_time_formatted: clipData.stream_time_formatted || `00:${Math.floor((clipData.start_time ?? 10) / 60).toString().padStart(2, '0')}:00`,
+      tags: clipData.tags || ['#Shorts', '#Viral', '#Gaming'],
+      views_count: clipData.views_count || 50000,
+      retention_rate: clipData.retention_rate || 90.0,
+      created_at: new Date().toISOString(),
+      framing_mode: clipData.framing_mode || 'split_facecam',
+      chat_burst_score: clipData.chat_burst_score || 9.2,
+      peak_chatters: clipData.peak_chatters || 2200,
+      reaction_emojis: clipData.reaction_emojis || ['🔥', '😱', '⚡'],
+    };
+
+    try {
+      const res = await fetch(`${BASE_URL}/clips`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newClip),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        const stored = getStoredClips();
+        saveStoredClips([saved, ...stored.filter((c) => c.id !== saved.id)]);
+        return saved;
+      }
+    } catch {}
+
+    const stored = getStoredClips();
+    saveStoredClips([newClip, ...stored.filter((c) => c.id !== newClip.id)]);
+    return newClip;
+  },
+
   getClipStreamUrl(clipId: string): string {
     return `/clips/${clipId}.mp4`;
   },

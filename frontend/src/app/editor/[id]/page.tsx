@@ -23,6 +23,8 @@ import {
   Flame,
   Filter,
   Timer,
+  PlusCircle,
+  ArrowRight,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
@@ -30,6 +32,7 @@ import ViralityBreakdown from '@/components/ViralityBreakdown';
 import TranscriptTrimmer from '@/components/TranscriptTrimmer';
 import CaptionStyler from '@/components/CaptionStyler';
 import PublishModal from '@/components/PublishModal';
+import ClipGeneratorModal from '@/components/ClipGeneratorModal';
 import ClipCard from '@/components/ClipCard';
 import MultiTrackTimeline from '@/components/MultiTrackTimeline';
 import ComparisonPlayer from '@/components/ComparisonPlayer';
@@ -51,6 +54,7 @@ export default function ClipEditorPage() {
   const [loading, setLoading] = useState(!initialVid);
   const [rendering, setRendering] = useState(false);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
+  const [isGenModalOpen, setIsGenModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
   const [streamFilter, setStreamFilter] = useState<'all' | 'h1_3' | 'h4_6' | 'h7_10' | 'top'>('all');
 
@@ -299,6 +303,14 @@ export default function ClipEditorPage() {
         {selectedClip && (
           <div className="flex items-center flex-wrap gap-2 sm:gap-3">
             <button
+              onClick={() => setIsGenModalOpen(true)}
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 via-pink-600 to-purple-600 hover:opacity-95 text-white transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30"
+            >
+              <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
+              <span>+ Generate More Clips</span>
+            </button>
+
+            <button
               onClick={handleRender}
               disabled={rendering || selectedClip.status === 'rendering'}
               className="px-5 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-700 text-white transition flex items-center gap-2 shadow-lg shadow-purple-600/30 disabled:opacity-50"
@@ -409,9 +421,42 @@ export default function ClipEditorPage() {
                 </button>
               );
             })}
+
+            <button
+              onClick={() => setIsGenModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white flex items-center gap-1.5 whitespace-nowrap transition border border-purple-400 shadow-md shadow-purple-600/30 shrink-0"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-yellow-300" />
+              <span>+ Generate Clip</span>
+            </button>
           </div>
         </div>
       )}
+
+      {/* ⚡ DIRECT AI CLIP GENERATOR BANNER */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-900/40 via-[#161825] to-[#12141e] border border-purple-500/30 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40">
+            <Sparkles className="w-4 h-4 text-yellow-300" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-white flex items-center gap-2">
+              Generate More Viral Moments
+              <span className="text-[10px] text-emerald-400 font-mono font-normal">● 1-Click Autopilot &bull; 0 Typing Needed</span>
+            </h4>
+            <p className="text-[11px] text-gray-400">
+              Detect more moments from this stream automatically or slice custom timestamps directly in the studio.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsGenModalOpen(true)}
+          className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white transition flex items-center justify-center gap-1.5 shadow-md shadow-purple-600/20 shrink-0"
+        >
+          <Zap className="w-3.5 h-3.5 text-yellow-300" />
+          <span>Open AI Clip Generator</span>
+        </button>
+      </div>
 
       {activeTab === 'compare' && selectedClip && video ? (
         <ComparisonPlayer clip={selectedClip} video={video} />
@@ -723,6 +768,19 @@ export default function ClipEditorPage() {
           isOpen={isPublishOpen}
           onClose={() => setIsPublishOpen(false)}
           onSuccess={loadData}
+        />
+      )}
+
+      {/* AI Clip Generator Modal (No Prompt Needed) */}
+      {video && (
+        <ClipGeneratorModal
+          video={video}
+          isOpen={isGenModalOpen}
+          onClose={() => setIsGenModalOpen(false)}
+          onClipCreated={(newClip) => {
+            setClips((prev) => [newClip, ...prev.filter((c) => c.id !== newClip.id)]);
+            setSelectedClip(newClip);
+          }}
         />
       )}
     </div>
