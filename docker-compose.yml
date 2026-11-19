@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: clipforge-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: clipforge-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/clipforge.db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_ALWAYS_EAGER=False
+      - FFMPEG_PATH=ffmpeg
+      - FFPROBE_PATH=ffprobe
+      - UPLOAD_DIR=/app/uploads
+      - CLIPS_DIR=/app/clips
+      - TEMP_DIR=/app/temp
+    volumes:
+      - uploads_data:/app/uploads
+      - clips_data:/app/clips
+      - temp_data:/app/temp
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: clipforge-worker
+    command: celery -A backend.app.core.celery_app.celery_app worker --loglevel=info -c 2
+    environment:
+      - DATABASE_URL=sqlite:////app/clipforge.db
+      - REDIS_URL=redis://redis:6379/0
+      - FFMPEG_PATH=ffmpeg
+      - FFPROBE_PATH=ffprobe
+      - UPLOAD_DIR=/app/uploads
+      - CLIPS_DIR=/app/clips
+      - TEMP_DIR=/app/temp
+    volumes:
+      - uploads_data:/app/uploads
+      - clips_data:/app/clips
+      - temp_data:/app/temp
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+
+volumes:
+  uploads_data:
+  clips_data:
+  temp_data:
+
