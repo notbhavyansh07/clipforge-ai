@@ -138,18 +138,38 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
 
         {publishedData ? (
           <div className="text-center py-6 space-y-4">
-            <div className="w-12 h-12 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-7 h-7" />
+            <div className={`w-14 h-14 ${publishedData.is_scheduled ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400'} rounded-full flex items-center justify-center mx-auto`}>
+              <CheckCircle2 className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Export & Publishing Ready!</h3>
-              <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">{publishedData.message}</p>
+              <h3 className="text-lg font-bold text-white">
+                {publishedData.is_scheduled ? '📅 Autopilot Upload Scheduled!' : '🎉 Live on YouTube Shorts!'}
+              </h3>
+              <p className="text-xs text-gray-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+                {publishedData.message}
+              </p>
+              {publishedData.youtube_url && !publishedData.is_scheduled && (
+                <div className="mt-2 text-xs font-mono text-purple-400">
+                  Short URL: <a href={publishedData.youtube_url} target="_blank" rel="noreferrer" className="underline hover:text-purple-300">{publishedData.youtube_url}</a>
+                </div>
+              )}
             </div>
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-3">
+              {publishedData.youtube_url && !publishedData.is_scheduled && (
+                <a
+                  href={publishedData.youtube_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-red-600/30"
+                >
+                  <Youtube className="w-4 h-4" />
+                  <span>▶ Watch on YouTube Shorts</span>
+                </a>
+              )}
               <a
                 href={downloadUrl}
                 download={`${clip.title}.mp4`}
-                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition flex items-center gap-1.5"
               >
                 <Download className="w-4 h-4" />
                 <span>Download MP4</span>
@@ -158,10 +178,10 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
                 href="https://studio.youtube.com/channel/upload"
                 target="_blank"
                 rel="noreferrer"
-                className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-[#1d2030] hover:bg-[#252a40] text-gray-200 text-xs font-semibold border border-gray-700 transition flex items-center gap-1.5"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Go to YouTube Studio</span>
+                <span>YouTube Studio</span>
               </a>
             </div>
           </div>
