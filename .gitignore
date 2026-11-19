@@ -13,8 +13,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -26,6 +26,8 @@ wheels/
 # Virtual Environment
 .venv/
 venv/
+/lib/
+/lib64/
 
 # Environment Variables & Secrets (CRITICAL: Never commit secrets)
 .env
