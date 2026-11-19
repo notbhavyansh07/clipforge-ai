@@ -66,16 +66,6 @@ export default function ClipCard({
                 👑 #1 WINNER
               </span>
             )}
-            {clip.status === 'scheduled' && (
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-900/60 border border-purple-500/50 text-purple-300">
-                <Clock className="w-2.5 h-2.5 text-purple-400" />
-                <span>
-                  {clip.scheduled_publish_time
-                    ? `📅 ${clip.scheduled_publish_time.slice(11, 16)}`
-                    : '📅 Scheduled'}
-                </span>
-              </span>
-            )}
             {clip.stream_time_formatted && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-blue-950/60 border border-blue-800/70 text-blue-300">
                 <Timer className="w-2.5 h-2.5 text-blue-400" />
@@ -210,18 +200,6 @@ export default function ClipCard({
             <CheckCircle className="w-3.5 h-3.5" />
             <span>Live</span>
           </a>
-        ) : clip.status === 'scheduled' ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(clip);
-            }}
-            className="py-2 px-3 rounded-xl text-xs font-bold bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/50 transition flex items-center gap-1 shadow-sm"
-            title="Scheduled for Autopilot Upload. Click to view or adjust."
-          >
-            <Clock className="w-3.5 h-3.5 text-purple-300" />
-            <span>Scheduled</span>
-          </button>
         ) : (
           <button
             onClick={(e) => {

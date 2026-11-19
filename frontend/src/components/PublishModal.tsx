@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
   X,
   Youtube,
-  Calendar,
   Tag,
   ShieldCheck,
   CheckCircle2,
@@ -33,7 +32,6 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
       `Watch this insane GTA 6 moment! 🔥\n\nCredit: ${video.creator_name || 'Streamer'}\n#Shorts #GTA6 #Gaming #Viral`
   );
   const [tags, setTags] = useState<string>(clip.tags?.join(', ') || '#Shorts, #Viral, #GTA6, #CarryMinati');
-  const [scheduledAt, setScheduledAt] = useState('');
   const [includeAttribution, setIncludeAttribution] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,17 +42,6 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
   if (!isOpen) return null;
 
   const downloadUrl = api.getClipStreamUrl(clip.id);
-
-  const handleSetPeakTime = (hours: number, minutes: number) => {
-    const d = new Date();
-    d.setHours(hours, minutes, 0, 0);
-    if (d.getTime() <= Date.now()) {
-      d.setDate(d.getDate() + 1);
-    }
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const formatted = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    setScheduledAt(formatted);
-  };
 
   const handleCopyTitle = () => {
     navigator.clipboard.writeText(title);
@@ -79,7 +66,6 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
         title: title.trim(),
         description: description.trim(),
         tags: tags.split(',').map((t) => t.trim()),
-        scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
         include_attribution: includeAttribution,
       });
       setPublishedData(res);
@@ -138,24 +124,22 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
 
         {publishedData ? (
           <div className="text-center py-6 space-y-4">
-            <div className={`w-14 h-14 ${publishedData.is_scheduled ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400'} rounded-full flex items-center justify-center mx-auto`}>
+            <div className="w-14 h-14 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">
-                {publishedData.is_scheduled ? '📅 Autopilot Upload Scheduled!' : '🎉 Live on YouTube Shorts!'}
-              </h3>
+              <h3 className="text-lg font-bold text-white">🎉 Published to YouTube Shorts!</h3>
               <p className="text-xs text-gray-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
                 {publishedData.message}
               </p>
-              {publishedData.youtube_url && !publishedData.is_scheduled && (
+              {publishedData.youtube_url && (
                 <div className="mt-2 text-xs font-mono text-purple-400">
                   Short URL: <a href={publishedData.youtube_url} target="_blank" rel="noreferrer" className="underline hover:text-purple-300">{publishedData.youtube_url}</a>
                 </div>
               )}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2.5 pt-3">
-              {publishedData.youtube_url && !publishedData.is_scheduled && (
+              {publishedData.youtube_url && (
                 <a
                   href={publishedData.youtube_url}
                   target="_blank"
@@ -256,63 +240,6 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
               </div>
             )}
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Automated Peak Traffic Scheduler</span>
-                </label>
-                {scheduledAt && (
-                  <button
-                    type="button"
-                    onClick={() => setScheduledAt('')}
-                    className="text-[10px] text-gray-400 hover:text-white"
-                  >
-                    Clear schedule (Publish Now)
-                  </button>
-                )}
-              </div>
-
-              {/* 1-Click Peak Algorithmic Traffic Windows */}
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleSetPeakTime(18, 0)}
-                  className="px-3 py-2 rounded-xl text-left bg-[#181b28] hover:bg-[#202438] border border-gray-700/80 hover:border-purple-500/60 transition group"
-                >
-                  <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                    <span>🔥 6:00 PM IST</span>
-                    <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950 px-1 rounded">PEAK</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">Prime Evening Traffic Window</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleSetPeakTime(20, 30)}
-                  className="px-3 py-2 rounded-xl text-left bg-[#181b28] hover:bg-[#202438] border border-gray-700/80 hover:border-purple-500/60 transition group"
-                >
-                  <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                    <span>🌙 8:30 PM IST</span>
-                    <span className="text-[9px] font-mono text-purple-300 bg-purple-950 px-1 rounded">GAMING</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">Night Viral Engagement Rush</div>
-                </button>
-              </div>
-
-              <input
-                type="datetime-local"
-                value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                className="w-full bg-[#181b28] border border-gray-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-500 transition"
-              />
-              <p className="text-[10px] text-gray-400 leading-tight">
-                {scheduledAt
-                  ? `⚡ Autopilot daemon will upload this Short automatically at your selected time.`
-                  : `Publishing immediately without schedule.`}
-              </p>
-            </div>
-
             {error && (
               <p className="text-xs text-red-400 bg-red-950/40 p-2.5 rounded-lg border border-red-800/40">
                 {error}
@@ -340,20 +267,14 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`px-5 py-2 rounded-xl text-xs font-bold text-white disabled:opacity-50 transition flex items-center gap-2 shadow-lg ${
-                    scheduledAt
-                      ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/30'
-                      : 'bg-red-600 hover:bg-red-700 shadow-red-600/30'
-                  }`}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30 disabled:opacity-50 transition flex items-center gap-2"
                 >
-                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                  <span>
-                    {loading
-                      ? 'Processing...'
-                      : scheduledAt
-                      ? '📅 Schedule Autopilot Upload'
-                      : 'One-Click Publish Now'}
-                  </span>
+                  {loading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Youtube className="w-4 h-4" />
+                  )}
+                  <span>{loading ? 'Publishing Short...' : 'One-Click Publish to YouTube Shorts'}</span>
                 </button>
               </div>
             </div>

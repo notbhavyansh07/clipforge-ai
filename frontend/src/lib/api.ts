@@ -414,27 +414,17 @@ export const api = {
 
     const allClips = getStoredClips();
     const idx = allClips.findIndex((c) => c.id === payload.clip_id);
-    const isSched = !!payload.scheduled_at;
     const defaultYtId = payload.clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : 'bzN0Z8dzUu8';
 
     if (idx !== -1) {
-      if (isSched) {
-        allClips[idx].status = 'scheduled';
-        allClips[idx].scheduled_publish_time = payload.scheduled_at;
-      } else {
-        allClips[idx].status = 'published';
-        allClips[idx].youtube_video_id = allClips[idx].youtube_video_id || defaultYtId;
-      }
+      allClips[idx].status = 'published';
+      allClips[idx].youtube_video_id = allClips[idx].youtube_video_id || defaultYtId;
       saveStoredClips(allClips);
     }
     const ytId = (idx !== -1 && allClips[idx].youtube_video_id) ? allClips[idx].youtube_video_id : defaultYtId;
     return {
       success: true,
-      is_scheduled: isSched,
-      scheduled_at: payload.scheduled_at,
-      message: isSched
-        ? `Short queued for Autopilot publishing at ${payload.scheduled_at}!`
-        : 'Short published live to YouTube Shorts!',
+      message: 'Short published live to YouTube Shorts!',
       youtube_video_id: ytId,
       youtube_url: `https://youtube.com/shorts/${ytId}`,
     };
