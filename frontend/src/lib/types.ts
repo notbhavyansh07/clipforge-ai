@@ -43,12 +43,12 @@ export interface Clip {
   incident_type?: string;
   stream_time_formatted?: string;
   caption_style?: Record<string, any>;
-  tags: string[];
+  tags?: string[];
   youtube_video_id?: string;
   youtube_publish_time?: string | null;
-  views_count: number;
-  retention_rate: number;
-  created_at: string;
+  views_count?: number;
+  retention_rate?: number;
+  created_at?: string;
   chat_burst_score?: number;
   peak_chatters?: number;
   reaction_emojis?: string[];
