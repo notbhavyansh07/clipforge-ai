@@ -13,13 +13,24 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
+const CLIPS_KEY = 'clipforge_clips_v5';
+const VIDEOS_KEY = 'clipforge_videos_v5';
+
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
   try {
-    const raw = localStorage.getItem('clipforge_videos');
+    const raw = localStorage.getItem(VIDEOS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const parsed: Video[] = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const initMap = new Map(INITIAL_VIDEOS.map((v) => [v.id, v]));
+        const merged = INITIAL_VIDEOS.map((iv) => {
+          const userV = parsed.find((p) => p.id === iv.id);
+          return userV ? { ...iv, ...userV } : iv;
+        });
+        const custom = parsed.filter((p) => !initMap.has(p.id));
+        return [...merged, ...custom];
+      }
     }
   } catch {}
   return INITIAL_VIDEOS;
@@ -28,7 +39,7 @@ function getStoredVideos(): Video[] {
 function saveStoredVideos(videos: Video[]) {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem('clipforge_videos', JSON.stringify(videos));
+      localStorage.setItem(VIDEOS_KEY, JSON.stringify(videos));
     } catch {}
   }
 }
@@ -36,10 +47,26 @@ function saveStoredVideos(videos: Video[]) {
 function getStoredClips(): Clip[] {
   if (typeof window === 'undefined') return INITIAL_CLIPS;
   try {
-    const raw = localStorage.getItem('clipforge_clips');
+    const raw = localStorage.getItem(CLIPS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const parsed: Clip[] = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const initMap = new Map(INITIAL_CLIPS.map((c) => [c.id, c]));
+        // Keep initial clips authoritative for output_path and thumbnail_path, but preserve user status (e.g. published)
+        const merged = INITIAL_CLIPS.map((ic) => {
+          const userC = parsed.find((p) => p.id === ic.id);
+          if (userC) {
+            return {
+              ...ic,
+              status: userC.status || ic.status,
+              youtube_video_id: userC.youtube_video_id || ic.youtube_video_id,
+            };
+          }
+          return ic;
+        });
+        const custom = parsed.filter((p) => !initMap.has(p.id));
+        return [...merged, ...custom];
+      }
     }
   } catch {}
   return INITIAL_CLIPS;
@@ -48,7 +75,7 @@ function getStoredClips(): Clip[] {
 function saveStoredClips(clips: Clip[]) {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem('clipforge_clips', JSON.stringify(clips));
+      localStorage.setItem(CLIPS_KEY, JSON.stringify(clips));
     } catch {}
   }
 }

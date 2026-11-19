@@ -25,6 +25,9 @@ import {
   Timer,
   PlusCircle,
   ArrowRight,
+  Crop,
+  Type,
+  Scissors,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
@@ -56,7 +59,26 @@ export default function ClipEditorPage() {
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [isGenModalOpen, setIsGenModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
+  const [editorSubTab, setEditorSubTab] = useState<'reframing' | 'captions' | 'virality' | 'transcript'>('reframing');
+  const [showSafeZoneOverlay, setShowSafeZoneOverlay] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
   const [streamFilter, setStreamFilter] = useState<'all' | 'h1_3' | 'h4_6' | 'h7_10' | 'top'>('all');
+
+  const handleSelectClip = (c: Clip) => {
+    setSelectedClip(c);
+    const el = document.getElementById('studio-player');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+      }
+    }, 200);
+  };
 
   // Multi-track playback sync state
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -75,7 +97,7 @@ export default function ClipEditorPage() {
   // Auto-edit options including FilmCraft & HyperFrames & GTA-Auto-Clipper
   const [renderOptions, setRenderOptions] = useState<RenderOptions>({
     aspect_ratio: '9:16',
-    framing_mode: 'fill_player_track',
+    framing_mode: 'split_facecam',
     lead_in_seconds: 6,
     enable_swear_masking: true,
     caption_language: 'auto',
@@ -88,7 +110,7 @@ export default function ClipEditorPage() {
     color_preset: 'viral_vibrant',
     enable_punch_in_zoom: true,
     enable_retention_bar: true,
-    split_screen: false,
+    split_screen: true,
   });
 
   const loadData = async () => {
@@ -402,7 +424,7 @@ export default function ClipEditorPage() {
               return (
                 <button
                   key={c.id}
-                  onClick={() => setSelectedClip(c)}
+                  onClick={() => handleSelectClip(c)}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-200 border ${
                     isSelected
                       ? 'bg-purple-600 text-white border-purple-400 shadow-md shadow-purple-600/40 scale-[1.02]'
@@ -463,15 +485,49 @@ export default function ClipEditorPage() {
       ) : (
         <>
           {/* Main Studio Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Column: 9:16 Portrait Preview Player */}
-            <div className="lg:col-span-4 flex flex-col items-center">
-              <div className="relative w-[280px] h-[498px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/40 shadow-2xl flex items-center justify-center group">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Pro 9:16 Portrait Preview Player */}
+            <div id="studio-player" className="lg:col-span-5 flex flex-col items-center space-y-3.5 scroll-mt-24">
+              {/* Pro Studio Monitor Header */}
+              <div className="w-[300px] sm:w-[320px] flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-[11px] font-mono font-bold text-gray-300">
+                    1080 × 1920 • 60 FPS
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowSafeZoneOverlay(!showSafeZoneOverlay)}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold font-mono transition border ${
+                      showSafeZoneOverlay
+                        ? 'bg-purple-600 text-white border-purple-400'
+                        : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
+                    }`}
+                    title="Toggle YouTube Shorts / TikTok UI Safe Area Overlay"
+                  >
+                    Safe Overlay
+                  </button>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800">
+                    PRO MASTER
+                  </span>
+                </div>
+              </div>
+
+              {/* 9:16 Canvas Chassis */}
+              <div className="relative w-[300px] sm:w-[320px] h-[534px] sm:h-[568px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/50 shadow-2xl flex items-center justify-center group">
                 {selectedClip?.output_path && (selectedClip.status === 'rendered' || selectedClip.status === 'published' || selectedClip.status === 'scheduled') ? (
                   <video
                     ref={videoRef}
                     key={selectedClip.id + (selectedClip.output_path || '')}
-                    src={api.getClipStreamUrl(selectedClip.id)}
+                    src={
+                      selectedClip.output_path
+                        ? selectedClip.output_path.startsWith('/')
+                          ? selectedClip.output_path
+                          : `/${selectedClip.output_path}`
+                        : api.getClipStreamUrl(selectedClip.id)
+                    }
                     poster={selectedClip.thumbnail_path ? (selectedClip.thumbnail_path.startsWith('/') ? selectedClip.thumbnail_path : `/${selectedClip.thumbnail_path}`) : undefined}
                     onTimeUpdate={handleTimeUpdate}
                     playsInline
@@ -514,48 +570,177 @@ export default function ClipEditorPage() {
 
                 {/* Virality score floating pill */}
                 {selectedClip && (
-                  <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur border border-[#00FF66]/40 text-[#00FF66] text-xs font-black pointer-events-none">
-                    {selectedClip.virality_score} VIRAL
+                  <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur border border-[#00FF66]/50 text-[#00FF66] text-xs font-black pointer-events-none z-20 flex items-center gap-1">
+                    <Zap className="w-3.5 h-3.5 fill-current" />
+                    <span>{selectedClip.virality_score} VIRAL</span>
+                  </div>
+                )}
+
+                {/* Optional Shorts/TikTok Safe-Zone Overlay */}
+                {showSafeZoneOverlay && (
+                  <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-4 border border-dashed border-cyan-400/60 bg-black/10">
+                    <div className="text-center bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 text-[10px] font-mono py-1 rounded">
+                      TOP HEADER SAFE ZONE (y: 0 - 200px)
+                    </div>
+                    <div className="flex-1 my-4 border border-dashed border-emerald-400/40 rounded flex items-center justify-center">
+                      <span className="text-[10px] font-mono text-emerald-300 bg-black/60 px-2 py-0.5 rounded">
+                        OPTIMAL SUBTITLE & ACTION SAFE AREA
+                      </span>
+                    </div>
+                    <div className="text-center bg-pink-950/80 border border-pink-500/60 text-pink-300 text-[10px] font-mono py-1 rounded">
+                      BOTTOM SHORTS UI OVERLAY (y: 1720 - 1920px)
+                    </div>
                   </div>
                 )}
               </div>
 
+              {/* Timecode and Playback Controls */}
               {selectedClip && (
-                <div className="w-[280px] mt-4 flex items-center justify-between text-xs text-gray-400 font-mono">
-                  <span>{selectedClip.start_time.toFixed(1)}s</span>
-                  <span className="text-purple-300 font-bold">Duration: {selectedClip.duration}s</span>
-                  <span>{selectedClip.end_time.toFixed(1)}s</span>
+                <div className="w-[300px] sm:w-[320px] flex items-center justify-between text-xs text-gray-300 font-mono bg-[#141624] px-3.5 py-2 rounded-xl border border-gray-800">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-purple-300 font-bold">{currentTime.toFixed(1)}s</span>
+                    <span className="text-gray-500">/</span>
+                    <span>{selectedClip.duration}s</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[1.0, 1.25, 1.5].map((rate) => (
+                      <button
+                        key={rate}
+                        type="button"
+                        onClick={() => {
+                          setPlaybackRate(rate);
+                          if (videoRef.current) videoRef.current.playbackRate = rate;
+                        }}
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-bold font-mono transition ${
+                          playbackRate === rate
+                            ? 'bg-purple-600 text-white'
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {rate}x
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {/* 1-Click Carry Split Screen Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setRenderOptions({
+                    ...renderOptions,
+                    framing_mode: 'split_facecam',
+                    split_screen: true,
+                    caption_preset: 'karaoke_bold',
+                    enable_animated_captions: true,
+                    enable_face_tracking: true,
+                    enable_swear_masking: true,
+                    lead_in_seconds: 6,
+                    caption_position: 'lower_third',
+                  });
+                  alert('👑 Carry-Minati Pro Split Screen Preset Applied!\n• Stacked 1080x768 Streamer Facecam\n• 1080x1152 Gameplay Action\n• Neon Cyan Divider\n• Hormozi Karaoke Micro-Pops\n• 6s Lead-In Pre-Roll');
+                }}
+                className="w-[300px] sm:w-[320px] py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-amber-500/30 hover:from-purple-600 hover:to-pink-600 text-purple-200 hover:text-white border border-purple-500/40 hover:border-purple-300 transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                <span>Apply Carry-Style Pro Split (1-Click)</span>
+              </button>
             </div>
 
-            {/* Right Column: Virality Rubric, Transcript Trimmer, and Caption Controls */}
-            <div className="lg:col-span-8 space-y-5">
-              {selectedClip && (
-                <ViralityBreakdown
-                  score={selectedClip.virality_score}
-                  breakdown={selectedClip.score_breakdown}
-                  reason={selectedClip.virality_reason}
-                />
+            {/* Right Column: Pro NLE Tabbed Editing Workstation */}
+            <div className="lg:col-span-7 space-y-4">
+              {/* Studio Tab Navigation */}
+              <div className="flex items-center gap-1 bg-[#12141e] p-1.5 rounded-2xl border border-gray-800 shadow-md overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setEditorSubTab('reframing')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
+                    editorSubTab === 'reframing'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                  }`}
+                >
+                  <Crop className="w-3.5 h-3.5 text-yellow-400" />
+                  <span>AI Framing & Split</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorSubTab('captions')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
+                    editorSubTab === 'captions'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                  }`}
+                >
+                  <Type className="w-3.5 h-3.5 text-pink-400" />
+                  <span>Hormozi Subtitles</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorSubTab('virality')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
+                    editorSubTab === 'virality'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Virality & Burst</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorSubTab('transcript')}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition whitespace-nowrap ${
+                    editorSubTab === 'transcript'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/40'
+                  }`}
+                >
+                  <Scissors className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Transcript Trimmer</span>
+                </button>
+              </div>
+
+              {/* Sub-Tab 1: Framing & Cinematic Controls */}
+              {editorSubTab === 'reframing' && (
+                <div className="animate-in fade-in duration-150">
+                  <CinematicControls options={renderOptions} onChange={setRenderOptions} />
+                </div>
               )}
 
-              {video?.transcript && selectedClip && (
-                <TranscriptTrimmer
-                  transcript={video.transcript}
-                  startTime={selectedClip.start_time}
-                  endTime={selectedClip.end_time}
-                  currentTime={currentTime}
-                  onSetStartTime={(t) => handleUpdateBoundaries(t, selectedClip.end_time)}
-                  onSetEndTime={(t) => handleUpdateBoundaries(selectedClip.start_time, t)}
-                  onSeek={handleSeek}
-                />
+              {/* Sub-Tab 2: Hormozi Subtitles & Styler */}
+              {editorSubTab === 'captions' && (
+                <div className="animate-in fade-in duration-150">
+                  <CaptionStyler options={renderOptions} onChange={setRenderOptions} />
+                </div>
               )}
 
-              {/* FilmCraft & HyperFrames Controls */}
-              <CinematicControls options={renderOptions} onChange={setRenderOptions} />
+              {/* Sub-Tab 3: Virality Breakdown Rubric */}
+              {editorSubTab === 'virality' && selectedClip && (
+                <div className="animate-in fade-in duration-150">
+                  <ViralityBreakdown
+                    score={selectedClip.virality_score}
+                    breakdown={selectedClip.score_breakdown}
+                    reason={selectedClip.virality_reason}
+                  />
+                </div>
+              )}
 
-              {/* Subtitle Styler */}
-              <CaptionStyler options={renderOptions} onChange={setRenderOptions} />
+              {/* Sub-Tab 4: Transcript Word Trimmer */}
+              {editorSubTab === 'transcript' && video?.transcript && selectedClip && (
+                <div className="animate-in fade-in duration-150">
+                  <TranscriptTrimmer
+                    transcript={video.transcript}
+                    startTime={selectedClip.start_time}
+                    endTime={selectedClip.end_time}
+                    currentTime={currentTime}
+                    onSetStartTime={(t) => handleUpdateBoundaries(t, selectedClip.end_time)}
+                    onSetEndTime={(t) => handleUpdateBoundaries(selectedClip.start_time, t)}
+                    onSeek={handleSeek}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -744,13 +929,14 @@ export default function ClipEditorPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {displayedClips.map((clip) => (
             <ClipCard
               key={clip.id}
               clip={clip}
+              isSelected={clip.id === selectedClip?.id}
               isChampion={clip.id === topClip?.id}
-              onSelect={(c) => setSelectedClip(c)}
+              onSelect={(c) => handleSelectClip(c)}
               onPublishClick={(c) => {
                 setSelectedClip(c);
                 setIsPublishOpen(true);
