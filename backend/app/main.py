@@ -7,8 +7,13 @@ from backend.app.core.config import settings
 from backend.app.core.database import engine, Base
 from backend.app.api import videos, clips, youtube, analytics
 
-# Create tables
+# Create tables & auto-seed initial clips
 Base.metadata.create_all(bind=engine)
+try:
+    from backend.app.core.db_seeder import seed_database_if_empty
+    seed_database_if_empty()
+except Exception as e:
+    print(f"[Main] Seeder notice: {e}")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
