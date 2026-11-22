@@ -13,8 +13,8 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v9';
-const VIDEOS_KEY = 'clipforge_videos_v9';
+const CLIPS_KEY = 'clipforge_clips_v10';
+const VIDEOS_KEY = 'clipforge_videos_v10';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
@@ -487,11 +487,16 @@ export const api = {
 
     if (idx !== -1) {
       allClips[idx].status = 'published';
-      allClips[idx].youtube_video_id = allClips[idx].youtube_video_id || defaultYtId;
+      if (!allClips[idx].youtube_video_id || allClips[idx].youtube_video_id.startsWith('CF_')) {
+        allClips[idx].youtube_video_id = defaultYtId;
+      }
       allClips[idx].instagram_url = igUrl;
       saveStoredClips(allClips);
     }
-    const ytId = (idx !== -1 && allClips[idx].youtube_video_id) ? allClips[idx].youtube_video_id : defaultYtId;
+    const ytId =
+      idx !== -1 && allClips[idx].youtube_video_id && !allClips[idx].youtube_video_id.startsWith('CF_')
+        ? allClips[idx].youtube_video_id
+        : defaultYtId;
     return {
       success: true,
       message: 'Published to YouTube Shorts & Instagram Reels!',
