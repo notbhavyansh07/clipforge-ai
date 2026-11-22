@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -27,6 +27,7 @@ import {
   Maximize2,
   Volume2,
   Film,
+  Scissors,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
@@ -89,6 +90,26 @@ export default function ClipEditorPage() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const selectedClipRef = useRef<Clip | null>(null);
+
+  // Real-time active subtitle text calculation for in-web preview
+  const currentSubtitle = useMemo(() => {
+    if (!selectedClip) return '';
+    if (video?.transcript) {
+      const seg = video.transcript.find(
+        (s) => currentTime >= s.start && currentTime <= s.end
+      );
+      if (seg) {
+        if (seg.words && seg.words.length > 0) {
+          const activeWord = seg.words.find(
+            (w) => currentTime >= w.start && currentTime <= w.end
+          );
+          if (activeWord) return activeWord.word;
+        }
+        return seg.text;
+      }
+    }
+    return selectedClip.hook_text || selectedClip.title || 'WAIT FOR THIS PART! 😱';
+  }, [selectedClip, video, currentTime]);
 
   useEffect(() => {
     selectedClipRef.current = selectedClip;
@@ -425,9 +446,57 @@ export default function ClipEditorPage() {
               </div>
             )}
 
+            {/* Live Split-Screen FaceCam HUD Overlay */}
+            {selectedClip && renderOptions.split_screen && (
+              <div className="absolute top-0 inset-x-0 h-[38%] pointer-events-none z-10 border-b-2 border-purple-500/80 bg-gradient-to-b from-purple-950/60 via-purple-900/20 to-transparent flex flex-col justify-between p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-black/85 text-purple-300 border border-purple-500/50 flex items-center gap-1.5 shadow-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{video?.creator_name || 'Streamer'} (FaceCam)</span>
+                  </span>
+                  <span className="text-[9px] font-mono text-yellow-300 bg-black/80 px-2 py-0.5 rounded border border-yellow-500/40">
+                    AI FACE-LOCK
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[9px] font-mono text-purple-200/90 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">
+                  <span>Dynamic Split Framing</span>
+                  <div className="flex items-end gap-1 h-2.5">
+                    <span className="w-0.5 h-2.5 bg-purple-400 rounded-full animate-pulse" />
+                    <span className="w-0.5 h-3.5 bg-pink-400 rounded-full animate-pulse" />
+                    <span className="w-0.5 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Live Subtitle Overlay Engine (Hormozi Gold / Cyber Neon / Clean Minimal) */}
+            {selectedClip && renderOptions.enable_animated_captions && currentSubtitle && (
+              <div className="absolute bottom-16 inset-x-3 text-center pointer-events-none z-20 flex justify-center animate-in fade-in duration-150">
+                {renderOptions.caption_preset === 'karaoke_bold' ? (
+                  <div className="bg-black/90 px-4 py-2 rounded-2xl border-2 border-yellow-400 shadow-2xl backdrop-blur-md max-w-[90%]">
+                    <span className="text-yellow-300 font-black text-sm sm:text-base tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">
+                      {currentSubtitle}
+                    </span>
+                  </div>
+                ) : renderOptions.caption_preset === 'neon_cyber' ? (
+                  <div className="bg-emerald-950/95 px-4 py-2 rounded-2xl border-2 border-emerald-400 shadow-[0_0_20px_rgba(0,255,102,0.6)] backdrop-blur-md max-w-[90%]">
+                    <span className="text-emerald-300 font-mono font-black text-sm sm:text-base tracking-widest uppercase">
+                      ⚡ {currentSubtitle}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="bg-gray-950/85 px-3.5 py-1.5 rounded-xl border border-white/20 shadow-lg backdrop-blur-md max-w-[90%]">
+                    <span className="text-white font-bold text-xs sm:text-sm tracking-wide">
+                      {currentSubtitle}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Virality Floating Metric */}
             {selectedClip && (
-              <div className="absolute top-4 left-4 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur border border-emerald-500/50 text-emerald-400 text-xs font-black pointer-events-none z-20 flex items-center gap-1">
+              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur border border-emerald-500/50 text-emerald-400 text-xs font-black pointer-events-none z-20 flex items-center gap-1 shadow-lg">
                 <Zap className="w-3.5 h-3.5 fill-current" />
                 <span>{selectedClip.virality_score} VIRAL</span>
               </div>
@@ -503,13 +572,72 @@ export default function ClipEditorPage() {
             </div>
           )}
 
-          {/* Direct File Download & Shorts Export CTAs */}
+          {/* ✂️ Quick In-Browser Trimmer Controls */}
+          {selectedClip && (
+            <div className="w-[300px] sm:w-[320px] bg-[#12141f] p-3 rounded-2xl border border-gray-800/80 space-y-2 shadow-md">
+              <div className="flex items-center justify-between text-[11px] font-mono text-gray-300">
+                <span className="text-purple-400 font-bold flex items-center gap-1">
+                  <Scissors className="w-3.5 h-3.5" />
+                  <span>Trim Video In Web:</span>
+                </span>
+                <span className="text-gray-400 font-bold">
+                  {selectedClip.start_time.toFixed(1)}s – {selectedClip.end_time.toFixed(1)}s ({selectedClip.duration}s)
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                <div className="flex items-center justify-between bg-gray-900/80 px-2 py-1.5 rounded-xl border border-gray-800">
+                  <span className="text-gray-400">START:</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateBoundaries(Math.max(0, selectedClip.start_time - 1), selectedClip.end_time)}
+                      className="px-1.5 py-0.5 bg-purple-950 hover:bg-purple-800 text-purple-300 rounded font-bold"
+                      title="Move start point back 1 second"
+                    >
+                      -1s
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateBoundaries(Math.min(selectedClip.end_time - 3, selectedClip.start_time + 1), selectedClip.end_time)}
+                      className="px-1.5 py-0.5 bg-purple-950 hover:bg-purple-800 text-purple-300 rounded font-bold"
+                      title="Move start point forward 1 second"
+                    >
+                      +1s
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between bg-gray-900/80 px-2 py-1.5 rounded-xl border border-gray-800">
+                  <span className="text-gray-400">END:</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateBoundaries(selectedClip.start_time, Math.max(selectedClip.start_time + 3, selectedClip.end_time - 1))}
+                      className="px-1.5 py-0.5 bg-pink-950 hover:bg-pink-800 text-pink-300 rounded font-bold"
+                      title="Trim end point back 1 second"
+                    >
+                      -1s
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateBoundaries(selectedClip.start_time, selectedClip.end_time + 1)}
+                      className="px-1.5 py-0.5 bg-pink-950 hover:bg-pink-800 text-pink-300 rounded font-bold"
+                      title="Extend end point forward 1 second"
+                    >
+                      +1s
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Primary Action Buttons (Download MP4 & 1-Click Publish) */}
           {selectedClip && (
             <div className="w-[300px] sm:w-[320px] flex flex-col gap-2">
               <a
                 href={getVideoUrl(selectedClip)}
                 download={`${selectedClip.id}.mp4`}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-[#171a2a] hover:bg-[#20243b] text-gray-200 hover:text-white border border-gray-700/80 transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#171a2a] hover:bg-[#20243b] text-white border border-gray-700/80 transition-all flex items-center justify-center gap-2 shadow-lg hover:border-purple-500/50"
               >
                 <Download className="w-4 h-4 text-purple-400" />
                 <span>Download Master MP4 (1080p 60FPS)</span>
@@ -518,40 +646,46 @@ export default function ClipEditorPage() {
               <button
                 type="button"
                 onClick={() => setIsPublishOpen(true)}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 hover:opacity-95 text-white transition-all flex items-center justify-center gap-2 shadow-md shadow-pink-600/25"
+                className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 hover:opacity-95 text-white transition-all flex items-center justify-center gap-2 shadow-md shadow-pink-600/30"
               >
                 <Share2 className="w-4 h-4" />
                 <span>Publish to YouTube Shorts &amp; Instagram Reels</span>
               </button>
 
-              {/* DaVinci Resolve Timeline Export (via samuelgursky/davinci-resolve-mcp) */}
-              <div className="grid grid-cols-2 gap-2 pt-0.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const edl = generateDaVinciEDL(selectedClip, video || undefined);
-                    downloadFile(edl, `${selectedClip.id}_davinci_timeline.edl`, 'text/plain');
-                  }}
-                  className="py-2 px-3 rounded-xl text-[11px] font-bold bg-[#141624] hover:bg-[#1f2238] text-amber-300 border border-amber-500/40 hover:border-amber-400 transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                  title="Export CMX 3600 EDL for DaVinci Resolve Studio & Free"
-                >
-                  <Film className="w-3.5 h-3.5 text-amber-400" />
-                  <span>DaVinci EDL</span>
-                </button>
+              {/* Optional: Collapsible DaVinci Resolve Timeline Export */}
+              <details className="w-full group pt-1">
+                <summary className="cursor-pointer py-1.5 px-3 rounded-xl bg-gray-900/60 hover:bg-gray-800 border border-gray-800 text-[10px] font-mono text-gray-400 hover:text-gray-300 flex items-center justify-between transition list-none">
+                  <span>⚡ Optional: Pro NLE Export (DaVinci / Premiere)</span>
+                  <span className="text-gray-500 group-open:rotate-180 transition-transform">▾</span>
+                </summary>
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const edl = generateDaVinciEDL(selectedClip, video || undefined);
+                      downloadFile(edl, `${selectedClip.id}_davinci_timeline.edl`, 'text/plain');
+                    }}
+                    className="py-1.5 px-2.5 rounded-lg text-[10px] font-bold bg-[#141624] hover:bg-[#1f2238] text-amber-300 border border-amber-500/40 transition flex items-center justify-center gap-1"
+                    title="Export CMX 3600 EDL for DaVinci Resolve"
+                  >
+                    <Film className="w-3 h-3 text-amber-400" />
+                    <span>DaVinci EDL</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const fcpxml = generateDaVinciFCPXML(selectedClip, video || undefined);
-                    downloadFile(fcpxml, `${selectedClip.id}_davinci_timeline.fcpxml`, 'application/xml');
-                  }}
-                  className="py-2 px-3 rounded-xl text-[11px] font-bold bg-[#141624] hover:bg-[#1f2238] text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 transition-all flex items-center justify-center gap-1.5 shadow-sm"
-                  title="Export FCPXML Timeline for DaVinci Resolve (1080x1920 60FPS)"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>DaVinci XML</span>
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const fcpxml = generateDaVinciFCPXML(selectedClip, video || undefined);
+                      downloadFile(fcpxml, `${selectedClip.id}_davinci_timeline.fcpxml`, 'application/xml');
+                    }}
+                    className="py-1.5 px-2.5 rounded-lg text-[10px] font-bold bg-[#141624] hover:bg-[#1f2238] text-cyan-300 border border-cyan-500/40 transition flex items-center justify-center gap-1"
+                    title="Export FCPXML Timeline for DaVinci Resolve"
+                  >
+                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    <span>DaVinci XML</span>
+                  </button>
+                </div>
+              </details>
             </div>
           )}
         </div>
