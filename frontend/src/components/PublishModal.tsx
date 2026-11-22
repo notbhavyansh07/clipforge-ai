@@ -12,9 +12,12 @@ import {
   Check,
   ExternalLink,
   Share2,
+  Film,
+  Sparkles,
 } from 'lucide-react';
 import { Clip, Video } from '@/lib/types';
 import { api } from '@/lib/api';
+import { generateDaVinciEDL, generateDaVinciFCPXML, downloadFile } from '@/lib/davinciExport';
 
 interface PublishModalProps {
   clip: Clip;
@@ -409,15 +412,43 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
               </p>
             )}
 
-            <div className="flex justify-between items-center pt-2">
-              <a
-                href={downloadUrl}
-                download={`${clip.title}.mp4`}
-                className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 font-semibold transition"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Save to Disk</span>
-              </a>
+            <div className="flex justify-between items-center pt-2 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <a
+                  href={downloadUrl}
+                  download={`${clip.title}.mp4`}
+                  className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1 font-semibold transition"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>MP4</span>
+                </a>
+                <span className="text-gray-600">&bull;</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const edl = generateDaVinciEDL(clip, video);
+                    downloadFile(edl, `${clip.id}_timeline.edl`, 'text/plain');
+                  }}
+                  className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold transition"
+                  title="Export CMX 3600 EDL for DaVinci Resolve"
+                >
+                  <Film className="w-3.5 h-3.5" />
+                  <span>DaVinci EDL</span>
+                </button>
+                <span className="text-gray-600">&bull;</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const xml = generateDaVinciFCPXML(clip, video);
+                    downloadFile(xml, `${clip.id}_timeline.fcpxml`, 'application/xml');
+                  }}
+                  className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold transition"
+                  title="Export FCPXML Timeline for DaVinci Resolve"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>DaVinci XML</span>
+                </button>
+              </div>
 
               <div className="flex gap-2">
                 <button

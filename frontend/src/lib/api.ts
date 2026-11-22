@@ -13,13 +13,13 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v7';
-const VIDEOS_KEY = 'clipforge_videos_v7';
+const CLIPS_KEY = 'clipforge_clips_v9';
+const VIDEOS_KEY = 'clipforge_videos_v9';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
   try {
-    const raw = localStorage.getItem(VIDEOS_KEY) || localStorage.getItem('clipforge_videos_v5');
+    const raw = localStorage.getItem(VIDEOS_KEY) || localStorage.getItem('clipforge_videos_v7') || localStorage.getItem('clipforge_videos_v5');
     if (raw) {
       const parsed: Video[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -47,7 +47,7 @@ function saveStoredVideos(videos: Video[]) {
 function getStoredClips(): Clip[] {
   if (typeof window === 'undefined') return INITIAL_CLIPS;
   try {
-    const raw = localStorage.getItem(CLIPS_KEY) || localStorage.getItem('clipforge_clips_v5');
+    const raw = localStorage.getItem(CLIPS_KEY) || localStorage.getItem('clipforge_clips_v7') || localStorage.getItem('clipforge_clips_v5');
     if (raw) {
       const parsed: Clip[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -65,10 +65,14 @@ function getStoredClips(): Clip[] {
           return ic;
         });
 
-        // Filter out duplicate cards and legacy repetitive clips
+        // Filter out duplicate cards, legacy repetitive clips, and Carry clips that leaked into Speed
         const seenTitles = new Set(INITIAL_CLIPS.map((c) => (c.title || '').toLowerCase()));
         const custom = parsed.filter((p) => {
           if (initMap.has(p.id)) return false;
+          // Strictly purge any CarryMinati clips from Speed's livestream
+          if (p.video_id === 'vid-speed-gta-crash' && (p.thumbnail_path?.includes('clip-inc') || p.output_path?.includes('clip-inc'))) {
+            return false;
+          }
           const t = (p.title || '').toLowerCase();
           if (seenTitles.has(t)) return false;
           seenTitles.add(t);

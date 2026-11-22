@@ -328,3 +328,14 @@ This verifies:
 6. Word-by-word animated ASS subtitle generation
 7. Mandatory content ownership and permission verification
 
+---
+
+## 🎬 8. DaVinci Resolve MCP Integration
+
+ClipForge integrates with the [samuelgursky/davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp) ecosystem for professional timeline interchange and automated editing:
+
+- **1-Click CMX 3600 EDL Export**: Direct export of high-precision edit decision lists with exact SMPTE timecodes and virality metadata.
+- **FCPXML 1.9/1.10 Vertical Timelines**: Import auto-generated 9:16 vertical shorts directly into DaVinci Resolve Studio & Free editions with synchronized split facecam tracks, normalized audio, and markers.
+- **Offline Subtitle & Grade Codec**: Leverages DaVinci Resolve MCP's offline editorial interchange and subtitle timeline parsing to allow round-tripping between ClipForge AI and DaVinci Resolve.
+
+

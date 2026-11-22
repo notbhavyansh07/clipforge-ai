@@ -26,6 +26,7 @@ import {
   Share2,
   Maximize2,
   Volume2,
+  Film,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
@@ -35,6 +36,7 @@ import ClipCard from '@/components/ClipCard';
 import TranscriptTrimmer from '@/components/TranscriptTrimmer';
 import ComparisonPlayer from '@/components/ComparisonPlayer';
 import { INITIAL_VIDEOS, INITIAL_CLIPS } from '@/lib/seedData';
+import { generateDaVinciEDL, generateDaVinciFCPXML, downloadFile } from '@/lib/davinciExport';
 
 export default function ClipEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -207,14 +209,22 @@ export default function ClipEditorPage() {
   const topClip = sortedClips[0];
 
   // Deduplicate clips by title and ID to guarantee 100% unique situation cards (no duplicate cards)
-  const uniqueClips = sortedClips.filter(
-    (c, idx, arr) =>
+  // Strictly filter out any CarryMinati clips when viewing IShowSpeed's livestream project
+  const uniqueClips = sortedClips.filter((c, idx, arr) => {
+    if (
+      (id === 'vid-speed-gta-crash' || video?.creator_name === 'IShowSpeed') &&
+      (c.thumbnail_path?.includes('clip-inc') || c.output_path?.includes('clip-inc'))
+    ) {
+      return false;
+    }
+    return (
       arr.findIndex(
         (x) =>
           x.id === c.id ||
           (x.title && c.title && x.title.trim().toLowerCase() === c.title.trim().toLowerCase())
       ) === idx
-  );
+    );
+  });
 
   const displayedClips = uniqueClips.filter((c) => {
     const t = (c.title || '').toLowerCase();
@@ -490,6 +500,35 @@ export default function ClipEditorPage() {
                 <Share2 className="w-4 h-4" />
                 <span>Publish to YouTube Shorts &amp; Instagram Reels</span>
               </button>
+
+              {/* DaVinci Resolve Timeline Export (via samuelgursky/davinci-resolve-mcp) */}
+              <div className="grid grid-cols-2 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const edl = generateDaVinciEDL(selectedClip, video || undefined);
+                    downloadFile(edl, `${selectedClip.id}_davinci_timeline.edl`, 'text/plain');
+                  }}
+                  className="py-2 px-3 rounded-xl text-[11px] font-bold bg-[#141624] hover:bg-[#1f2238] text-amber-300 border border-amber-500/40 hover:border-amber-400 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                  title="Export CMX 3600 EDL for DaVinci Resolve Studio & Free"
+                >
+                  <Film className="w-3.5 h-3.5 text-amber-400" />
+                  <span>DaVinci EDL</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const fcpxml = generateDaVinciFCPXML(selectedClip, video || undefined);
+                    downloadFile(fcpxml, `${selectedClip.id}_davinci_timeline.fcpxml`, 'application/xml');
+                  }}
+                  className="py-2 px-3 rounded-xl text-[11px] font-bold bg-[#141624] hover:bg-[#1f2238] text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                  title="Export FCPXML Timeline for DaVinci Resolve (1080x1920 60FPS)"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>DaVinci XML</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
