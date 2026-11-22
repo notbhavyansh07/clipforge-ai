@@ -56,7 +56,7 @@ export default function ClipEditorPage() {
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
   const [showSafeZoneOverlay, setShowSafeZoneOverlay] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
-  const [streamFilter, setStreamFilter] = useState<'all' | 'top' | 'crash' | 'drift'>('all');
+  const [streamFilter, setStreamFilter] = useState<'all' | 'top' | 'pursuits' | 'heists' | 'crashes'>('all');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Editable clip metadata
@@ -206,10 +206,47 @@ export default function ClipEditorPage() {
   const sortedClips = [...clips].sort((a, b) => (b.virality_score || 0) - (a.virality_score || 0));
   const topClip = sortedClips[0];
 
-  const displayedClips = sortedClips.filter((c) => {
-    if (streamFilter === 'top') return (c.virality_score || 0) >= 98;
-    if (streamFilter === 'crash') return c.title.toLowerCase().includes('crash') || c.title.toLowerCase().includes('barrier');
-    if (streamFilter === 'drift') return c.title.toLowerCase().includes('drift') || c.title.toLowerCase().includes('wanted');
+  // Deduplicate clips by title and ID to guarantee 100% unique situation cards (no duplicate cards)
+  const uniqueClips = sortedClips.filter(
+    (c, idx, arr) =>
+      arr.findIndex(
+        (x) =>
+          x.id === c.id ||
+          (x.title && c.title && x.title.trim().toLowerCase() === c.title.trim().toLowerCase())
+      ) === idx
+  );
+
+  const displayedClips = uniqueClips.filter((c) => {
+    const t = (c.title || '').toLowerCase();
+    const l = (c.location || '').toLowerCase();
+    if (streamFilter === 'top') return (c.virality_score || 0) >= 99;
+    if (streamFilter === 'pursuits')
+      return (
+        t.includes('pursuit') ||
+        t.includes('chiliad') ||
+        t.includes('stunt') ||
+        l.includes('chiliad') ||
+        l.includes('los santos')
+      );
+    if (streamFilter === 'heists')
+      return (
+        t.includes('heist') ||
+        t.includes('casino') ||
+        t.includes('snipers') ||
+        t.includes('jumpscare') ||
+        l.includes('casino') ||
+        l.includes('legion') ||
+        l.includes('webcam')
+      );
+    if (streamFilter === 'crashes')
+      return (
+        t.includes('crash') ||
+        t.includes('rage') ||
+        t.includes('storm') ||
+        l.includes('del perro') ||
+        l.includes('studio') ||
+        l.includes('pacific')
+      );
     return true;
   });
 
@@ -726,46 +763,56 @@ export default function ClipEditorPage() {
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 bg-[#12141e] p-1 rounded-xl border border-gray-800/80">
+          <div className="flex items-center gap-1.5 bg-[#12141e] p-1 rounded-xl border border-gray-800/80 overflow-x-auto">
             <button
               onClick={() => setStreamFilter('all')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 streamFilter === 'all'
                   ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
-              All ({sortedClips.length})
+              All ({uniqueClips.length})
             </button>
             <button
               onClick={() => setStreamFilter('top')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 streamFilter === 'top'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-emerald-400'
               }`}
             >
-              🔥 Top 98+
+              🔥 Top 99+
             </button>
             <button
-              onClick={() => setStreamFilter('crash')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                streamFilter === 'crash'
+              onClick={() => setStreamFilter('pursuits')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
+                streamFilter === 'pursuits'
                   ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
-              💥 Crashes
+              🚨 Pursuits & Stunts
             </button>
             <button
-              onClick={() => setStreamFilter('drift')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                streamFilter === 'drift'
+              onClick={() => setStreamFilter('heists')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
+                streamFilter === 'heists'
                   ? 'bg-purple-600 text-white shadow-sm'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
             >
-              🏎️ Drifts
+              💎 Heists & Trolling
+            </button>
+            <button
+              onClick={() => setStreamFilter('crashes')}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
+                streamFilter === 'crashes'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              💥 Crashes & Rage
             </button>
           </div>
         </div>

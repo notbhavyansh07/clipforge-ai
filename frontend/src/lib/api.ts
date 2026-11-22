@@ -13,13 +13,13 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v5';
-const VIDEOS_KEY = 'clipforge_videos_v5';
+const CLIPS_KEY = 'clipforge_clips_v7';
+const VIDEOS_KEY = 'clipforge_videos_v7';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
   try {
-    const raw = localStorage.getItem(VIDEOS_KEY);
+    const raw = localStorage.getItem(VIDEOS_KEY) || localStorage.getItem('clipforge_videos_v5');
     if (raw) {
       const parsed: Video[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -47,12 +47,12 @@ function saveStoredVideos(videos: Video[]) {
 function getStoredClips(): Clip[] {
   if (typeof window === 'undefined') return INITIAL_CLIPS;
   try {
-    const raw = localStorage.getItem(CLIPS_KEY);
+    const raw = localStorage.getItem(CLIPS_KEY) || localStorage.getItem('clipforge_clips_v5');
     if (raw) {
       const parsed: Clip[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const initMap = new Map(INITIAL_CLIPS.map((c) => [c.id, c]));
-        // Keep initial clips authoritative for output_path and thumbnail_path, but preserve user status (e.g. published)
+        // Keep initial clips authoritative for output_path, thumbnail_path, location, incident_type, and title
         const merged = INITIAL_CLIPS.map((ic) => {
           const userC = parsed.find((p) => p.id === ic.id);
           if (userC) {
@@ -64,7 +64,16 @@ function getStoredClips(): Clip[] {
           }
           return ic;
         });
-        const custom = parsed.filter((p) => !initMap.has(p.id));
+
+        // Filter out duplicate cards and legacy repetitive clips
+        const seenTitles = new Set(INITIAL_CLIPS.map((c) => (c.title || '').toLowerCase()));
+        const custom = parsed.filter((p) => {
+          if (initMap.has(p.id)) return false;
+          const t = (p.title || '').toLowerCase();
+          if (seenTitles.has(t)) return false;
+          seenTitles.add(t);
+          return true;
+        });
         return [...merged, ...custom];
       }
     }
@@ -287,19 +296,19 @@ export const api = {
       score_breakdown: clipData.score_breakdown || { hook: 98, emotion: 98, pacing: 97, story: 95, trend: 99 },
       virality_reason: clipData.virality_reason || 'High emotional peak and fast-paced gameplay.',
       status: clipData.status || 'rendered',
-      output_path: clipData.output_path || 'clips/clip-speed-01-crash.mp4',
-      thumbnail_path: clipData.thumbnail_path || '/clips/clip-speed-01-crash_thumb.jpg',
-      location: clipData.location || 'Livestream Action',
-      incident_type: clipData.incident_type || 'Streamer Highlight',
+      output_path: clipData.output_path || 'clips/clip-inc-02-chase.mp4',
+      thumbnail_path: clipData.thumbnail_path || '/clips/clip-inc-02-chase_thumb.jpg',
+      location: clipData.location || 'Downtown Los Santos',
+      incident_type: clipData.incident_type || '5-Star Police Chopper Pursuit',
       stream_time_formatted: clipData.stream_time_formatted || `00:${Math.floor((clipData.start_time ?? 10) / 60).toString().padStart(2, '0')}:00`,
       tags: clipData.tags || ['#Shorts', '#Viral', '#Gaming'],
-      views_count: clipData.views_count || 50000,
-      retention_rate: clipData.retention_rate || 90.0,
+      views_count: clipData.views_count || 120000,
+      retention_rate: clipData.retention_rate || 92.0,
       created_at: new Date().toISOString(),
       framing_mode: clipData.framing_mode || 'split_facecam',
-      chat_burst_score: clipData.chat_burst_score || 9.2,
-      peak_chatters: clipData.peak_chatters || 2200,
-      reaction_emojis: clipData.reaction_emojis || ['🔥', '😱', '⚡'],
+      chat_burst_score: clipData.chat_burst_score || 9.4,
+      peak_chatters: clipData.peak_chatters || 3200,
+      reaction_emojis: clipData.reaction_emojis || ['🔥', '🚨', '⚡'],
     };
 
     try {
@@ -335,23 +344,58 @@ export const api = {
       if (res.ok) return await res.json();
     } catch {}
 
+    const q = query.toLowerCase();
+    let sample = {
+      video: 'clip-inc-02-chase',
+      location: 'Downtown Los Santos',
+      incident: '5-Star Police Chopper Pursuit',
+      icon: '🚨'
+    };
+
+    if (q.includes('stunt') || q.includes('jump') || q.includes('chiliad') || q.includes('bike') || q.includes('fall')) {
+      sample = { video: 'clip-inc-11-stunt', location: 'Mount Chiliad Summit', incident: '1,000ft Cliff Parachute Stunt', icon: '🚀' };
+    } else if (q.includes('casino') || q.includes('heist') || q.includes('vault') || q.includes('alarm') || q.includes('drill')) {
+      sample = { video: 'clip-inc-09-heist', location: 'Diamond Casino & Resort', incident: 'Stealth Heist Alarm Failure', icon: '💎' };
+    } else if (q.includes('sniper') || q.includes('troll') || q.includes('chat') || q.includes('voice') || q.includes('funny')) {
+      sample = { video: 'clip-inc-08-ai', location: 'Legion Square / City Center', incident: 'Stream Sniper Lobby Mayhem', icon: '🤣' };
+    } else if (q.includes('shoot') || q.includes('swat') || q.includes('beach') || q.includes('gun') || q.includes('rpg')) {
+      sample = { video: 'clip-inc-07-shootout', location: 'Vespucci Beach Boardwalk', incident: 'SWAT Tactical Shootout', icon: '🎯' };
+    } else if (q.includes('storm') || q.includes('water') || q.includes('ocean') || q.includes('sea') || q.includes('wave')) {
+      sample = { video: 'clip-inc-10-graphics', location: 'Pacific Bluffs Ocean', incident: 'Night Hurricane Jet Ski Escape', icon: '🌊' };
+    } else if (q.includes('jumpscare') || q.includes('scare') || q.includes('face') || q.includes('close') || q.includes('scream')) {
+      sample = { video: 'clip-speed-05-jumpscare', location: 'Ultra Close-Up Webcam', incident: '0-Inch Lens Jumpscare & Chat Mayhem', icon: '💀' };
+    } else if (q.includes('rage') || q.includes('desk') || q.includes('break') || q.includes('setup') || q.includes('smash')) {
+      sample = { video: 'clip-speed-04-rage', location: 'Streamer Studio Setup', incident: 'Streamer Freakout & Desk Slam', icon: '🤬' };
+    } else if (q.includes('crash') || q.includes('highway') || q.includes('speed') || q.includes('wall') || q.includes('car')) {
+      sample = { video: 'clip-speed-01-crash', location: 'Del Perro Freeway', incident: '300MPH Violent Vehicle Crash', icon: '💥' };
+    }
+
     const newClip: Clip = {
       id: `clip-prompt-${Date.now()}`,
       video_id: videoId,
-      title: `⚡ AI HIGHLIGHT: ${query.toUpperCase()}`,
+      title: `${sample.icon} ${query.toUpperCase()}`,
       hook_text: `WAIT FOR THIS PART! 😱`,
-      description: `AI detected viral moment matching: "${query}"`,
-      start_time: 15.0,
-      end_time: 30.0,
+      description: `AI detected viral moment matching: "${query}" in ${sample.location}`,
+      start_time: 25.0,
+      end_time: 40.0,
       duration: 15.0,
-      virality_score: 96.5,
-      score_breakdown: { hook: 98, emotion: 97, pacing: 95, story: 94, trend: 98 },
+      virality_score: 98.4,
+      score_breakdown: { hook: 99, emotion: 98, pacing: 97, story: 95, trend: 99 },
       virality_reason: `Detected key query match "${query}" with high emotional spike.`,
       status: 'rendered',
-      tags: ['#Shorts', '#Viral', '#Gaming'],
-      views_count: 0,
-      retention_rate: 0,
+      output_path: `clips/${sample.video}.mp4`,
+      thumbnail_path: `/clips/${sample.video}_thumb.jpg`,
+      location: sample.location,
+      incident_type: sample.incident,
+      stream_time_formatted: '00:25:00',
+      tags: ['#Shorts', '#Viral', '#Gaming', `#${sample.location.replace(/[^a-zA-Z0-9]/g, '')}`],
+      views_count: 85000,
+      retention_rate: 92.5,
       created_at: new Date().toISOString(),
+      framing_mode: 'split_facecam',
+      chat_burst_score: 9.3,
+      peak_chatters: 2400,
+      reaction_emojis: ['🔥', sample.icon],
     };
     saveStoredClips([newClip, ...getStoredClips()]);
     return newClip;

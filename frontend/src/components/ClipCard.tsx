@@ -94,13 +94,19 @@ export default function ClipCard({
           {clip.location && (
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-900 border border-gray-800 text-gray-300">
               <MapPin className="w-3 h-3 text-red-400 shrink-0" />
-              <span className="truncate max-w-[140px]">{clip.location}</span>
+              <span className="truncate max-w-[130px]">{clip.location}</span>
+            </span>
+          )}
+          {clip.incident_type && (
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-purple-950/40 border border-purple-800/40 text-purple-300">
+              <Zap className="w-2.5 h-2.5 text-yellow-400 shrink-0" />
+              <span className="truncate max-w-[140px]">{clip.incident_type}</span>
             </span>
           )}
           {clip.chat_burst_score && (
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-950/50 border border-purple-800/60 text-purple-300">
               <MessageSquare className="w-2.5 h-2.5 text-purple-400" />
-              <span>{clip.chat_burst_score}x Chat Burst</span>
+              <span>{clip.chat_burst_score}x</span>
               {clip.reaction_emojis && <span>{clip.reaction_emojis.join('')}</span>}
             </span>
           )}
