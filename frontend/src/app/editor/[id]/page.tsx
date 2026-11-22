@@ -269,10 +269,10 @@ export default function ClipEditorPage() {
           {selectedClip && (
             <button
               onClick={() => setIsPublishOpen(true)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white transition flex items-center gap-2 shadow-md shadow-red-600/30"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 hover:opacity-95 text-white transition flex items-center gap-2 shadow-md shadow-pink-600/30"
             >
-              <Youtube className="w-4 h-4" />
-              <span>Publish to Shorts</span>
+              <Share2 className="w-4 h-4" />
+              <span>Publish (YouTube &amp; Instagram)</span>
             </button>
           )}
         </div>
@@ -448,10 +448,10 @@ export default function ClipEditorPage() {
               <button
                 type="button"
                 onClick={() => setIsPublishOpen(true)}
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white transition-all flex items-center justify-center gap-2 shadow-md shadow-red-600/20"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 hover:opacity-95 text-white transition-all flex items-center justify-center gap-2 shadow-md shadow-pink-600/25"
               >
-                <Youtube className="w-4 h-4" />
-                <span>Publish Directly to YouTube Shorts</span>
+                <Share2 className="w-4 h-4" />
+                <span>Publish to YouTube Shorts &amp; Instagram Reels</span>
               </button>
             </div>
           )}

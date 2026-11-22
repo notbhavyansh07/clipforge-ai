@@ -46,6 +46,9 @@ export interface Clip {
   tags?: string[];
   youtube_video_id?: string;
   youtube_publish_time?: string | null;
+  instagram_media_id?: string;
+  instagram_url?: string;
+  instagram_publish_time?: string | null;
   views_count?: number;
   retention_rate?: number;
   created_at?: string;
@@ -114,5 +117,8 @@ export interface PublishPayload {
   scheduled_at?: string;
   include_attribution: boolean;
   privacy_status?: string;
+  platforms?: ('youtube' | 'instagram')[];
+  instagram_access_token?: string;
+  instagram_account_id?: string;
 }
 

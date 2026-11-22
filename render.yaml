@@ -29,6 +29,18 @@ services:
         value: 10000
       - key: NEXT_PUBLIC_API_URL
         value: https://clipforge-backend.onrender.com
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://clipforge-frontend-04i1.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REFRESH_TOKEN
+        sync: false
+      - key: INSTAGRAM_ACCESS_TOKEN
+        sync: false
+      - key: INSTAGRAM_ACCOUNT_ID
+        sync: false
       - key: BACKEND_INTERNAL_URL
         fromService:
           type: web

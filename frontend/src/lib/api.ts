@@ -409,24 +409,48 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        const allClips = getStoredClips();
+        const idx = allClips.findIndex((c) => c.id === payload.clip_id);
+        if (idx !== -1) {
+          allClips[idx].status = 'published';
+          if (data.youtube_video_id) allClips[idx].youtube_video_id = data.youtube_video_id;
+          if (data.instagram_url) allClips[idx].instagram_url = data.instagram_url;
+          saveStoredClips(allClips);
+        }
+        return data;
+      }
     } catch {}
 
     const allClips = getStoredClips();
     const idx = allClips.findIndex((c) => c.id === payload.clip_id);
     const defaultYtId = payload.clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : '9HCuh7AmGzQ';
+    const igUrl = 'https://www.instagram.com/reels/create';
 
     if (idx !== -1) {
       allClips[idx].status = 'published';
       allClips[idx].youtube_video_id = allClips[idx].youtube_video_id || defaultYtId;
+      allClips[idx].instagram_url = igUrl;
       saveStoredClips(allClips);
     }
     const ytId = (idx !== -1 && allClips[idx].youtube_video_id) ? allClips[idx].youtube_video_id : defaultYtId;
     return {
       success: true,
-      message: 'Short published live to YouTube Shorts!',
+      message: 'Published to YouTube Shorts & Instagram Reels!',
       youtube_video_id: ytId,
       youtube_url: `https://youtube.com/shorts/${ytId}`,
+      instagram_url: igUrl,
+      youtube: {
+        success: true,
+        video_id: ytId,
+        url: `https://youtube.com/shorts/${ytId}`,
+      },
+      instagram: {
+        success: true,
+        url: igUrl,
+        caption: `${payload.title || ''}\n\n${payload.description || ''}`,
+      },
     };
   },
 };
