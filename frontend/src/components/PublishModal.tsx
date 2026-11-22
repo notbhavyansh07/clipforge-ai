@@ -195,36 +195,51 @@ export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }
 
               {/* Instagram Result */}
               {selectedPlatforms.includes('instagram') && (
-                <div className="p-3.5 rounded-xl bg-[#161824] border border-pink-900/40 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-lg bg-gradient-to-tr from-yellow-500 via-pink-600 to-purple-600 text-white">
-                      <Instagram className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <span>Instagram Reels</span>
-                        <span className="text-[10px] text-pink-400 bg-pink-950 px-1.5 py-0.2 rounded font-mono">READY</span>
+                <div className="p-3.5 rounded-xl bg-[#161824] border border-pink-900/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-lg bg-gradient-to-tr from-yellow-500 via-pink-600 to-purple-600 text-white">
+                        <Instagram className="w-4 h-4" />
                       </div>
-                      <div className="text-[11px] text-gray-400">Caption auto-copied to clipboard</div>
+                      <div>
+                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Instagram Reels</span>
+                          <span className="text-[10px] text-pink-400 bg-pink-950 px-1.5 py-0.2 rounded font-mono">READY</span>
+                        </div>
+                        <div className="text-[11px] text-gray-400">Caption &amp; 1080p 60FPS video ready</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyIgCaption}
+                        className="px-2.5 py-1.5 rounded-lg bg-[#222538] hover:bg-[#2b2f48] text-[11px] font-semibold text-gray-200 border border-gray-700 transition flex items-center gap-1"
+                        title="Copy caption with hashtags"
+                      >
+                        {copiedIgCaption ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedIgCaption ? 'Copied' : 'Copy Caption'}</span>
+                      </button>
+                      <a
+                        href="https://www.instagram.com/reels/create"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-pink-600/30"
+                      >
+                        <span>📸 Open Reels Web</span>
+                      </a>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleCopyIgCaption}
-                      className="px-2.5 py-1.5 rounded-lg bg-[#222538] hover:bg-[#2b2f48] text-[11px] font-semibold text-gray-200 border border-gray-700 transition flex items-center gap-1"
-                      title="Copy caption with hashtags"
-                    >
-                      {copiedIgCaption ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedIgCaption ? 'Copied' : 'Copy'}</span>
-                    </button>
+
+                  {/* Creator Guidance Banner */}
+                  <div className="p-2.5 rounded-lg bg-[#1a1d2e] border border-pink-950 text-[11px] text-gray-300 leading-relaxed flex items-center justify-between">
+                    <span>💡 <strong>Instagram Tip:</strong> If logged into Instagram on your PC, click <strong>Open Reels Web</strong>. On mobile, use <strong>Save Video</strong> and upload from the Instagram app with your copied caption.</span>
                     <a
-                      href="https://www.instagram.com/reels/create"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:opacity-90 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-pink-600/30"
+                      href={downloadUrl}
+                      download={`${clip.title}.mp4`}
+                      className="ml-2 px-2.5 py-1 rounded-md bg-purple-600/40 hover:bg-purple-600 text-white text-[10px] font-bold whitespace-nowrap transition"
                     >
-                      <span>📸 Open Reels</span>
+                      Save Video
                     </a>
                   </div>
                 </div>

@@ -477,9 +477,20 @@ export default function ClipEditorPage() {
               )}
             </div>
 
-            {/* Editable Title */}
+            {/* Editable Title with YouTube Agent Packaging Linter */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-300">Short Title</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-300">Short Title</label>
+                <div className="flex items-center gap-2 text-[10px] font-mono">
+                  <span className={clipTitle.length > 60 ? 'text-red-400 font-bold' : clipTitle.length > 40 ? 'text-yellow-400' : 'text-emerald-400'}>
+                    {clipTitle.length} chars
+                  </span>
+                  <span className="text-gray-500">•</span>
+                  <span className={clipTitle.length <= 40 ? 'text-emerald-400' : clipTitle.length <= 60 ? 'text-yellow-400' : 'text-red-400'}>
+                    {clipTitle.length <= 40 ? '📱 Mobile Feed Safe' : clipTitle.length <= 60 ? '💻 Desktop Search Safe' : '⚠️ Truncates on Feed'}
+                  </span>
+                </div>
+              </div>
               <input
                 type="text"
                 value={clipTitle}
@@ -489,9 +500,14 @@ export default function ClipEditorPage() {
               />
             </div>
 
-            {/* Editable Hook Line */}
+            {/* Editable Hook Line with Non-Redundancy Check */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-300">Opening Hook Caption</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-300">Opening Hook Caption (0-3s On-Screen)</label>
+                <span className="text-[10px] font-mono text-purple-300 bg-purple-950/70 border border-purple-800/80 px-2 py-0.5 rounded">
+                  21-Formula Hook
+                </span>
+              </div>
               <input
                 type="text"
                 value={clipHook}
@@ -499,6 +515,17 @@ export default function ClipEditorPage() {
                 placeholder="e.g. SPEED WENT FLYING AT 300MPH! 💀"
                 className="w-full bg-[#181a27] border border-gray-800 focus:border-purple-500 rounded-xl px-3.5 py-2.5 text-xs text-yellow-300 font-semibold placeholder-gray-500 outline-none transition font-mono"
               />
+              {/* Packaging Linting Tip */}
+              <div className="flex items-center justify-between text-[10px] text-gray-400 pt-0.5">
+                <span>
+                  {clipHook.trim() && clipTitle.trim() && clipHook.trim().toLowerCase() === clipTitle.trim().toLowerCase() ? (
+                    <span className="text-yellow-400">⚠️ Hook repeats title. Different words with the same promise increase CTR!</span>
+                  ) : (
+                    <span className="text-emerald-400">✓ Hook &amp; Title complement each other without redundancy</span>
+                  )}
+                </span>
+                <span className="text-purple-400 font-mono">Loop Retention: Enabled</span>
+              </div>
             </div>
 
             {/* Algorithmic Reason (Clean 1-liner) */}

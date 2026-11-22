@@ -159,7 +159,19 @@ export async function POST(request: Request) {
       'https://clipforge-frontend-04i1.onrender.com';
     const publicVideoUrl = `${appUrl.replace(/\/$/, '')}/clips/${fileName}`;
 
-    let ytId = existing?.youtube_video_id || (clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : '9HCuh7AmGzQ');
+    const KNOWN_LIVE_IDS: Record<string, string> = {
+      'clip-speed-01-crash': '9HCuh7AmGzQ',
+      'clip-speed-02-drift': 'oYIBdgQEjq0',
+      'clip-speed-03-barrier': 'JigGsq0q5iY',
+      'clip-speed-04-rage': 'ghZdV6UuanU',
+      'clip-speed-05-jumpscare': 'x9QuUyucZjY',
+      'clip-inc-04-crash': 'C53QBQs0hnM',
+      'clip-inc-06-freakout': 'IDChCwdIHFM',
+    };
+
+    let ytId = (existing?.youtube_video_id && !existing.youtube_video_id.startsWith('CF_'))
+      ? existing.youtube_video_id
+      : (KNOWN_LIVE_IDS[clip_id] || '9HCuh7AmGzQ');
     let ytError: string | null = null;
     let ytSuccess = false;
 

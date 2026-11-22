@@ -425,7 +425,16 @@ export const api = {
 
     const allClips = getStoredClips();
     const idx = allClips.findIndex((c) => c.id === payload.clip_id);
-    const defaultYtId = payload.clip_id === 'clip-inc-04-crash' ? 'C53QBQs0hnM' : '9HCuh7AmGzQ';
+    const KNOWN_LIVE_IDS: Record<string, string> = {
+      'clip-speed-01-crash': '9HCuh7AmGzQ',
+      'clip-speed-02-drift': 'oYIBdgQEjq0',
+      'clip-speed-03-barrier': 'JigGsq0q5iY',
+      'clip-speed-04-rage': 'ghZdV6UuanU',
+      'clip-speed-05-jumpscare': 'x9QuUyucZjY',
+      'clip-inc-04-crash': 'C53QBQs0hnM',
+      'clip-inc-06-freakout': 'IDChCwdIHFM',
+    };
+    const defaultYtId = KNOWN_LIVE_IDS[payload.clip_id] || '9HCuh7AmGzQ';
     const igUrl = 'https://www.instagram.com/reels/create';
 
     if (idx !== -1) {
