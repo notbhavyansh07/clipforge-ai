@@ -18,542 +18,329 @@ export const INITIAL_VIDEOS: Video[] = [
     "error_message": null,
     "transcript": [
       {
-        "id": 0,
-        "start": 0.5,
-        "end": 4.0,
-        "text": "Yo did you see what Rockstar just dropped for GTA 6?",
-        "words": [
-          {
-            "word": "Yo",
+            "id": 0,
             "start": 0.5,
-            "end": 0.82,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "did",
-            "start": 0.82,
-            "end": 1.14,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "you",
-            "start": 1.14,
-            "end": 1.45,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "see",
-            "start": 1.45,
-            "end": 1.77,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "what",
-            "start": 1.77,
-            "end": 2.09,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "Rockstar",
-            "start": 2.09,
-            "end": 2.41,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "just",
-            "start": 2.41,
-            "end": 2.73,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "dropped",
-            "start": 2.73,
-            "end": 3.05,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "for",
-            "start": 3.05,
-            "end": 3.36,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "GTA",
-            "start": 3.36,
-            "end": 3.68,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "6?",
-            "start": 3.68,
             "end": 4.0,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 188.6,
-        "filler_count": 0
+            "text": "Bhai mai nahi bachunga, gadi full speed me palti kha gayi!",
+            "words": [
+                  {
+                        "word": "Bhai",
+                        "start": 0.5,
+                        "end": 0.9,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "mai",
+                        "start": 0.9,
+                        "end": 1.3,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "nahi",
+                        "start": 1.3,
+                        "end": 1.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "bachunga,",
+                        "start": 1.7,
+                        "end": 2.3,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "gadi",
+                        "start": 2.3,
+                        "end": 2.8,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "full",
+                        "start": 2.8,
+                        "end": 3.2,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "speed",
+                        "start": 3.2,
+                        "end": 3.6,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "me!",
+                        "start": 3.6,
+                        "end": 4.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  }
+            ],
+            "wpm": 140.0,
+            "filler_count": 0
       },
       {
-        "id": 1,
-        "start": 4.5,
-        "end": 9.5,
-        "text": "This is completely insane, they literally redesigned the entire Vice City physics engine.",
-        "words": [
-          {
-            "word": "This",
+            "id": 1,
             "start": 4.5,
-            "end": 4.88,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "is",
-            "start": 4.88,
-            "end": 5.27,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "completely",
-            "start": 5.27,
-            "end": 5.65,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "insane,",
-            "start": 5.65,
-            "end": 6.04,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "they",
-            "start": 6.04,
-            "end": 6.42,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "literally",
-            "start": 6.42,
-            "end": 6.81,
-            "probability": 0.98,
-            "is_filler": true
-          },
-          {
-            "word": "redesigned",
-            "start": 6.81,
-            "end": 7.19,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "the",
-            "start": 7.19,
-            "end": 7.58,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "entire",
-            "start": 7.58,
-            "end": 7.96,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "Vice",
-            "start": 7.96,
-            "end": 8.35,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "City",
-            "start": 8.35,
-            "end": 8.73,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "physics",
-            "start": 8.73,
-            "end": 9.12,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "engine.",
-            "start": 9.12,
             "end": 9.5,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 156.0,
-        "filler_count": 1
+            "text": "Oye 200 ki speed pe sidha divider me thok di bhai, pura ud gaya car!",
+            "words": [
+                  {
+                        "word": "Oye",
+                        "start": 4.5,
+                        "end": 4.9,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "200",
+                        "start": 4.9,
+                        "end": 5.4,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "ki",
+                        "start": 5.4,
+                        "end": 5.8,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "speed",
+                        "start": 5.8,
+                        "end": 6.3,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "pe",
+                        "start": 6.3,
+                        "end": 6.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "sidha",
+                        "start": 6.7,
+                        "end": 7.2,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "divider",
+                        "start": 7.2,
+                        "end": 7.8,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "me",
+                        "start": 7.8,
+                        "end": 8.2,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "thok",
+                        "start": 8.2,
+                        "end": 8.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "di!",
+                        "start": 8.7,
+                        "end": 9.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  }
+            ],
+            "wpm": 145.0,
+            "filler_count": 0
       },
       {
-        "id": 2,
-        "start": 10.0,
-        "end": 14.5,
-        "text": "Look at this scene right here, the crowd reaction AI is unmatched.",
-        "words": [
-          {
-            "word": "Look",
+            "id": 2,
             "start": 10.0,
-            "end": 10.38,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "at",
-            "start": 10.38,
-            "end": 10.75,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "this",
-            "start": 10.75,
-            "end": 11.12,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "scene",
-            "start": 11.12,
-            "end": 11.5,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "right",
-            "start": 11.5,
-            "end": 11.88,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "here,",
-            "start": 11.88,
-            "end": 12.25,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "the",
-            "start": 12.25,
-            "end": 12.62,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "crowd",
-            "start": 12.62,
-            "end": 13.0,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "reaction",
-            "start": 13.0,
-            "end": 13.38,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "AI",
-            "start": 13.38,
-            "end": 13.75,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "is",
-            "start": 13.75,
-            "end": 14.12,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "unmatched.",
-            "start": 14.12,
             "end": 14.5,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 160.0,
-        "filler_count": 0
+            "text": "Dekho scene bhai, Vice City me 5 star wanted level lag chuka hai!",
+            "words": [
+                  {
+                        "word": "Dekho",
+                        "start": 10.0,
+                        "end": 10.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "scene",
+                        "start": 10.5,
+                        "end": 11.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "bhai,",
+                        "start": 11.0,
+                        "end": 11.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "Vice",
+                        "start": 11.5,
+                        "end": 12.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "City",
+                        "start": 12.0,
+                        "end": 12.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "police",
+                        "start": 12.5,
+                        "end": 13.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "piche",
+                        "start": 13.0,
+                        "end": 13.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "pad",
+                        "start": 13.7,
+                        "end": 14.1,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "gayi!",
+                        "start": 14.1,
+                        "end": 14.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  }
+            ],
+            "wpm": 140.0,
+            "filler_count": 0
       },
       {
-        "id": 3,
-        "start": 15.0,
-        "end": 19.0,
-        "text": "Everybody was doubting if it could run at 60 fps on next gen.",
-        "words": [
-          {
-            "word": "Everybody",
+            "id": 3,
             "start": 15.0,
-            "end": 15.31,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "was",
-            "start": 15.31,
-            "end": 15.62,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "doubting",
-            "start": 15.62,
-            "end": 15.92,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "if",
-            "start": 15.92,
-            "end": 16.23,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "it",
-            "start": 16.23,
-            "end": 16.54,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "could",
-            "start": 16.54,
-            "end": 16.85,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "run",
-            "start": 16.85,
-            "end": 17.15,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "at",
-            "start": 17.15,
-            "end": 17.46,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "60",
-            "start": 17.46,
-            "end": 17.77,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "fps",
-            "start": 17.77,
-            "end": 18.08,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "on",
-            "start": 18.08,
-            "end": 18.38,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "next",
-            "start": 18.38,
-            "end": 18.69,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "gen.",
-            "start": 18.69,
             "end": 19.0,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 195.0,
-        "filler_count": 0
+            "text": "Mount Chiliad se mega bike ramp stunt maar raha hu!",
+            "words": [
+                  {
+                        "word": "Mount",
+                        "start": 15.0,
+                        "end": 15.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "Chiliad",
+                        "start": 15.5,
+                        "end": 16.2,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "se",
+                        "start": 16.2,
+                        "end": 16.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "mega",
+                        "start": 16.7,
+                        "end": 17.3,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "bike",
+                        "start": 17.3,
+                        "end": 17.8,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "jump!",
+                        "start": 17.8,
+                        "end": 19.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  }
+            ],
+            "wpm": 135.0,
+            "filler_count": 0
       },
       {
-        "id": 4,
-        "start": 19.5,
-        "end": 22.5,
-        "text": "And this leak just proved everyone wrong!",
-        "words": [
-          {
-            "word": "And",
+            "id": 4,
             "start": 19.5,
-            "end": 19.93,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "this",
-            "start": 19.93,
-            "end": 20.36,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "leak",
-            "start": 20.36,
-            "end": 20.79,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "just",
-            "start": 20.79,
-            "end": 21.21,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "proved",
-            "start": 21.21,
-            "end": 21.64,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "everyone",
-            "start": 21.64,
-            "end": 22.07,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "wrong!",
-            "start": 22.07,
-            "end": 22.5,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 140.0,
-        "filler_count": 0
-      },
-      {
-        "id": 5,
-        "start": 23.0,
-        "end": 26.5,
-        "text": "Let me know in the comments if you are preordering day one.",
-        "words": [
-          {
-            "word": "Let",
-            "start": 23.0,
-            "end": 23.29,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "me",
-            "start": 23.29,
-            "end": 23.58,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "know",
-            "start": 23.58,
-            "end": 23.88,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "in",
-            "start": 23.88,
-            "end": 24.17,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "the",
-            "start": 24.17,
-            "end": 24.46,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "comments",
-            "start": 24.46,
-            "end": 24.75,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "if",
-            "start": 24.75,
-            "end": 25.04,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "you",
-            "start": 25.04,
-            "end": 25.33,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "are",
-            "start": 25.33,
-            "end": 25.63,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "preordering",
-            "start": 25.63,
-            "end": 25.92,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "day",
-            "start": 25.92,
-            "end": 26.21,
-            "probability": 0.98,
-            "is_filler": false
-          },
-          {
-            "word": "one.",
-            "start": 26.21,
-            "end": 26.5,
-            "probability": 0.98,
-            "is_filler": false
-          }
-        ],
-        "wpm": 205.7,
-        "filler_count": 0
+            "end": 24.0,
+            "text": "Parachute khul gaya bhai, kya next-gen ocean graphics hai!",
+            "words": [
+                  {
+                        "word": "Parachute",
+                        "start": 19.5,
+                        "end": 20.3,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "khul",
+                        "start": 20.3,
+                        "end": 20.9,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "gaya",
+                        "start": 20.9,
+                        "end": 21.5,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "bhai,",
+                        "start": 21.5,
+                        "end": 22.1,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "kya",
+                        "start": 22.1,
+                        "end": 22.7,
+                        "probability": 0.99,
+                        "is_filler": false
+                  },
+                  {
+                        "word": "graphics!",
+                        "start": 22.7,
+                        "end": 24.0,
+                        "probability": 0.99,
+                        "is_filler": false
+                  }
+            ],
+            "wpm": 130.0,
+            "filler_count": 0
       }
-    ],
+],
     "audio_metrics": "{\"average_energy\": 0.0829, \"energy_peaks\": [0.0, 0.5, 1.0, 1.5, 16.0, 16.5, 18.0, 18.5, 25.5, 26.0, 27.0, 27.5], \"silence_intervals\": []}",
     "scene_cuts": "[5.0, 15.0, 30.0, 45.0, 60.0]",
     "is_live": true,
@@ -843,7 +630,7 @@ export const INITIAL_CLIPS: Clip[] = [
       "trend": 100
     },
     "virality_reason": "Unprecedented 200MPH collision showing realistic vehicle deformation and ragdoll physics.",
-    "status": "scheduled",
+    "status": "rendered",
     "output_path": "clips/clip-inc-04-crash.mp4",
     "thumbnail_path": "/clips/clip-inc-04-crash_thumb.jpg",
     "captions_data": "[{\"word\": \"200 KI SPEED\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"PE UDAYA! \\ud83c\\udfce\\ufe0f\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"SAMNE DEKHO\", \"start\": 1.5, \"end\": 2.4}, {\"word\": \"SAMNE DEKHO! \\ud83d\\udea8\", \"start\": 2.4, \"end\": 3.3}, {\"word\": \"BRAKE MAAR\", \"start\": 3.3, \"end\": 4.3}, {\"word\": \"OH BHAI GAYA! \\ud83d\\udc80\", \"start\": 4.3, \"end\": 5.4}, {\"word\": \"BOOOOOM!\", \"start\": 5.4, \"end\": 6.5}, {\"word\": \"CRASH HO GAYA! \\ud83d\\udca5\", \"start\": 6.5, \"end\": 7.6}, {\"word\": \"CAR HAWA MEIN\", \"start\": 7.6, \"end\": 8.8}, {\"word\": \"3 FLIPS LIYE! \\ud83c\\udf2a\\ufe0f\", \"start\": 8.8, \"end\": 10.0}, {\"word\": \"BODY DAMAGE\", \"start\": 10.0, \"end\": 11.5}, {\"word\": \"MODEL DEKHO! \\ud83d\\ude97\", \"start\": 11.5, \"end\": 13.2}, {\"word\": \"KAISE BACHA\", \"start\": 13.2, \"end\": 14.5}, {\"word\": \"BHAI AAKHIR?! \\ud83d\\ude31\", \"start\": 14.5, \"end\": 15.8}, {\"word\": \"RATE CRASH\", \"start\": 15.8, \"end\": 16.5}, {\"word\": \"1 TO 10! \\ud83d\\udc47\", \"start\": 16.5, \"end\": 17.0}]",
@@ -1225,7 +1012,7 @@ export const INITIAL_CLIPS: Clip[] = [
       "trend": 100
     },
     "virality_reason": "Epic motorcycle ramp jump off a Vice City skyscraper ending in a parachute deployment above Ocean Drive.",
-    "status": "rendered",
+    "status": "scheduled",
     "output_path": "clips/clip-inc-11-stunt.mp4",
     "thumbnail_path": "/clips/clip-inc-11-stunt_thumb.jpg",
     "captions_data": "[{\"word\": \"RAMP DEKHO\", \"start\": 0.0, \"end\": 0.7}, {\"word\": \"SAMNE SKYSCRAPER! \\ud83c\\udfe2\", \"start\": 0.7, \"end\": 1.5}, {\"word\": \"500 FEET KA\", \"start\": 1.5, \"end\": 2.5}, {\"word\": \"MEGA JUMP! \\ud83d\\ude80\", \"start\": 2.5, \"end\": 3.6}, {\"word\": \"BIKE HAWA MEIN\", \"start\": 3.6, \"end\": 4.8}, {\"word\": \"UDI PURA! \\ud83d\\ude31\", \"start\": 4.8, \"end\": 6.2}, {\"word\": \"PARACHUTE DEPLOY\", \"start\": 6.2, \"end\": 7.6}, {\"word\": \"TIME PAR! \\ud83e\\ude82\", \"start\": 7.6, \"end\": 9.2}, {\"word\": \"OCEAN DRIVE KA\", \"start\": 9.2, \"end\": 11.0}, {\"word\": \"INSANE VIEW! \\ud83c\\udf34\", \"start\": 11.0, \"end\": 13.0}, {\"word\": \"PERFECT LANDING\", \"start\": 13.0, \"end\": 15.0}, {\"word\": \"RESPECT +++ \\ud83d\\udd76\\ufe0f\", \"start\": 15.0, \"end\": 16.5}, {\"word\": \"LIKE AND SUBSCRIBE\", \"start\": 16.5, \"end\": 17.5}, {\"word\": \"FOR PART 2! \\u2764\\ufe0f\", \"start\": 17.5, \"end\": 18.0}]",
@@ -1250,7 +1037,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "location": "Mile-High Skyscraper Tower",
     "incident_type": "500ft Ramp Stunt Finale",
     "stream_time_formatted": "09:45:00 (Hour 10)",
-    "scheduled_publish_time": null,
+    "scheduled_publish_time": "2026-11-23 13:30:00",
     "chat_burst_score": 9.9,
     "peak_chatters": 410,
     "reaction_emojis": [
@@ -1665,7 +1452,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "High altitude vehicular stunt with screaming physical streamer reaction.",
     "status": "scheduled",
     "output_path": "clips/clip-speed-06-accel.mp4",
-    "thumbnail_path": "/clips/clip-speed-06-accel_thumb.jpg",
+    "thumbnail_path": "/clips/clip-speed-09-stuntramp_thumb.jpg",
     "captions_data": "[{\"word\":\"FULL BOOST!\",\"start\":0,\"end\":1.5},{\"word\":\"INTO THE CLOUDS!\",\"start\":1.5,\"end\":3.5},{\"word\":\"HE IS FLYING!\",\"start\":3.5,\"end\":5.5}]",
     "youtube_video_id": null,
     "youtube_publish_time": null,
@@ -2008,7 +1795,7 @@ export const INITIAL_CLIPS: Clip[] = [
     "virality_reason": "Leading global trending topic: next-generation photorealistic fluid dynamics breakdown.",
     "status": "scheduled",
     "output_path": "clips/clip-inc-10-graphics.mp4",
-    "thumbnail_path": "/clips/clip-inc-10-graphics_thumb.jpg",
+    "thumbnail_path": "/clips/clip-trend-01-water_thumb.jpg",
     "captions_data": "[{\"word\":\"REAL-TIME WAVES!\",\"start\":0,\"end\":1.5},{\"word\":\"CATEGORY 5 STORM!\",\"start\":1.5,\"end\":3.5},{\"word\":\"IS THIS REAL LIFE?!\",\"start\":3.5,\"end\":5.5}]",
     "youtube_video_id": null,
     "youtube_publish_time": null,

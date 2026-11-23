@@ -13,13 +13,13 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v10';
-const VIDEOS_KEY = 'clipforge_videos_v10';
+const CLIPS_KEY = 'clipforge_clips_v11';
+const VIDEOS_KEY = 'clipforge_videos_v11';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
   try {
-    const raw = localStorage.getItem(VIDEOS_KEY) || localStorage.getItem('clipforge_videos_v7') || localStorage.getItem('clipforge_videos_v5');
+    const raw = localStorage.getItem(VIDEOS_KEY);
     if (raw) {
       const parsed: Video[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -47,7 +47,7 @@ function saveStoredVideos(videos: Video[]) {
 function getStoredClips(): Clip[] {
   if (typeof window === 'undefined') return INITIAL_CLIPS;
   try {
-    const raw = localStorage.getItem(CLIPS_KEY) || localStorage.getItem('clipforge_clips_v7') || localStorage.getItem('clipforge_clips_v5');
+    const raw = localStorage.getItem(CLIPS_KEY);
     if (raw) {
       const parsed: Clip[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -74,11 +74,15 @@ function getStoredClips(): Clip[] {
         const custom = parsed.filter((p) => {
           if (initMap.has(p.id)) return false;
           // Strictly purge any CarryMinati clips from Speed's livestream
-          if (p.video_id === 'vid-speed-gta-crash' && (p.thumbnail_path?.includes('clip-inc') || p.output_path?.includes('clip-inc') || p.tags?.some(t => t.toLowerCase().includes('carry')))) {
+          if (p.video_id === 'vid-speed-gta-crash' && (p.thumbnail_path?.includes('clip-inc') || p.output_path?.includes('clip-inc') || p.tags?.some((t) => t.toLowerCase().includes('carry')))) {
             return false;
           }
           // Strictly purge any Speed clips from CarryMinati's livestream
-          if (p.video_id === 'a5d7460f-90e1-4e4e-9051-210d35430446' && (p.thumbnail_path?.includes('clip-speed') || p.output_path?.includes('clip-speed') || p.tags?.some(t => t.toLowerCase().includes('speed')))) {
+          if (p.video_id === 'a5d7460f-90e1-4e4e-9051-210d35430446' && (p.thumbnail_path?.includes('clip-speed') || p.output_path?.includes('clip-speed') || p.tags?.some((t) => t.toLowerCase().includes('speed')))) {
+            return false;
+          }
+          // Strictly purge cross-contamination from Daily Trending
+          if (p.video_id === 'vid-trending-daily-viral' && (p.thumbnail_path?.includes('clip-speed') || p.thumbnail_path?.includes('clip-inc-04'))) {
             return false;
           }
 
@@ -623,25 +627,41 @@ export const api = {
     const carryClips = allClips.filter(
       (c) =>
         (c.video_id === 'a5d7460f-90e1-4e4e-9051-210d35430446' || (c.tags && c.tags.some((t) => t.toLowerCase().includes('carry')))) &&
-        !c.thumbnail_path?.includes('clip-speed')
+        !c.thumbnail_path?.includes('clip-speed') &&
+        !c.id.startsWith('clip-speed-') &&
+        !c.id.startsWith('clip-trend-')
     );
-    const scheduledCarry = carryClips.find((c) => c.status === 'scheduled') || carryClips.find((c) => c.status !== 'published') || carryClips[0];
+    const scheduledCarry =
+      carryClips.find((c) => c.id === 'clip-inc-11-stunt') ||
+      carryClips.find((c) => c.status === 'scheduled') ||
+      carryClips[0];
 
     // 2. Slot 2: IShowSpeed (6:00 PM IST)
     const speedClips = allClips.filter(
       (c) =>
         (c.video_id === 'vid-speed-gta-crash' || (c.tags && c.tags.some((t) => t.toLowerCase().includes('speed')))) &&
-        !c.thumbnail_path?.includes('clip-inc')
+        !c.thumbnail_path?.includes('clip-inc') &&
+        !c.id.startsWith('clip-inc-') &&
+        !c.id.startsWith('clip-trend-')
     );
-    const scheduledSpeed = speedClips.find((c) => c.status === 'scheduled') || speedClips.find((c) => c.status !== 'published') || speedClips[0];
+    const scheduledSpeed =
+      speedClips.find((c) => c.id === 'clip-speed-09-stuntramp') ||
+      speedClips.find((c) => c.status === 'scheduled') ||
+      speedClips[0];
 
     // 3. Slot 3: Daily Trending Viral Discovery (9:30 PM IST)
     const trendClips = allClips.filter(
       (c) =>
-        c.video_id === 'vid-trending-daily-viral' ||
-        (c.tags && c.tags.some((t) => t.toLowerCase().includes('trending') || t.toLowerCase().includes('gta6')))
+        (c.video_id === 'vid-trending-daily-viral' || c.id.startsWith('clip-trend-')) &&
+        !c.id.startsWith('clip-inc-') &&
+        !c.id.startsWith('clip-speed-') &&
+        !c.thumbnail_path?.includes('clip-inc') &&
+        !c.thumbnail_path?.includes('clip-speed')
     );
-    const scheduledTrend = trendClips.find((c) => c.status === 'scheduled') || trendClips.find((c) => c.status !== 'published') || trendClips[0];
+    const scheduledTrend =
+      trendClips.find((c) => c.id === 'clip-trend-01-water') ||
+      trendClips.find((c) => c.status === 'scheduled') ||
+      trendClips[0];
 
     const slots = [
       {
