@@ -7,6 +7,7 @@ import {
   spring,
   useCurrentFrame,
   useVideoConfig,
+  Video as RemotionVideo,
 } from 'remotion';
 import { Clip, Video, RenderOptions } from '@/lib/types';
 
@@ -35,20 +36,33 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
 
   // Find active transcript word
   const activeWordInfo = React.useMemo(() => {
-    if (!video.transcript) return null;
-    for (const seg of video.transcript) {
-      if (absoluteTime >= seg.start && absoluteTime <= seg.end) {
-        if (seg.words && seg.words.length > 0) {
-          const w = seg.words.find(
-            (item) => absoluteTime >= item.start && absoluteTime <= item.end
-          );
-          if (w) return { word: w.word, start: w.start, end: w.end };
+    // 1. Check clip.captions_data first (relative to clipTime)
+    if (clip.captions_data) {
+      try {
+        const parsed = typeof clip.captions_data === 'string' ? JSON.parse(clip.captions_data) : clip.captions_data;
+        if (Array.isArray(parsed)) {
+          const match = parsed.find((w: any) => clipTime >= w.start && clipTime <= w.end);
+          if (match) return { word: match.word, start: clip.start_time + match.start, end: clip.start_time + match.end };
         }
-        return { word: seg.text, start: seg.start, end: seg.end };
+      } catch {}
+    }
+
+    // 2. Check video.transcript (absolute time)
+    if (video.transcript) {
+      for (const seg of video.transcript) {
+        if (absoluteTime >= seg.start && absoluteTime <= seg.end) {
+          if (seg.words && seg.words.length > 0) {
+            const w = seg.words.find(
+              (item) => absoluteTime >= item.start && absoluteTime <= item.end
+            );
+            if (w) return { word: w.word, start: w.start, end: w.end };
+          }
+          return { word: seg.text, start: seg.start, end: seg.end };
+        }
       }
     }
     return null;
-  }, [video.transcript, absoluteTime]);
+  }, [clip.captions_data, video.transcript, clipTime, absoluteTime, clip.start_time]);
 
   const activeWord = activeWordInfo?.word || clip.hook_text || clip.title || 'WAIT FOR THIS PART! 😱';
 
@@ -70,8 +84,8 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
   // Retention progress bar at top of video
   const progressPercent = (frame / durationInFrames) * 100;
 
-  // Split-screen calculation
-  const isSplitScreen = renderOptions.split_screen;
+  // Split-screen calculation: only split if explicitly requested AND not a single-track clip
+  const isSplitScreen = renderOptions.split_screen && renderOptions.framing_mode === 'split_facecam';
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000000', overflow: 'hidden' }}>
@@ -95,7 +109,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
       {isSplitScreen ? (
         // Split-screen mode: Top FaceCam + Bottom Action
         <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          {/* Top Half: Streamer FaceCam (40%) */}
+          {/* Top Half: Streamer FaceCam (42%) */}
           <div
             style={{
               position: 'relative',
@@ -106,16 +120,15 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
               borderBottom: '4px solid #a855f7',
             }}
           >
-            <video
+            <RemotionVideo
               src={videoUrl}
-              poster={posterUrl}
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
                 objectPosition: 'center 20%',
               }}
-              playsInline
+              volume={0}
               muted
             />
 
@@ -178,7 +191,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
             }}
           />
 
-          {/* Bottom Half: Gameplay Action (58%) */}
+          {/* Bottom Half: Action Stream (58%) */}
           <div
             style={{
               position: 'relative',
@@ -188,33 +201,27 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
               backgroundColor: '#000000',
             }}
           >
-            <video
+            <RemotionVideo
               src={videoUrl}
-              poster={posterUrl}
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
                 objectPosition: 'center 75%',
               }}
-              playsInline
-              muted
             />
           </div>
         </div>
       ) : (
         // Fullscreen 9:16 Centered Crop
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <video
+          <RemotionVideo
             src={videoUrl}
-            poster={posterUrl}
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
             }}
-            playsInline
-            muted
           />
         </div>
       )}

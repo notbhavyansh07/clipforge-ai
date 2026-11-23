@@ -13,8 +13,8 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v12';
-const VIDEOS_KEY = 'clipforge_videos_v12';
+const CLIPS_KEY = 'clipforge_clips_v13';
+const VIDEOS_KEY = 'clipforge_videos_v13';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;

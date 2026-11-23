@@ -112,6 +112,17 @@ export default function ClipEditorPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const selectedClipRef = useRef<Clip | null>(null);
 
+  useEffect(() => {
+    if (selectedClip) {
+      const isSplit = selectedClip.framing_mode === 'split_facecam';
+      setRenderOptions((prev) => ({
+        ...prev,
+        split_screen: isSplit,
+        framing_mode: isSplit ? 'split_facecam' : 'fill_player_track',
+      }));
+    }
+  }, [selectedClip?.id, selectedClip?.framing_mode]);
+
   // VoiceStudio AI Voiceover Narrator state
   const [voiceHookStyle, setVoiceHookStyle] = useState<'hype' | 'trailer' | 'shock' | 'cyber'>('hype');
   const [isVoicePlaying, setIsVoicePlaying] = useState<boolean>(false);
@@ -588,8 +599,8 @@ export default function ClipEditorPage() {
               </div>
             )}
 
-            {/* Live Split-Screen FaceCam HUD Overlay */}
-            {selectedClip && renderOptions.split_screen && (
+            {/* Live Split-Screen FaceCam HUD Overlay (Native Mode Only) */}
+            {playerMode === 'native' && selectedClip && renderOptions.split_screen && (
               <div className="absolute top-0 inset-x-0 h-[38%] pointer-events-none z-10 border-b-2 border-purple-500/80 bg-gradient-to-b from-purple-950/60 via-purple-900/20 to-transparent flex flex-col justify-between p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-black/85 text-purple-300 border border-purple-500/50 flex items-center gap-1.5 shadow-md">
@@ -611,8 +622,8 @@ export default function ClipEditorPage() {
               </div>
             )}
 
-            {/* Live Subtitle Overlay Engine (Hormozi Gold / Cyber Neon / Clean Minimal) */}
-            {selectedClip && renderOptions.enable_animated_captions && currentSubtitle && (
+            {/* Live Subtitle Overlay Engine (Native Mode Only) */}
+            {playerMode === 'native' && selectedClip && renderOptions.enable_animated_captions && currentSubtitle && (
               <div className="absolute bottom-16 inset-x-3 text-center pointer-events-none z-20 flex justify-center animate-in fade-in duration-150">
                 {renderOptions.caption_preset === 'karaoke_bold' ? (
                   <div className="bg-black/90 px-4 py-2 rounded-2xl border-2 border-yellow-400 shadow-2xl backdrop-blur-md max-w-[90%]">
@@ -636,8 +647,8 @@ export default function ClipEditorPage() {
               </div>
             )}
 
-            {/* Virality Floating Metric */}
-            {selectedClip && (
+            {/* Virality Floating Metric (Native Mode Only) */}
+            {playerMode === 'native' && selectedClip && (
               <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur border border-emerald-500/50 text-emerald-400 text-xs font-black pointer-events-none z-20 flex items-center gap-1 shadow-lg">
                 <Zap className="w-3.5 h-3.5 fill-current" />
                 <span>{selectedClip.virality_score} VIRAL</span>
