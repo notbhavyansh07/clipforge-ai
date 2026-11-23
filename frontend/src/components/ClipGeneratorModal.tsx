@@ -16,6 +16,8 @@ import {
   AlertCircle,
   Loader2,
   TrendingUp,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { Clip, Video } from '@/lib/types';
@@ -45,6 +47,40 @@ export default function ClipGeneratorModal({
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+  const [isListening, setIsListening] = useState(false);
+
+  const toggleVoiceDictation = () => {
+    if (typeof window === 'undefined') return;
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert('Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRec();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => setIsListening(true);
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend = () => setIsListening(false);
+
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -289,6 +325,19 @@ export default function ClipGeneratorModal({
   const handleSelectPreset = async (preset: (typeof PRESET_INCIDENTS)[0]) => {
     try {
       setLoading(true);
+      const existingClips = await api.getClipsForVideo(video.id);
+      const matched = existingClips.find(
+        (c) =>
+          c.output_path?.includes(preset.video_file) ||
+          c.location?.toLowerCase().trim() === preset.category.toLowerCase().trim() ||
+          c.title?.toLowerCase().trim() === preset.title.toLowerCase().trim()
+      );
+      if (matched) {
+        onClipCreated(matched);
+        onClose();
+        return;
+      }
+
       const newClip: Clip = {
         id: `clip-${video.id.substring(0, 8)}-${preset.id_suffix}-${Date.now().toString().slice(-4)}`,
         video_id: video.id,
@@ -317,7 +366,7 @@ export default function ClipGeneratorModal({
           .padStart(2, '0')}:${Math.floor(preset.start_time % 60)
           .toString()
           .padStart(2, '0')}`,
-        tags: ['#Shorts', '#Viral', '#Gaming', `#${preset.category.replace(/\s+/g, '')}`],
+        tags: ['#Shorts', '#Viral', isSpeedVideo ? '#IShowSpeed' : '#CarryMinati', `#${preset.category.replace(/\s+/g, '')}`],
         views_count: Math.floor(preset.virality_score * 1200),
         retention_rate: Math.round(preset.virality_score * 0.92 * 10) / 10,
         created_at: new Date().toISOString(),
@@ -343,31 +392,36 @@ export default function ClipGeneratorModal({
     try {
       setLoading(true);
       setScanProgress('Analyzing acoustic energy peaks & screaming spikes...');
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 400));
 
       setScanProgress('Detecting YOLOX streamer facecam coordinates...');
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 400));
 
       setScanProgress('Computing MAD chat velocity burst radar...');
-      await new Promise((r) => setTimeout(r, 600));
+      await new Promise((r) => setTimeout(r, 400));
 
-      setScanProgress('Compositing Carry-style 9:16 split-screen layout & micro-pops...');
-      await new Promise((r) => setTimeout(r, 700));
+      setScanProgress('Compositing creator 9:16 split-screen layout & micro-pops...');
+      await new Promise((r) => setTimeout(r, 500));
 
       // Find diverse candidates that are not yet added to ensure zero duplicates & maximum situation diversity
       const existingClips = await api.getClipsForVideo(video.id);
-      const existingTitles = new Set(existingClips.map((c) => (c.title || '').toLowerCase()));
-      const existingLocations = new Set(existingClips.map((c) => (c.location || '').toLowerCase()));
+      const existingTitles = new Set(existingClips.map((c) => (c.title || '').toLowerCase().trim()));
+      const existingLocations = new Set(existingClips.map((c) => (c.location || '').toLowerCase().trim()));
+      const existingFiles = new Set(existingClips.map((c) => (c.output_path || '').trim()));
 
-      let candidatePresets = PRESET_INCIDENTS.filter(
-        (p) => !existingTitles.has(p.title.toLowerCase()) && !existingLocations.has(p.category.toLowerCase())
+      const candidatePresets = PRESET_INCIDENTS.filter(
+        (p) =>
+          !existingTitles.has(p.title.toLowerCase().trim()) &&
+          !existingLocations.has(p.category.toLowerCase().trim()) &&
+          !existingFiles.has(`clips/${p.video_file}.mp4`)
       );
 
-      if (candidatePresets.length < 3) {
-        const extra = PRESET_INCIDENTS.filter(
-          (p) => !existingTitles.has(p.title.toLowerCase()) && !candidatePresets.includes(p)
-        );
-        candidatePresets = [...candidatePresets, ...extra];
+      if (candidatePresets.length === 0) {
+        alert('All unique viral locations and incidents for this livestream are already loaded in your studio!');
+        setScanProgress(null);
+        setLoading(false);
+        onClose();
+        return;
       }
 
       const unadded = candidatePresets.slice(0, 3);
@@ -393,7 +447,7 @@ export default function ClipGeneratorModal({
           stream_time_formatted: `00:${Math.floor(p.start_time / 60)
             .toString()
             .padStart(2, '0')}:00`,
-          tags: ['#Shorts', '#Viral', '#AIHighlight', `#${p.category.replace(/[^a-zA-Z0-9]/g, '')}`],
+          tags: ['#Shorts', '#Viral', isSpeedVideo ? '#IShowSpeed' : '#CarryMinati', `#${p.category.replace(/[^a-zA-Z0-9]/g, '')}`],
           views_count: Math.floor(p.virality_score * 1100),
           retention_rate: 91.5,
           created_at: new Date().toISOString(),
@@ -773,16 +827,40 @@ export default function ClipGeneratorModal({
           {activeTab === 'search' && (
             <form onSubmit={handleSearchMoment} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-300">Describe What Happened in the Stream</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-gray-300">Describe What Happened in the Stream</label>
+                  <button
+                    type="button"
+                    onClick={toggleVoiceDictation}
+                    className={`text-[11px] px-2.5 py-1 rounded-xl flex items-center gap-1.5 font-bold transition ${
+                      isListening
+                        ? 'bg-red-500/20 text-red-400 border border-red-500/50 animate-pulse'
+                        : 'bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-800/60'
+                    }`}
+                    title="Speak prompt using OpenWhispr voice dictation"
+                  >
+                    {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5 text-purple-400" />}
+                    <span>{isListening ? 'Listening... Speak Now' : '🎙️ Speak Prompt'}</span>
+                  </button>
+                </div>
                 <div className="relative">
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="e.g. Speed barking at the camera, car flipping, rage freakout..."
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#141622] border border-gray-800 text-white text-xs focus:outline-none focus:border-purple-500"
+                    className="w-full pl-10 pr-12 py-3 rounded-2xl bg-[#141622] border border-gray-800 text-white text-xs focus:outline-none focus:border-purple-500"
                   />
                   <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-3.5" />
+                  <button
+                    type="button"
+                    onClick={toggleVoiceDictation}
+                    className={`absolute right-3 top-2.5 p-1 rounded-lg transition ${
+                      isListening ? 'text-red-400 bg-red-950/50 animate-ping' : 'text-gray-400 hover:text-purple-300'
+                    }`}
+                  >
+                    <Mic className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 

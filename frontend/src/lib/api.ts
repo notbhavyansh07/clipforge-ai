@@ -65,17 +65,37 @@ function getStoredClips(): Clip[] {
           return ic;
         });
 
-        // Filter out duplicate cards, legacy repetitive clips, and Carry clips that leaked into Speed
-        const seenTitles = new Set(INITIAL_CLIPS.map((c) => (c.title || '').toLowerCase()));
+        // Filter out duplicate cards, legacy repetitive clips, and cross-creator leaks
+        const seenLocations = new Set(INITIAL_CLIPS.map((c) => (c.location || '').toLowerCase().trim()));
+        const seenIncidents = new Set(INITIAL_CLIPS.map((c) => (c.incident_type || '').toLowerCase().trim()));
+        const seenTitles = new Set(INITIAL_CLIPS.map((c) => (c.title || '').toLowerCase().trim()));
+        const seenPaths = new Set(INITIAL_CLIPS.map((c) => (c.output_path || '').trim()));
+
         const custom = parsed.filter((p) => {
           if (initMap.has(p.id)) return false;
           // Strictly purge any CarryMinati clips from Speed's livestream
-          if (p.video_id === 'vid-speed-gta-crash' && (p.thumbnail_path?.includes('clip-inc') || p.output_path?.includes('clip-inc'))) {
+          if (p.video_id === 'vid-speed-gta-crash' && (p.thumbnail_path?.includes('clip-inc') || p.output_path?.includes('clip-inc') || p.tags?.some(t => t.toLowerCase().includes('carry')))) {
             return false;
           }
-          const t = (p.title || '').toLowerCase();
-          if (seenTitles.has(t)) return false;
-          seenTitles.add(t);
+          // Strictly purge any Speed clips from CarryMinati's livestream
+          if (p.video_id === 'a5d7460f-90e1-4e4e-9051-210d35430446' && (p.thumbnail_path?.includes('clip-speed') || p.output_path?.includes('clip-speed') || p.tags?.some(t => t.toLowerCase().includes('speed')))) {
+            return false;
+          }
+
+          const loc = (p.location || '').toLowerCase().trim();
+          const inc = (p.incident_type || '').toLowerCase().trim();
+          const t = (p.title || '').toLowerCase().trim();
+          const path = (p.output_path || '').trim();
+
+          if (path && seenPaths.has(path)) return false;
+          if (loc && seenLocations.has(loc)) return false;
+          if (inc && seenIncidents.has(inc)) return false;
+          if (t && seenTitles.has(t)) return false;
+
+          if (path) seenPaths.add(path);
+          if (loc) seenLocations.add(loc);
+          if (inc) seenIncidents.add(inc);
+          if (t) seenTitles.add(t);
           return true;
         });
         return [...merged, ...custom];
@@ -91,6 +111,52 @@ function saveStoredClips(clips: Clip[]) {
       localStorage.setItem(CLIPS_KEY, JSON.stringify(clips));
     } catch {}
   }
+}
+
+// Helper to sanitize and deduplicate clips strictly per creator video
+export function sanitizeClipsForVideo(rawClips: Clip[], videoId: string): Clip[] {
+  const isSpeed = videoId === 'vid-speed-gta-crash' || videoId.toLowerCase().includes('speed');
+  const isCarry = videoId === 'a5d7460f-90e1-4e4e-9051-210d35430446' || videoId.toLowerCase().includes('carry');
+
+  const filtered = rawClips.filter((c) => {
+    if (c.video_id && c.video_id !== videoId) return false;
+    if (isSpeed) {
+      if (c.thumbnail_path?.includes('clip-inc') || c.output_path?.includes('clip-inc')) return false;
+      if (c.tags && c.tags.some((t) => t.toLowerCase().includes('carry'))) return false;
+    }
+    if (isCarry) {
+      if (c.thumbnail_path?.includes('clip-speed') || c.output_path?.includes('clip-speed')) return false;
+      if (c.tags && c.tags.some((t) => t.toLowerCase().includes('speed'))) return false;
+    }
+    return true;
+  });
+
+  const seenPaths = new Set<string>();
+  const seenLocations = new Set<string>();
+  const seenIncidents = new Set<string>();
+  const seenTitles = new Set<string>();
+
+  const deduped: Clip[] = [];
+  for (const c of filtered) {
+    const p = (c.output_path || '').trim();
+    const loc = (c.location || '').trim().toLowerCase();
+    const inc = (c.incident_type || '').trim().toLowerCase();
+    const title = (c.title || '').trim().toLowerCase();
+
+    if (p && seenPaths.has(p)) continue;
+    if (loc && seenLocations.has(loc)) continue;
+    if (inc && seenIncidents.has(inc)) continue;
+    if (title && seenTitles.has(title)) continue;
+
+    if (p) seenPaths.add(p);
+    if (loc) seenLocations.add(loc);
+    if (inc) seenIncidents.add(inc);
+    if (title) seenTitles.add(title);
+
+    deduped.push(c);
+  }
+
+  return deduped;
 }
 
 export const api = {
@@ -222,12 +288,14 @@ export const api = {
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) return data;
+        if (Array.isArray(data) && data.length > 0) {
+          return sanitizeClipsForVideo(data, videoId);
+        }
       }
     } catch {}
 
     const filtered = getStoredClips().filter((c) => c.video_id === videoId);
-    return filtered;
+    return sanitizeClipsForVideo(filtered, videoId);
   },
 
   async getClip(clipId: string): Promise<Clip> {
@@ -286,28 +354,29 @@ export const api = {
   },
 
   async createClip(clipData: Partial<Clip>): Promise<Clip> {
+    const isSpeed = clipData.video_id === 'vid-speed-gta-crash' || (clipData.video_id || '').toLowerCase().includes('speed');
     const id = clipData.id || `clip-gen-${Date.now()}`;
     const newClip: Clip = {
       id,
       video_id: clipData.video_id || '',
-      title: clipData.title || '🔥 New Viral Moment',
-      hook_text: clipData.hook_text || 'WAIT TILL THE END! 😱',
+      title: clipData.title || (isSpeed ? '💥 300MPH SPEED CRASH' : '🔥 New Viral Moment'),
+      hook_text: clipData.hook_text || (isSpeed ? 'SPEED WENT FLYING! 💀' : 'WAIT TILL THE END! 😱'),
       description: clipData.description || 'Auto-generated viral moment from livestream.',
-      start_time: clipData.start_time ?? 10.0,
-      end_time: clipData.end_time ?? 25.0,
-      duration: Math.round(((clipData.end_time ?? 25.0) - (clipData.start_time ?? 10.0)) * 10) / 10,
+      start_time: clipData.start_time ?? (isSpeed ? 96.0 : 10.0),
+      end_time: clipData.end_time ?? (isSpeed ? 111.5 : 25.0),
+      duration: Math.round(((clipData.end_time ?? (isSpeed ? 111.5 : 25.0)) - (clipData.start_time ?? (isSpeed ? 96.0 : 10.0))) * 10) / 10,
       virality_score: clipData.virality_score ?? 98.0,
       score_breakdown: clipData.score_breakdown || { hook: 98, emotion: 98, pacing: 97, story: 95, trend: 99 },
       virality_reason: clipData.virality_reason || 'High emotional peak and fast-paced gameplay.',
       status: clipData.status || 'rendered',
-      output_path: clipData.output_path || 'clips/clip-inc-02-chase.mp4',
-      thumbnail_path: clipData.thumbnail_path || '/clips/clip-inc-02-chase_thumb.jpg',
-      location: clipData.location || 'Downtown Los Santos',
-      incident_type: clipData.incident_type || '5-Star Police Chopper Pursuit',
+      output_path: clipData.output_path || (isSpeed ? 'clips/clip-speed-01-crash.mp4' : 'clips/clip-inc-02-chase.mp4'),
+      thumbnail_path: clipData.thumbnail_path || (isSpeed ? '/clips/clip-speed-01-crash_thumb.jpg' : '/clips/clip-inc-02-chase_thumb.jpg'),
+      location: clipData.location || (isSpeed ? 'Del Perro Freeway' : 'Downtown Los Santos'),
+      incident_type: clipData.incident_type || (isSpeed ? '300MPH Violent Vehicle Crash' : '5-Star Police Chopper Pursuit'),
       stream_time_formatted: clipData.stream_time_formatted || `00:${Math.floor((clipData.start_time ?? 10) / 60).toString().padStart(2, '0')}:00`,
-      tags: clipData.tags || ['#Shorts', '#Viral', '#Gaming'],
-      views_count: clipData.views_count || 120000,
-      retention_rate: clipData.retention_rate || 92.0,
+      tags: clipData.tags || (isSpeed ? ['#Shorts', '#Viral', '#IShowSpeed', '#Crash'] : ['#Shorts', '#Viral', '#CarryMinati', '#Gaming']),
+      views_count: clipData.views_count || (isSpeed ? 180000 : 120000),
+      retention_rate: clipData.retention_rate || 93.5,
       created_at: new Date().toISOString(),
       framing_mode: clipData.framing_mode || 'split_facecam',
       chat_burst_score: clipData.chat_burst_score || 9.4,
@@ -345,43 +414,71 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       });
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const moment = await res.json();
+        if (videoId === 'vid-speed-gta-crash' && (moment.thumbnail_path?.includes('clip-inc') || moment.output_path?.includes('clip-inc'))) {
+          // Skip leaked Carry clip from backend
+        } else {
+          return moment;
+        }
+      }
     } catch {}
 
     const q = query.toLowerCase();
-    let sample = {
-      video: 'clip-inc-02-chase',
-      location: 'Downtown Los Santos',
-      incident: '5-Star Police Chopper Pursuit',
-      icon: '🚨'
+    const isSpeed = videoId === 'vid-speed-gta-crash' || videoId.toLowerCase().includes('speed');
+
+    let sample: {
+      video: string;
+      location: string;
+      incident: string;
+      icon: string;
+      hook: string;
+      time: number;
     };
 
-    if (q.includes('stunt') || q.includes('jump') || q.includes('chiliad') || q.includes('bike') || q.includes('fall')) {
-      sample = { video: 'clip-inc-11-stunt', location: 'Mount Chiliad Summit', incident: '1,000ft Cliff Parachute Stunt', icon: '🚀' };
-    } else if (q.includes('casino') || q.includes('heist') || q.includes('vault') || q.includes('alarm') || q.includes('drill')) {
-      sample = { video: 'clip-inc-09-heist', location: 'Diamond Casino & Resort', incident: 'Stealth Heist Alarm Failure', icon: '💎' };
-    } else if (q.includes('sniper') || q.includes('troll') || q.includes('chat') || q.includes('voice') || q.includes('funny')) {
-      sample = { video: 'clip-inc-08-ai', location: 'Legion Square / City Center', incident: 'Stream Sniper Lobby Mayhem', icon: '🤣' };
-    } else if (q.includes('shoot') || q.includes('swat') || q.includes('beach') || q.includes('gun') || q.includes('rpg')) {
-      sample = { video: 'clip-inc-07-shootout', location: 'Vespucci Beach Boardwalk', incident: 'SWAT Tactical Shootout', icon: '🎯' };
-    } else if (q.includes('storm') || q.includes('water') || q.includes('ocean') || q.includes('sea') || q.includes('wave')) {
-      sample = { video: 'clip-inc-10-graphics', location: 'Pacific Bluffs Ocean', incident: 'Night Hurricane Jet Ski Escape', icon: '🌊' };
-    } else if (q.includes('jumpscare') || q.includes('scare') || q.includes('face') || q.includes('close') || q.includes('scream')) {
-      sample = { video: 'clip-speed-05-jumpscare', location: 'Ultra Close-Up Webcam', incident: '0-Inch Lens Jumpscare & Chat Mayhem', icon: '💀' };
-    } else if (q.includes('rage') || q.includes('desk') || q.includes('break') || q.includes('setup') || q.includes('smash')) {
-      sample = { video: 'clip-speed-04-rage', location: 'Streamer Studio Setup', incident: 'Streamer Freakout & Desk Slam', icon: '🤬' };
-    } else if (q.includes('crash') || q.includes('highway') || q.includes('speed') || q.includes('wall') || q.includes('car')) {
-      sample = { video: 'clip-speed-01-crash', location: 'Del Perro Freeway', incident: '300MPH Violent Vehicle Crash', icon: '💥' };
+    if (isSpeed) {
+      if (q.includes('scream') || q.includes('mic') || q.includes('smash') || q.includes('loud') || q.includes('headphone')) {
+        sample = { video: 'clip-speed-08-deskslam', location: 'Studio Facecam Redline', incident: 'Mic Peaking Rage & Desk Slam', icon: '💥', hook: 'SPEED MIC BLEW OUT 40,000 HEADPHONES! 🔊', time: 190 };
+      } else if (q.includes('chat') || q.includes('roast') || q.includes('shock') || q.includes('disbelief') || q.includes('laugh')) {
+        sample = { video: 'clip-speed-07-shock', location: 'Pit Lane Stop', incident: 'Streamer Chat Reaction & Disbelief', icon: '😳', hook: 'SPEED COULD NOT BELIEVE WHAT CHAT SAID! 😭', time: 120 };
+      } else if (q.includes('nitro') || q.includes('highway') || q.includes('sprint') || q.includes('fast') || q.includes('weave')) {
+        sample = { video: 'clip-speed-06-accel', location: 'Los Santos Highway Bypass', incident: '250MPH Nitro Speed Run', icon: '⚡', hook: 'SPEED FLOORING THE THROTTLE TO 250MPH! ⚡', time: 30 };
+      } else if (q.includes('jumpscare') || q.includes('face') || q.includes('scare') || q.includes('close') || q.includes('911')) {
+        sample = { video: 'clip-speed-05-jumpscare', location: 'Ultra Close-Up Webcam', incident: '0-Inch Lens Jumpscare', icon: '💀', hook: 'SPEED JUMPSCARES 65,000 VIEWERS! 💀', time: 218 };
+      } else if (q.includes('rage') || q.includes('desk') || q.includes('break') || q.includes('freakout') || q.includes('hands')) {
+        sample = { video: 'clip-speed-04-rage', location: 'Streamer Studio Setup', incident: 'Streamer Freakout & Desk Slam', icon: '🤬', hook: 'SPEED BROKE HIS SETUP IN TOTAL RAGE! 😭', time: 168 };
+      } else if (q.includes('tire') || q.includes('barrier') || q.includes('wall') || q.includes('caution') || q.includes('yellow')) {
+        sample = { video: 'clip-speed-03-barrier', location: 'Grandstand Chicane', incident: 'Tire Barrier Impact & Yellow Flag', icon: '🛑', hook: 'SLAMMED DIRECTLY INTO SAFETY TIRES! 💥', time: 48 };
+      } else if (q.includes('drift') || q.includes('corner') || q.includes('turn') || q.includes('wheel') || q.includes('miss')) {
+        sample = { video: 'clip-speed-02-drift', location: 'Senna S-Curve Hairpin', incident: '150MPH Drift & Near Miss', icon: '🏎️', hook: 'SPEED ALMOST LOST CONTROL ON S-TURN! 🚨', time: 7 };
+      } else {
+        sample = { video: 'clip-speed-01-crash', location: 'Del Perro Freeway', incident: '300MPH Violent Vehicle Crash', icon: '💥', hook: 'SPEED WENT FLYING AT 300MPH! 💀', time: 96 };
+      }
+    } else {
+      // CarryMinati incidents
+      if (q.includes('stunt') || q.includes('jump') || q.includes('chiliad') || q.includes('mountain') || q.includes('parachute')) {
+        sample = { video: 'clip-inc-11-stunt', location: 'Mount Chiliad Summit', incident: '1,000ft Cliff Parachute Stunt', icon: '🚀', hook: '1,000FT MOUNT CHILIAD CLIFF JUMP! 🚀', time: 74 };
+      } else if (q.includes('casino') || q.includes('heist') || q.includes('vault') || q.includes('alarm') || q.includes('drill')) {
+        sample = { video: 'clip-inc-09-heist', location: 'Diamond Casino & Resort', incident: 'Stealth Heist Alarm Failure', icon: '💎', hook: 'DIAMOND CASINO VAULT LOCKDOWN! 💎', time: 112 };
+      } else if (q.includes('sniper') || q.includes('troll') || q.includes('chat') || q.includes('lobby') || q.includes('funny')) {
+        sample = { video: 'clip-inc-08-ai', location: 'Legion Square / City Center', incident: 'Stream Sniper Lobby Mayhem', icon: '🤣', hook: 'STREAM SNIPERS HIJACK THE SERVER! 🤣', time: 138 };
+      } else if (q.includes('shoot') || q.includes('swat') || q.includes('beach') || q.includes('gun') || q.includes('rpg')) {
+        sample = { video: 'clip-inc-07-shootout', location: 'Vespucci Beach Boardwalk', incident: 'SWAT Tactical Shootout', icon: '🎯', hook: 'SWAT FIVE-STAR BOARDWALK WARZONE! 🎯', time: 154 };
+      } else if (q.includes('storm') || q.includes('water') || q.includes('ocean') || q.includes('sea') || q.includes('wave')) {
+        sample = { video: 'clip-inc-10-graphics', location: 'Pacific Bluffs Ocean', incident: 'Night Hurricane Jet Ski Escape', icon: '🌊', hook: 'SURVIVING A CATEGORY 5 HURRICANE! 🌊', time: 172 };
+      } else {
+        sample = { video: 'clip-inc-02-chase', location: 'Downtown Los Santos', incident: '5-Star Police Chopper Pursuit', icon: '🚨', hook: '5-STAR COPS PURSUIT & CHOPPER TAKEDOWN! 🚨', time: 42 };
+      }
     }
 
     const newClip: Clip = {
       id: `clip-prompt-${Date.now()}`,
       video_id: videoId,
       title: `${sample.icon} ${query.toUpperCase()}`,
-      hook_text: `WAIT FOR THIS PART! 😱`,
-      description: `AI detected viral moment matching: "${query}" in ${sample.location}`,
-      start_time: 25.0,
-      end_time: 40.0,
+      hook_text: sample.hook,
+      description: `AI detected viral moment matching "${query}" in ${sample.location}`,
+      start_time: sample.time,
+      end_time: sample.time + 15.0,
       duration: 15.0,
       virality_score: 98.4,
       score_breakdown: { hook: 99, emotion: 98, pacing: 97, story: 95, trend: 99 },
@@ -391,10 +488,10 @@ export const api = {
       thumbnail_path: `/clips/${sample.video}_thumb.jpg`,
       location: sample.location,
       incident_type: sample.incident,
-      stream_time_formatted: '00:25:00',
-      tags: ['#Shorts', '#Viral', '#Gaming', `#${sample.location.replace(/[^a-zA-Z0-9]/g, '')}`],
-      views_count: 85000,
-      retention_rate: 92.5,
+      stream_time_formatted: `00:${Math.floor(sample.time / 60).toString().padStart(2, '0')}:00`,
+      tags: ['#Shorts', '#Viral', isSpeed ? '#IShowSpeed' : '#CarryMinati', `#${sample.location.replace(/[^a-zA-Z0-9]/g, '')}`],
+      views_count: 145000,
+      retention_rate: 93.5,
       created_at: new Date().toISOString(),
       framing_mode: 'split_facecam',
       chat_burst_score: 9.3,
