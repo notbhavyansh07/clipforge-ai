@@ -13,8 +13,8 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v13';
-const VIDEOS_KEY = 'clipforge_videos_v13';
+const CLIPS_KEY = 'clipforge_clips_v14';
+const VIDEOS_KEY = 'clipforge_videos_v14';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
@@ -645,7 +645,7 @@ export const api = {
         !c.id.startsWith('clip-trend-')
     );
     const scheduledSpeed =
-      speedClips.find((c) => c.id === 'clip-speed-09-stuntramp') ||
+      speedClips.find((c) => c.id === 'clip-speed-robotdog') ||
       speedClips.find((c) => c.status === 'scheduled') ||
       speedClips[0];
 
@@ -684,9 +684,9 @@ export const api = {
         video_id: 'vid-speed-gta-crash',
         clip: scheduledSpeed || null,
         status: scheduledSpeed?.status || 'scheduled',
-        peak_strategy: 'Peak US/Europe golden traffic surge with loudest audio screams',
-        youtube_video_id: scheduledSpeed?.youtube_video_id || '9HCuh7AmGzQ',
-        youtube_url: scheduledSpeed?.youtube_video_id ? `https://youtube.com/shorts/${scheduledSpeed.youtube_video_id}` : 'https://youtube.com/shorts/9HCuh7AmGzQ',
+        peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
+        youtube_video_id: scheduledSpeed?.youtube_video_id || 'nX7oT-jFXqU',
+        youtube_url: scheduledSpeed?.youtube_video_id ? `https://youtube.com/shorts/${scheduledSpeed.youtube_video_id}` : 'https://youtube.com/shorts/nX7oT-jFXqU',
       },
       {
         slot_number: 3,

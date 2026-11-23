@@ -69,8 +69,8 @@ class AutopilotService:
         # Slot 1: CarryisLive 1,000ft Stunt
         cls.schedule_clip("clip-inc-11-stunt", slot_1_today)
 
-        # Slot 2: IShowSpeed 400ft Mega Ramp Rocket Jump
-        cls.schedule_clip("clip-speed-09-stuntramp", slot_2_today)
+        # Slot 2: IShowSpeed AI Robot Dog Flamethrower Viral Freakout
+        cls.schedule_clip("clip-speed-robotdog", slot_2_today)
 
         # Slot 3: Daily Trending Internet Viral Reel (MrBeast $456,000 Squid Game)
         cls.schedule_clip("clip-trend-01-mrbeast", slot_3_today)

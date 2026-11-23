@@ -207,7 +207,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                objectPosition: 'center 75%',
+                objectPosition: 'center 88%',
               }}
             />
           </div>
@@ -231,7 +231,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
         <div
           style={{
             position: 'absolute',
-            bottom: height * 0.16,
+            bottom: height * 0.22,
             left: 0,
             right: 0,
             display: 'flex',
