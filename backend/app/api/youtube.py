@@ -177,3 +177,10 @@ def trigger_instant_upload(clip_id: str):
     if not res.get("success"):
         raise HTTPException(status_code=500, detail=res.get("error", "Upload failed"))
     return res
+
+@router.post("/autopilot/trigger-daily-cycle")
+def trigger_daily_cycle():
+    """Executes full daily cycle, uploading across all 3 peak viral slots (Carry, Speed, and Daily Trending)."""
+    from backend.app.services.autopilot_service import AutopilotService
+    res = AutopilotService.execute_daily_cycle()
+    return res

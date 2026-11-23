@@ -73,6 +73,15 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <Link
+            href="/autopilot"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-950/80 to-pink-950/80 hover:from-purple-900 hover:to-pink-900 text-purple-200 border border-purple-500/40 transition shadow-md shadow-purple-900/30"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="hidden sm:inline">⚡ Auto-Pilot (3/Day)</span>
+            <span className="sm:hidden">⚡ 3/Day</span>
+          </Link>
+
           {channelStatus.connected ? (
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-green-500/30 bg-green-500/10 text-green-400 text-[11px] sm:text-xs font-semibold shadow-sm shadow-green-500/10">
               <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 shrink-0" />

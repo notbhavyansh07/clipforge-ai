@@ -47,27 +47,44 @@ class AutopilotService:
 
     @classmethod
     def setup_initial_viral_queue(cls):
-        """Sets up default peak viral schedule for current clips."""
+        """Sets up default 3-slot daily peak viral schedule: Carry, Speed, and Daily Trending."""
         now_ist = datetime.now(IST)
         today_date = now_ist.date()
 
-        # Slot 1: Today 1:00 PM IST (13:00)
-        slot_1_today = datetime(today_date.year, today_date.month, today_date.day, 13, 0, 0, tzinfo=IST)
-        # If 1:00 PM passed today, schedule for next immediate window or tomorrow
+        # Slot 1: 1:30 PM IST (13:30) - CarryisLive Lunch Rush Peak
+        slot_1_today = datetime(today_date.year, today_date.month, today_date.day, 13, 30, 0, tzinfo=IST)
         if now_ist > slot_1_today:
-            # If past 1pm, use 30 minutes from now or next slot
-            slot_1_today = now_ist + timedelta(minutes=10)
+            slot_1_today = now_ist + timedelta(minutes=15)
 
-        # Slot 2: Today 6:00 PM IST (18:00) - Prime Golden Window
+        # Slot 2: 6:00 PM IST (18:00) - IShowSpeed Global Golden Hour Peak
         slot_2_today = datetime(today_date.year, today_date.month, today_date.day, 18, 0, 0, tzinfo=IST)
         if now_ist > slot_2_today:
             slot_2_today = now_ist + timedelta(hours=1)
 
-        # Schedule IShowSpeed for Slot 1 (Global Lunch Rush)
-        cls.schedule_clip("clip-speed-01-crash", slot_1_today)
+        # Slot 3: 9:30 PM IST (21:30) - Daily Trending Late Night Gaming Binge Peak
+        slot_3_today = datetime(today_date.year, today_date.month, today_date.day, 21, 30, 0, tzinfo=IST)
+        if now_ist > slot_3_today:
+            slot_3_today = now_ist + timedelta(hours=2)
 
-        # Schedule CarryMinati 200MPH Crash for Slot 2 (Peak Evening India Rush)
-        cls.schedule_clip("clip-inc-04-crash", slot_2_today)
+        # Slot 1: CarryisLive 1,000ft Stunt
+        cls.schedule_clip("clip-inc-11-stunt", slot_1_today)
+
+        # Slot 2: IShowSpeed 400ft Mega Ramp Rocket Jump
+        cls.schedule_clip("clip-speed-09-stuntramp", slot_2_today)
+
+        # Slot 3: Daily Trending GTA 6 Fluid Simulation
+        cls.schedule_clip("clip-trend-01-water", slot_3_today)
+
+    @classmethod
+    def execute_daily_cycle(cls) -> Dict[str, Any]:
+        """Executes full daily cycle, uploading clips across all 3 peak viral slots."""
+        cls.setup_initial_viral_queue()
+        queue = cls.get_queue()
+        results = []
+        for q in queue[:3]:
+            res = cls.execute_upload_now(q["id"])
+            results.append({"clip_id": q["id"], "title": q.get("title"), **res})
+        return {"success": True, "executed_slots": results}
 
     @classmethod
     def get_queue(cls) -> List[Dict[str, Any]]:

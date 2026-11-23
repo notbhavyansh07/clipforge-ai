@@ -122,3 +122,26 @@ export interface PublishPayload {
   instagram_account_id?: string;
 }
 
+export interface AutopilotSlot {
+  slot_number: 1 | 2 | 3;
+  target_time_label: string;
+  target_time_ist: string;
+  creator_name: string;
+  video_id: string;
+  clip: Clip | null;
+  status: 'scheduled' | 'publishing' | 'published' | 'queued';
+  peak_strategy: string;
+  youtube_video_id?: string;
+  youtube_publish_time?: string;
+  youtube_url?: string;
+}
+
+export interface AutopilotStatus {
+  daemon_running: boolean;
+  channel_title: string;
+  daily_target: number;
+  last_cycle_run?: string;
+  next_slot?: AutopilotSlot;
+  slots: AutopilotSlot[];
+}
+

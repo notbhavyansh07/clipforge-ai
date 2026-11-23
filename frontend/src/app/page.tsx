@@ -130,21 +130,28 @@ export default function DashboardPage() {
               </div>
 
               {/* 1-Click Creator Jump Chips */}
-              <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
-                <span className="text-[11px] font-mono text-gray-500">Demo Projects:</span>
+              <div className="flex items-center gap-2 text-xs text-gray-400 pt-1 flex-wrap">
+                <span className="text-[11px] font-mono text-gray-500">Live Projects:</span>
                 <Link
                   href="/editor/vid-speed-gta-crash"
                   className="px-2.5 py-1 rounded-lg bg-gray-900/80 hover:bg-gray-800 border border-gray-800 text-gray-300 text-xs transition flex items-center gap-1.5"
                 >
                   <span>⚡ IShowSpeed</span>
-                  <span className="text-[10px] text-purple-400 font-mono">99.7 Viral</span>
+                  <span className="text-[10px] text-purple-400 font-mono">12 Clips</span>
                 </Link>
                 <Link
                   href="/editor/a5d7460f-90e1-4e4e-9051-210d35430446"
                   className="px-2.5 py-1 rounded-lg bg-gray-900/80 hover:bg-gray-800 border border-gray-800 text-gray-300 text-xs transition flex items-center gap-1.5"
                 >
                   <span>👑 CarryisLive</span>
-                  <span className="text-[10px] text-blue-400 font-mono">11 Clips</span>
+                  <span className="text-[10px] text-blue-400 font-mono">14 Clips</span>
+                </Link>
+                <Link
+                  href="/editor/vid-trending-daily-viral"
+                  className="px-2.5 py-1 rounded-lg bg-gray-900/80 hover:bg-gray-800 border border-gray-800 text-gray-300 text-xs transition flex items-center gap-1.5"
+                >
+                  <span>🔥 Daily Trending</span>
+                  <span className="text-[10px] text-amber-400 font-mono">3 Clips</span>
                 </Link>
               </div>
             </div>
@@ -287,6 +294,82 @@ export default function DashboardPage() {
             <span className="text-[11px] text-gray-400 block font-mono">Livestream Safety</span>
             <span className="text-lg font-black text-white block">Zero Cross-Leak</span>
             <span className="text-[10px] text-emerald-400 font-medium">Strict Creator Segmentation</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 🤖 3-SLOT DAILY AUTONOMOUS AUTO-PILOT RADAR */}
+      <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-[#17142b] via-[#121422] to-[#0f111c] border border-purple-500/40 shadow-2xl relative overflow-hidden space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-800 mb-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>3 CLIPS/DAY AUTONOMOUS YOUTUBE PIPELINE ACTIVE</span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+              <span>Daily Peak Timing Auto-Upload Queue</span>
+              <span className="text-xs font-normal text-purple-300 font-mono">(@salviashu02)</span>
+            </h2>
+            <p className="text-xs text-gray-300 max-w-2xl mt-1">
+              Autonomous scheduling automatically uploads 3 viral Short clips daily at peak algorithmic viewing windows: CarryisLive (Lunch Rush), IShowSpeed (Prime Evening), and Daily Trending Viral Moments (Late Night).
+            </p>
+          </div>
+
+          <Link
+            href="/autopilot"
+            className="px-5 py-3 rounded-2xl text-xs font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white transition flex items-center gap-2 shadow-lg shadow-purple-600/30 shrink-0 self-start md:self-auto"
+          >
+            <Zap className="w-4 h-4 text-amber-300" />
+            <span>Open Auto-Pilot Command Center</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* 3 Peak Timing Slot Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          <div className="p-4 rounded-2xl bg-[#161828] border border-purple-900/40 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
+                SLOT #1 • 1:30 PM IST
+              </span>
+              <span className="text-[10px] font-mono text-emerald-400 font-bold">Lunch Rush</span>
+            </div>
+            <div className="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>👑 CarryisLive</span>
+            </div>
+            <p className="text-[11px] text-gray-400">
+              India peak gaming surge: Cargo plane landing &amp; 1,000ft dirtbike stunt.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#161828] border border-purple-900/40 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
+                SLOT #2 • 6:00 PM IST
+              </span>
+              <span className="text-[10px] font-mono text-amber-400 font-bold">Global Golden Hour</span>
+            </div>
+            <div className="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>⚡ IShowSpeed</span>
+            </div>
+            <p className="text-[11px] text-gray-400">
+              US &amp; Europe prime time: 400ft mega ramp rocket jump &amp; tank barking chaos.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#161828] border border-purple-900/40 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
+                SLOT #3 • 9:30 PM IST
+              </span>
+              <span className="text-[10px] font-mono text-blue-400 font-bold">Late Night Binge</span>
+            </div>
+            <div className="text-sm font-bold text-white flex items-center gap-1.5">
+              <span>🔥 Daily Trending Radar</span>
+            </div>
+            <p className="text-[11px] text-gray-400">
+              Auto-discovered viral leak: GTA 6 fluid simulation &amp; crowd panic AI.
+            </p>
           </div>
         </div>
       </div>

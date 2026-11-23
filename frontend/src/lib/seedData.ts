@@ -583,6 +583,82 @@ export const INITIAL_VIDEOS: Video[] = [
     "stream_chunk_count": null,
     "created_at": null,
     "updated_at": null
+  },
+  {
+    "id": "vid-trending-daily-viral",
+    "title": "\ud83d\udd25 DAILY TRENDING: GTA 6 Next-Gen Graphics & Emergent Viral AI Moments",
+    "source_type": "youtube",
+    "source_url": "https://www.youtube.com/watch?v=QdBZY2fkU-0",
+    "file_path": "uploads/vid-trending-daily-viral/video_master.mp4",
+    "duration": 360.0,
+    "fps": 60.0,
+    "width": 1920,
+    "height": 1080,
+    "has_permission": true,
+    "creator_name": "Daily Viral Radar",
+    "creator_url": "https://www.youtube.com/@DailyViralRadar",
+    "status": "ready",
+    "error_message": null,
+    "transcript": [
+      {
+        "id": 0,
+        "start": 0.0,
+        "end": 5.0,
+        "text": "This GTA 6 dynamic weather and hurricane simulation broke the internet today!",
+        "words": [
+          {
+            "word": "This",
+            "start": 0.0,
+            "end": 0.5,
+            "probability": 0.99,
+            "is_filler": false
+          },
+          {
+            "word": "GTA",
+            "start": 0.5,
+            "end": 1.0,
+            "probability": 0.99,
+            "is_filler": false
+          },
+          {
+            "word": "6",
+            "start": 1.0,
+            "end": 1.5,
+            "probability": 0.99,
+            "is_filler": false
+          },
+          {
+            "word": "weather",
+            "start": 1.5,
+            "end": 2.5,
+            "probability": 0.99,
+            "is_filler": false
+          },
+          {
+            "word": "is",
+            "start": 2.5,
+            "end": 3.2,
+            "probability": 0.99,
+            "is_filler": false
+          },
+          {
+            "word": "insane!",
+            "start": 3.2,
+            "end": 5.0,
+            "probability": 0.99,
+            "is_filler": false
+          }
+        ],
+        "wpm": 180.0,
+        "filler_count": 0
+      }
+    ],
+    "audio_metrics": null,
+    "scene_cuts": null,
+    "is_live": false,
+    "stream_chunk_count": null,
+    "created_at": "2026-11-23 12:00:00",
+    "updated_at": "2026-11-23 18:00:00"
   }
 ];
 
@@ -590,9 +666,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-01-reveal",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🔥 FIRST LOOK: GTA 6 VICE CITY OPENING",
-    "hook_text": "ROCKSTAR FINALLY SHOWED GTA 6! 🔥",
-    "description": "Viral Short: 🔥 FIRST LOOK: GTA 6 VICE CITY OPENING. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\udd25 FIRST LOOK: GTA 6 VICE CITY OPENING",
+    "hook_text": "ROCKSTAR FINALLY SHOWED GTA 6! \ud83d\udd25",
+    "description": "Viral Short: \ud83d\udd25 FIRST LOOK: GTA 6 VICE CITY OPENING. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 0,
     "end_time": 15,
     "duration": 14.5,
@@ -634,8 +710,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 8.9,
     "peak_chatters": 210,
     "reaction_emojis": [
-      "🔥",
-      "🌴"
+      "\ud83d\udd25",
+      "\ud83c\udf34"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -644,9 +720,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-02-chase",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🚨 5-STAR WANTED LEVEL ESCAPE",
-    "hook_text": "5-STAR WANTED IN GTA 6?! 🚨",
-    "description": "Viral Short: 🚨 5-STAR WANTED LEVEL ESCAPE. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\udea8 5-STAR WANTED LEVEL ESCAPE",
+    "hook_text": "5-STAR WANTED IN GTA 6?! \ud83d\udea8",
+    "description": "Viral Short: \ud83d\udea8 5-STAR WANTED LEVEL ESCAPE. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 15,
     "end_time": 32.5,
     "duration": 14.5,
@@ -688,8 +764,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.4,
     "peak_chatters": 340,
     "reaction_emojis": [
-      "🚨",
-      "💀"
+      "\ud83d\udea8",
+      "\ud83d\udc80"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -698,9 +774,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-03-nitro",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🏎️ 250MPH SUPERCAR NITRO HIGHWAY SPRINT",
-    "hook_text": "SUPERCAR SPEED TEST IN GTA 6! 🏎️💨",
-    "description": "Viral Short: 🏎️ 250MPH SUPERCAR NITRO HIGHWAY SPRINT. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83c\udfce\ufe0f 250MPH SUPERCAR NITRO HIGHWAY SPRINT",
+    "hook_text": "SUPERCAR SPEED TEST IN GTA 6! \ud83c\udfce\ufe0f\ud83d\udca8",
+    "description": "Viral Short: \ud83c\udfce\ufe0f 250MPH SUPERCAR NITRO HIGHWAY SPRINT. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 32.5,
     "end_time": 48,
     "duration": 14.5,
@@ -742,8 +818,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 8.6,
     "peak_chatters": 180,
     "reaction_emojis": [
-      "🏎️",
-      "💨"
+      "\ud83c\udfce\ufe0f",
+      "\ud83d\udca8"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -752,9 +828,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-04-crash",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "💥 200MPH HIGHWAY CAR CRASH & RAGDOLL",
-    "hook_text": "200MPH BRUTAL HIGHWAY CRASH! 💥",
-    "description": "Viral Short: 💥 200MPH HIGHWAY CAR CRASH & RAGDOLL. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\udca5 200MPH HIGHWAY CAR CRASH & RAGDOLL",
+    "hook_text": "200MPH BRUTAL HIGHWAY CRASH! \ud83d\udca5",
+    "description": "Viral Short: \ud83d\udca5 200MPH HIGHWAY CAR CRASH & RAGDOLL. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 48,
     "end_time": 65,
     "duration": 16,
@@ -796,8 +872,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 10.2,
     "peak_chatters": 490,
     "reaction_emojis": [
-      "💥",
-      "😱"
+      "\ud83d\udca5",
+      "\ud83d\ude31"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -806,9 +882,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-05-map",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🗺️ HUGE VICE CITY MAP LEAK & SECRETS",
-    "hook_text": "ROCKSTAR HID THIS SECRET IN GTA 6! 🤫🗺️",
-    "description": "Viral Short: 🗺️ HUGE VICE CITY MAP LEAK & SECRETS. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\uddfa\ufe0f HUGE VICE CITY MAP LEAK & SECRETS",
+    "hook_text": "ROCKSTAR HID THIS SECRET IN GTA 6! \ud83e\udd2b\ud83d\uddfa\ufe0f",
+    "description": "Viral Short: \ud83d\uddfa\ufe0f HUGE VICE CITY MAP LEAK & SECRETS. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 65,
     "end_time": 80,
     "duration": 14.5,
@@ -850,8 +926,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.1,
     "peak_chatters": 260,
     "reaction_emojis": [
-      "🗺️",
-      "👀"
+      "\ud83d\uddfa\ufe0f",
+      "\ud83d\udc40"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -860,9 +936,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-06-freakout",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "😱 CARRYMINATI LOST HIS MIND IN GTA 6! 🔥 #Shorts",
-    "hook_text": "CARRYMINATI LOST HIS MIND IN GTA 6! 😱🔥",
-    "description": "😱 UNREAL GTA 6 MOMENT! CarryMinati's craziest live stream freakout in Vice City!\n\n👑 Original Streamer Credit: CarryMinati (CarryisLive)\n🎮 Game: Grand Theft Auto VI (Vice City)\n⏱️ Live Stream Timestamp: 06:24:50 (Hour 6)\n🎬 Layout: Streamer Facecam (Top) + GTA 6 Highway Gameplay (Bottom)\n\n#Shorts #GTA6 #CarryMinati #Gaming #ViceCity #Viral #TrendingShorts #ShortsFeed",
+    "title": "\ud83d\ude31 CARRYMINATI LOST HIS MIND IN GTA 6! \ud83d\udd25 #Shorts",
+    "hook_text": "CARRYMINATI LOST HIS MIND IN GTA 6! \ud83d\ude31\ud83d\udd25",
+    "description": "\ud83d\ude31 UNREAL GTA 6 MOMENT! CarryMinati's craziest live stream freakout in Vice City!\n\n\ud83d\udc51 Original Streamer Credit: CarryMinati (CarryisLive)\n\ud83c\udfae Game: Grand Theft Auto VI (Vice City)\n\u23f1\ufe0f Live Stream Timestamp: 06:24:50 (Hour 6)\n\ud83c\udfac Layout: Streamer Facecam (Top) + GTA 6 Highway Gameplay (Bottom)\n\n#Shorts #GTA6 #CarryMinati #Gaming #ViceCity #Viral #TrendingShorts #ShortsFeed",
     "start_time": 80,
     "end_time": 98,
     "duration": 14.5,
@@ -907,9 +983,9 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 11.8,
     "peak_chatters": 620,
     "reaction_emojis": [
-      "👑",
-      "🔥",
-      "😂"
+      "\ud83d\udc51",
+      "\ud83d\udd25",
+      "\ud83d\ude02"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -918,9 +994,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-07-shootout",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🔫 VICE CITY BEACH POLICE SHOOTOUT",
-    "hook_text": "INSANE COP SHOOTOUT IN GTA 6! 🔫🚨",
-    "description": "Viral Short: 🔫 VICE CITY BEACH POLICE SHOOTOUT. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\udd2b VICE CITY BEACH POLICE SHOOTOUT",
+    "hook_text": "INSANE COP SHOOTOUT IN GTA 6! \ud83d\udd2b\ud83d\udea8",
+    "description": "Viral Short: \ud83d\udd2b VICE CITY BEACH POLICE SHOOTOUT. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 98,
     "end_time": 112,
     "duration": 14.5,
@@ -962,8 +1038,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9,
     "peak_chatters": 230,
     "reaction_emojis": [
-      "🔫",
-      "🚨"
+      "\ud83d\udd2b",
+      "\ud83d\udea8"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -972,9 +1048,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-08-ai",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🤯 REAL-TIME NPC CROWD AI GONE ROGUE",
-    "hook_text": "GTA 6 NPC AI IS ACTUALLY TERRIFYING! 🤯",
-    "description": "Viral Short: 🤯 REAL-TIME NPC CROWD AI GONE ROGUE. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83e\udd2f REAL-TIME NPC CROWD AI GONE ROGUE",
+    "hook_text": "GTA 6 NPC AI IS ACTUALLY TERRIFYING! \ud83e\udd2f",
+    "description": "Viral Short: \ud83e\udd2f REAL-TIME NPC CROWD AI GONE ROGUE. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 112,
     "end_time": 128,
     "duration": 14.5,
@@ -1016,8 +1092,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 8.2,
     "peak_chatters": 160,
     "reaction_emojis": [
-      "🤯",
-      "💀"
+      "\ud83e\udd2f",
+      "\ud83d\udc80"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -1026,9 +1102,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-09-heist",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🌴 JASON & LUCIA DYNAMIC DUO HEIST",
-    "hook_text": "JASON & LUCIA FIRST HEIST IN GTA 6! 💰",
-    "description": "Viral Short: 🌴 JASON & LUCIA DYNAMIC DUO HEIST. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83c\udf34 JASON & LUCIA DYNAMIC DUO HEIST",
+    "hook_text": "JASON & LUCIA FIRST HEIST IN GTA 6! \ud83d\udcb0",
+    "description": "Viral Short: \ud83c\udf34 JASON & LUCIA DYNAMIC DUO HEIST. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 128,
     "end_time": 144,
     "duration": 14.5,
@@ -1070,8 +1146,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.5,
     "peak_chatters": 310,
     "reaction_emojis": [
-      "🌴",
-      "💰"
+      "\ud83c\udf34",
+      "\ud83d\udcb0"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -1080,9 +1156,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-10-graphics",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "⚡ PS5 PRO 60FPS RAYTRACING & PUDDLE PHYSICS",
-    "hook_text": "PS5 PRO 60FPS RAYTRACING UNLOCKED! ⚡",
-    "description": "Viral Short: ⚡ PS5 PRO 60FPS RAYTRACING & PUDDLE PHYSICS. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\u26a1 PS5 PRO 60FPS RAYTRACING & PUDDLE PHYSICS",
+    "hook_text": "PS5 PRO 60FPS RAYTRACING UNLOCKED! \u26a1",
+    "description": "Viral Short: \u26a1 PS5 PRO 60FPS RAYTRACING & PUDDLE PHYSICS. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 144,
     "end_time": 162,
     "duration": 14.5,
@@ -1124,8 +1200,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 8.7,
     "peak_chatters": 195,
     "reaction_emojis": [
-      "⚡",
-      "✨"
+      "\u26a1",
+      "\u2728"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -1134,9 +1210,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-inc-11-stunt",
     "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
-    "title": "🚀 500FT SKYSCRAPER RAMP STUNT FINALE",
-    "hook_text": "HOW DID HE SURVIVE THIS JUMP?! 🚀😱",
-    "description": "Viral Short: 🚀 500FT SKYSCRAPER RAMP STUNT FINALE. AI-composed 9:16 high-retention gameplay Short.",
+    "title": "\ud83d\ude80 500FT SKYSCRAPER RAMP STUNT FINALE",
+    "hook_text": "HOW DID HE SURVIVE THIS JUMP?! \ud83d\ude80\ud83d\ude31",
+    "description": "Viral Short: \ud83d\ude80 500FT SKYSCRAPER RAMP STUNT FINALE. AI-composed 9:16 high-retention gameplay Short.",
     "start_time": 162,
     "end_time": 180,
     "duration": 14.5,
@@ -1178,8 +1254,8 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.9,
     "peak_chatters": 410,
     "reaction_emojis": [
-      "🚀",
-      "💥"
+      "\ud83d\ude80",
+      "\ud83d\udca5"
     ],
     "framing_mode": "fill_player_track",
     "swear_masked": true,
@@ -1188,9 +1264,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-05-jumpscare",
     "video_id": "vid-speed-gta-crash",
-    "title": "💀 0-INCH CAMERA JUMPSCARE & 911 CHAT SPAM",
-    "hook_text": "SPEED JUMPSCARES 65,000 VIEWERS! 💀",
-    "description": "Speed puts his entire face directly into the webcam lens with wide crazy eyes screaming! Chat goes wild spamming 911 and RIP SPEED 🤣",
+    "title": "\ud83d\udc80 0-INCH CAMERA JUMPSCARE & 911 CHAT SPAM",
+    "hook_text": "SPEED JUMPSCARES 65,000 VIEWERS! \ud83d\udc80",
+    "description": "Speed puts his entire face directly into the webcam lens with wide crazy eyes screaming! Chat goes wild spamming 911 and RIP SPEED \ud83e\udd23",
     "start_time": 218,
     "end_time": 233,
     "duration": 15,
@@ -1225,10 +1301,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 10,
     "peak_chatters": 4500,
     "reaction_emojis": [
-      "💀",
-      "👁️",
-      "🚨",
-      "🤣"
+      "\ud83d\udc80",
+      "\ud83d\udc41\ufe0f",
+      "\ud83d\udea8",
+      "\ud83e\udd23"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1236,9 +1312,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-01-crash",
     "video_id": "vid-speed-gta-crash",
-    "title": "💥 300MPH BRUTAL HIGHWAY CRASH & WALL SLAM",
-    "hook_text": "SPEED WENT FLYING AT 300MPH! 💀",
-    "description": "IShowSpeed has the most chaotic 300MPH brutal car crash in GTA! Speed completely crashes out on stream 😱💥 Drop a like and subscribe for more viral gaming clips!",
+    "title": "\ud83d\udca5 300MPH BRUTAL HIGHWAY CRASH & WALL SLAM",
+    "hook_text": "SPEED WENT FLYING AT 300MPH! \ud83d\udc80",
+    "description": "IShowSpeed has the most chaotic 300MPH brutal car crash in GTA! Speed completely crashes out on stream \ud83d\ude31\ud83d\udca5 Drop a like and subscribe for more viral gaming clips!",
     "start_time": 96,
     "end_time": 111.5,
     "duration": 15.5,
@@ -1273,10 +1349,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.4,
     "peak_chatters": 2450,
     "reaction_emojis": [
-      "😱",
-      "💥",
-      "🏎️",
-      "💀"
+      "\ud83d\ude31",
+      "\ud83d\udca5",
+      "\ud83c\udfce\ufe0f",
+      "\ud83d\udc80"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1284,9 +1360,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-04-rage",
     "video_id": "vid-speed-gta-crash",
-    "title": "🤬 STREAMER FREAKOUT: INSTANT REPLAY RAGE",
-    "hook_text": "SPEED BROKE HIS SETUP IN TOTAL RAGE! 😭",
-    "description": "Speed hits pause in absolute despair, throwing both hands behind his head screaming! Classic Speed rage reaction! 🤬💥",
+    "title": "\ud83e\udd2c STREAMER FREAKOUT: INSTANT REPLAY RAGE",
+    "hook_text": "SPEED BROKE HIS SETUP IN TOTAL RAGE! \ud83d\ude2d",
+    "description": "Speed hits pause in absolute despair, throwing both hands behind his head screaming! Classic Speed rage reaction! \ud83e\udd2c\ud83d\udca5",
     "start_time": 168,
     "end_time": 183,
     "duration": 15,
@@ -1321,10 +1397,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.8,
     "peak_chatters": 3100,
     "reaction_emojis": [
-      "🤬",
-      "😱",
-      "🔊",
-      "💥"
+      "\ud83e\udd2c",
+      "\ud83d\ude31",
+      "\ud83d\udd0a",
+      "\ud83d\udca5"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1332,9 +1408,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-02-drift",
     "video_id": "vid-speed-gta-crash",
-    "title": "🏎️ 150MPH HAIRPIN CORNER DRIFT & NEAR MISS",
-    "hook_text": "SPEED ALMOST LOST CONTROL ON S-TURN! 🚨",
-    "description": "Speed hits the dangerous S-turn hairpin at 150 KPH, steering wildly with terrified wide eyes! 😱 Near death drift in GTA! Like & Subscribe!",
+    "title": "\ud83c\udfce\ufe0f 150MPH HAIRPIN CORNER DRIFT & NEAR MISS",
+    "hook_text": "SPEED ALMOST LOST CONTROL ON S-TURN! \ud83d\udea8",
+    "description": "Speed hits the dangerous S-turn hairpin at 150 KPH, steering wildly with terrified wide eyes! \ud83d\ude31 Near death drift in GTA! Like & Subscribe!",
     "start_time": 7,
     "end_time": 21.5,
     "duration": 14.5,
@@ -1369,10 +1445,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 8.7,
     "peak_chatters": 1820,
     "reaction_emojis": [
-      "🏎️",
-      "⚡",
-      "🏁",
-      "👑"
+      "\ud83c\udfce\ufe0f",
+      "\u26a1",
+      "\ud83c\udfc1",
+      "\ud83d\udc51"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1380,9 +1456,9 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-03-barrier",
     "video_id": "vid-speed-gta-crash",
-    "title": "🛑 HEAD-ON TIRE BARRIER IMPACT & CAUTION",
-    "hook_text": "SLAMMED DIRECTLY INTO SAFETY TIRES! 💥",
-    "description": "Speed completely misjudges the braking zone and rams head-first into the tire safety wall! Yellow caution flag deployed 🟨",
+    "title": "\ud83d\uded1 HEAD-ON TIRE BARRIER IMPACT & CAUTION",
+    "hook_text": "SLAMMED DIRECTLY INTO SAFETY TIRES! \ud83d\udca5",
+    "description": "Speed completely misjudges the braking zone and rams head-first into the tire safety wall! Yellow caution flag deployed \ud83d\udfe8",
     "start_time": 48,
     "end_time": 63,
     "duration": 15,
@@ -1417,10 +1493,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.1,
     "peak_chatters": 2100,
     "reaction_emojis": [
-      "🛑",
-      "💥",
-      "🟨",
-      "💀"
+      "\ud83d\uded1",
+      "\ud83d\udca5",
+      "\ud83d\udfe8",
+      "\ud83d\udc80"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1428,8 +1504,8 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-06-accel",
     "video_id": "vid-speed-gta-crash",
-    "title": "⚡ 250MPH NITRO SPRINT & HIGHWAY WEAVE",
-    "hook_text": "SPEED FLOORING THE THROTTLE TO 250MPH! ⚡",
+    "title": "\u26a1 250MPH NITRO SPRINT & HIGHWAY WEAVE",
+    "hook_text": "SPEED FLOORING THE THROTTLE TO 250MPH! \u26a1",
     "description": "Speed engages full nitro acceleration weaving through rush-hour traffic on the Los Santos freeway with hyper-focused eyes! Like & Subscribe!",
     "start_time": 30,
     "end_time": 45,
@@ -1465,10 +1541,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.3,
     "peak_chatters": 2800,
     "reaction_emojis": [
-      "⚡",
-      "🏎️",
-      "🔥",
-      "💨"
+      "\u26a1",
+      "\ud83c\udfce\ufe0f",
+      "\ud83d\udd25",
+      "\ud83d\udca8"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1476,8 +1552,8 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-07-shock",
     "video_id": "vid-speed-gta-crash",
-    "title": "😳 CHAT ROASTS SPEED: TOTAL DISBELIEF",
-    "hook_text": "SPEED COULD NOT BELIEVE WHAT CHAT SAID! 😭",
+    "title": "\ud83d\ude33 CHAT ROASTS SPEED: TOTAL DISBELIEF",
+    "hook_text": "SPEED COULD NOT BELIEVE WHAT CHAT SAID! \ud83d\ude2d",
     "description": "Speed stops the car in absolute shock reading 50,000 chatters spamming W CRASH and L DRIVING! Pure comedic streamer moment!",
     "start_time": 120,
     "end_time": 135,
@@ -1513,10 +1589,10 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 9.6,
     "peak_chatters": 3400,
     "reaction_emojis": [
-      "😳",
-      "🤣",
-      "💬",
-      "💀"
+      "\ud83d\ude33",
+      "\ud83e\udd23",
+      "\ud83d\udcac",
+      "\ud83d\udc80"
     ],
     "framing_mode": "split_facecam",
     "caption_position": "safe_center"
@@ -1524,8 +1600,8 @@ export const INITIAL_CLIPS: Clip[] = [
   {
     "id": "clip-speed-08-deskslam",
     "video_id": "vid-speed-gta-crash",
-    "title": "💥 MIC PEAKING SCREAM & SETUP SMASH",
-    "hook_text": "SPEED MIC BLEW OUT 40,000 HEADPHONES! 🔊",
+    "title": "\ud83d\udca5 MIC PEAKING SCREAM & SETUP SMASH",
+    "hook_text": "SPEED MIC BLEW OUT 40,000 HEADPHONES! \ud83d\udd0a",
     "description": "Speed lets out an ear-splitting scream, completely redlining the audio levels and slamming the desk before standing up in outrage!",
     "start_time": 190,
     "end_time": 205,
@@ -1561,12 +1637,502 @@ export const INITIAL_CLIPS: Clip[] = [
     "chat_burst_score": 10,
     "peak_chatters": 4800,
     "reaction_emojis": [
-      "💥",
-      "🔊",
-      "🤬",
-      "🎧"
+      "\ud83d\udca5",
+      "\ud83d\udd0a",
+      "\ud83e\udd2c",
+      "\ud83c\udfa7"
     ],
     "framing_mode": "split_facecam",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-speed-09-stuntramp",
+    "video_id": "vid-speed-gta-crash",
+    "title": "\ud83d\ude80 400FT MEGA RAMP ROCKET JUMP & FREAKOUT",
+    "hook_text": "SPEED LAUNCHED 400FT IN THE AIR! \ud83d\ude80",
+    "description": "Speed hits full rocket boost on a vertical mega ramp soaring 400 feet into the clouds above the Maze Bank Arena!",
+    "start_time": 250,
+    "end_time": 265,
+    "duration": 15,
+    "virality_score": 99.6,
+    "score_breakdown": {
+      "hook": 100,
+      "emotion": 99.8,
+      "pacing": 99,
+      "story": 97,
+      "trend": 100
+    },
+    "virality_reason": "High altitude vehicular stunt with screaming physical streamer reaction.",
+    "status": "scheduled",
+    "output_path": "clips/clip-speed-06-accel.mp4",
+    "thumbnail_path": "/clips/clip-speed-06-accel_thumb.jpg",
+    "captions_data": "[{\"word\":\"FULL BOOST!\",\"start\":0,\"end\":1.5},{\"word\":\"INTO THE CLOUDS!\",\"start\":1.5,\"end\":3.5},{\"word\":\"HE IS FLYING!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Maze Bank Arena Stunt Track",
+    "incident_type": "400ft Mega Ramp Rocket Jump",
+    "stream_time_formatted": "04:10:00 (Minute 250)",
+    "tags": [
+      "IShowSpeed",
+      "MegaRamp",
+      "Stunt",
+      "RocketCar",
+      "Shorts"
+    ],
+    "views_count": 420000,
+    "retention_rate": 97.2,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": "2026-11-23 18:00:00",
+    "chat_burst_score": 9.9,
+    "peak_chatters": 5200,
+    "reaction_emojis": [
+      "\ud83d\ude80",
+      "\ud83d\ude31",
+      "\ud83d\udca5",
+      "\ud83d\udc51"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-speed-10-copchase",
+    "video_id": "vid-speed-gta-crash",
+    "title": "\ud83d\udea8 6-STAR MILITARY TANK EVASION & BARKING",
+    "hook_text": "SPEED BARKED AT A LITERAL TANK! \ud83d\udc36",
+    "description": "Speed triggers 6-star military response with rhino tanks, screaming and barking hysterically while weaving through tank shells in Fort Zancudo tunnel!",
+    "start_time": 280,
+    "end_time": 295,
+    "duration": 15,
+    "virality_score": 99.4,
+    "score_breakdown": {
+      "hook": 99.8,
+      "emotion": 100,
+      "pacing": 98.5,
+      "story": 96,
+      "trend": 100
+    },
+    "virality_reason": "Iconic streamer barking persona combined with maximum danger military tank evasion.",
+    "status": "rendered",
+    "output_path": "clips/clip-speed-01-crash.mp4",
+    "thumbnail_path": "/clips/clip-speed-01-crash_thumb.jpg",
+    "captions_data": "[{\"word\":\"TANK INCOMING!\",\"start\":0,\"end\":1.5},{\"word\":\"SPEED BARKING!\",\"start\":1.5,\"end\":3.5},{\"word\":\"DODGED SHELL!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Fort Zancudo Highway Tunnel",
+    "incident_type": "6-Star Military Tank Evasion & Barking",
+    "stream_time_formatted": "04:40:00 (Minute 280)",
+    "tags": [
+      "IShowSpeed",
+      "Barking",
+      "Tank",
+      "CopChase",
+      "Shorts"
+    ],
+    "views_count": 380000,
+    "retention_rate": 96.0,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.7,
+    "peak_chatters": 4600,
+    "reaction_emojis": [
+      "\ud83d\udc36",
+      "\ud83d\udea8",
+      "\ud83d\udca5",
+      "\ud83e\udd23"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-speed-11-trolling",
+    "video_id": "vid-speed-gta-crash",
+    "title": "\ud83e\udd23 SPEED GETS TROLLED BY NPC VOICEMAIL",
+    "hook_text": "THE NPC LITERALLY CALLED SPEED! \ud83d\ude2d",
+    "description": "An NPC in GTA calls Speed in-game during a high speed pursuit, leaving a confusing voicemail that makes Speed stop and scream at the phone!",
+    "start_time": 310,
+    "end_time": 325,
+    "duration": 15,
+    "virality_score": 98.7,
+    "score_breakdown": {
+      "hook": 98.5,
+      "emotion": 99.2,
+      "pacing": 97.5,
+      "story": 98,
+      "trend": 99
+    },
+    "virality_reason": "Top tier situational comedy with unexpected NPC audio and streamer confusion.",
+    "status": "rendered",
+    "output_path": "clips/clip-speed-07-shock.mp4",
+    "thumbnail_path": "/clips/clip-speed-07-shock_thumb.jpg",
+    "captions_data": "[{\"word\":\"PHONE RINGING!\",\"start\":0,\"end\":1.5},{\"word\":\"WHO IS CALLING?!\",\"start\":1.5,\"end\":3.5},{\"word\":\"HANG UP NOW!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Vinewood Boulevard Strip",
+    "incident_type": "Hilarious NPC Phone Call & Confusion",
+    "stream_time_formatted": "05:10:00 (Minute 310)",
+    "tags": [
+      "IShowSpeed",
+      "Trolled",
+      "Funny",
+      "NPC",
+      "Shorts"
+    ],
+    "views_count": 290000,
+    "retention_rate": 94.2,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.5,
+    "peak_chatters": 3900,
+    "reaction_emojis": [
+      "\ud83e\udd23",
+      "\ud83d\udcf1",
+      "\ud83d\ude33",
+      "\ud83d\udc80"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-speed-12-explosion",
+    "video_id": "vid-speed-gta-crash",
+    "title": "\ud83d\udca5 ACCIDENTAL RPG GAS STATION APOCALYPSE",
+    "hook_text": "SPEED BLEW UP THE ENTIRE MAP! \ud83d\udca5",
+    "description": "Speed attempts to shoot a helicopter above a Sandy Shores gas station, misfires into the pump, and sets off a chain reaction explosion that obliterates everything!",
+    "start_time": 340,
+    "end_time": 355,
+    "duration": 15,
+    "virality_score": 99.8,
+    "score_breakdown": {
+      "hook": 100,
+      "emotion": 100,
+      "pacing": 99.5,
+      "story": 97,
+      "trend": 100
+    },
+    "virality_reason": "Ultimate gaming disaster moment: massive multi-stage explosion with redline audio scream.",
+    "status": "rendered",
+    "output_path": "clips/clip-speed-08-deskslam.mp4",
+    "thumbnail_path": "/clips/clip-speed-08-deskslam_thumb.jpg",
+    "captions_data": "[{\"word\":\"AIM FOR CHOPPER!\",\"start\":0,\"end\":1.5},{\"word\":\"HIT THE PUMP!\",\"start\":1.5,\"end\":3.5},{\"word\":\"RUN FOR YOUR LIFE!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Sandy Shores Gas Station",
+    "incident_type": "Accidental RPG Chain Reaction",
+    "stream_time_formatted": "05:40:00 (Minute 340)",
+    "tags": [
+      "IShowSpeed",
+      "Explosion",
+      "RPG",
+      "Apocalypse",
+      "Shorts"
+    ],
+    "views_count": 480000,
+    "retention_rate": 97.8,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 10.0,
+    "peak_chatters": 5600,
+    "reaction_emojis": [
+      "\ud83d\udca5",
+      "\ud83d\udd25",
+      "\ud83d\ude31",
+      "\ud83d\udd0a"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-inc-12-airport",
+    "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
+    "title": "\u2708\ufe0f CARGO PLANE ROOF LANDING WITH SUPERCAR",
+    "hook_text": "CARGO PLANE PE CAR LAND KAR DI! \u2708\ufe0f\ud83d\udd25",
+    "description": "Carry attempts the impossible: jumping off an airport ramp and sticking a precision 4-wheel landing right on top of a moving Titan cargo plane!",
+    "start_time": 210,
+    "end_time": 225,
+    "duration": 15,
+    "virality_score": 99.5,
+    "score_breakdown": {
+      "hook": 99.8,
+      "emotion": 99.5,
+      "pacing": 99,
+      "story": 96,
+      "trend": 100
+    },
+    "virality_reason": "Unbelievable high-skill GTA physics stunt with peak celebratory streamer shout.",
+    "status": "scheduled",
+    "output_path": "clips/clip-inc-11-stunt.mp4",
+    "thumbnail_path": "/clips/clip-inc-11-stunt_thumb.jpg",
+    "captions_data": "[{\"word\":\"PLANE SPEED DEKHO!\",\"start\":0,\"end\":1.5},{\"word\":\"RAMP PE BOOST!\",\"start\":1.5,\"end\":3.5},{\"word\":\"LAND KAR DIYA BHAI!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Los Santos International Runway",
+    "incident_type": "Moving Cargo Plane Supercar Roof Landing",
+    "stream_time_formatted": "03:30:00 (Minute 210)",
+    "tags": [
+      "Shorts",
+      "CarryMinati",
+      "Stunt",
+      "PlaneLanding",
+      "Viral"
+    ],
+    "views_count": 360000,
+    "retention_rate": 96.2,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": "2026-11-23 13:30:00",
+    "chat_burst_score": 9.8,
+    "peak_chatters": 4400,
+    "reaction_emojis": [
+      "\u2708\ufe0f",
+      "\ud83d\udd25",
+      "\ud83d\ude80",
+      "\ud83d\udc51"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "lower_third"
+  },
+  {
+    "id": "clip-inc-13-metro",
+    "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
+    "title": "\ud83d\ude87 UNDERGROUND SUBWAY TUNNEL COP ESCAPE",
+    "hook_text": "POLICE KO METRO TUNNEL MEIN TRAP KIYA! \ud83d\ude87\ud83d\udca5",
+    "description": "With 5 police cruisers pinning him down, Carry drives headfirst down the subway station stairs, evading into the pitch-black metro tunnels!",
+    "start_time": 235,
+    "end_time": 250,
+    "duration": 15,
+    "virality_score": 99.1,
+    "score_breakdown": {
+      "hook": 99.2,
+      "emotion": 99.0,
+      "pacing": 98.8,
+      "story": 97,
+      "trend": 99.5
+    },
+    "virality_reason": "High-intensity subterranean pursuit maneuver with train near-miss.",
+    "status": "rendered",
+    "output_path": "clips/clip-inc-02-chase.mp4",
+    "thumbnail_path": "/clips/clip-inc-02-chase_thumb.jpg",
+    "captions_data": "[{\"word\":\"STAIRS DOWN JAA RAHA!\",\"start\":0,\"end\":1.5},{\"word\":\"TRAIN KA HORN AAYA!\",\"start\":1.5,\"end\":3.5},{\"word\":\"COPS CRASH HO GAYE!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Downtown Metro Transit Tubes",
+    "incident_type": "Underground Subway Train Evasion",
+    "stream_time_formatted": "03:55:00 (Minute 235)",
+    "tags": [
+      "Shorts",
+      "CarryMinati",
+      "PoliceChase",
+      "Subway",
+      "Viral"
+    ],
+    "views_count": 310000,
+    "retention_rate": 95.0,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.5,
+    "peak_chatters": 3800,
+    "reaction_emojis": [
+      "\ud83d\ude87",
+      "\ud83d\udea8",
+      "\ud83d\udca5",
+      "\ud83d\ude31"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "lower_third"
+  },
+  {
+    "id": "clip-inc-14-yacht",
+    "video_id": "a5d7460f-90e1-4e4e-9051-210d35430446",
+    "title": "\ud83d\udee5\ufe0f LUXURY SUPER YACHT PIRATE AMBUSH",
+    "hook_text": "YACHT PE DIRECT ASSAULT KAR DIYA! \ud83d\udee5\ufe0f\ud83c\udfaf",
+    "description": "Speedboat raid on a multi-million dollar luxury yacht off the Del Perro coast with tactical thermal sniper combat!",
+    "start_time": 260,
+    "end_time": 275,
+    "duration": 15,
+    "virality_score": 98.9,
+    "score_breakdown": {
+      "hook": 98.8,
+      "emotion": 99.0,
+      "pacing": 98.0,
+      "story": 96,
+      "trend": 99
+    },
+    "virality_reason": "Cinematic naval assault with explosive action and hilarious tactical commentary.",
+    "status": "rendered",
+    "output_path": "clips/clip-inc-10-graphics.mp4",
+    "thumbnail_path": "/clips/clip-inc-10-graphics_thumb.jpg",
+    "captions_data": "[{\"word\":\"YACHT DEKHO BHAI!\",\"start\":0,\"end\":1.5},{\"word\":\"BOARDING IN 3, 2, 1!\",\"start\":1.5,\"end\":3.5},{\"word\":\"FULL LOOT MISSION!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Del Perro Pier Deep Marina",
+    "incident_type": "Speedboat Super Yacht Ambush",
+    "stream_time_formatted": "04:20:00 (Minute 260)",
+    "tags": [
+      "Shorts",
+      "CarryMinati",
+      "Yacht",
+      "Heist",
+      "Viral"
+    ],
+    "views_count": 275000,
+    "retention_rate": 93.8,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.3,
+    "peak_chatters": 3400,
+    "reaction_emojis": [
+      "\ud83d\udee5\ufe0f",
+      "\ud83d\udc8e",
+      "\ud83c\udfaf",
+      "\ud83d\udd25"
+    ],
+    "framing_mode": "split_facecam",
+    "caption_position": "lower_third"
+  },
+  {
+    "id": "clip-trend-01-water",
+    "video_id": "vid-trending-daily-viral",
+    "title": "\ud83c\udf0a ULTRA-REALISTIC WATER & HURRICANE SIMULATION",
+    "hook_text": "GTA 6 WATER PHYSICS LOOK 100% REAL! \ud83c\udf0a",
+    "description": "Viral showcase of next-gen fluid simulation: dynamic hurricane tides smashing into luxury Vice City high-rises with volumetric spray!",
+    "start_time": 10,
+    "end_time": 25,
+    "duration": 15,
+    "virality_score": 99.9,
+    "score_breakdown": {
+      "hook": 100,
+      "emotion": 99.9,
+      "pacing": 99.5,
+      "story": 98,
+      "trend": 100
+    },
+    "virality_reason": "Leading global trending topic: next-generation photorealistic fluid dynamics breakdown.",
+    "status": "scheduled",
+    "output_path": "clips/clip-inc-10-graphics.mp4",
+    "thumbnail_path": "/clips/clip-inc-10-graphics_thumb.jpg",
+    "captions_data": "[{\"word\":\"REAL-TIME WAVES!\",\"start\":0,\"end\":1.5},{\"word\":\"CATEGORY 5 STORM!\",\"start\":1.5,\"end\":3.5},{\"word\":\"IS THIS REAL LIFE?!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Vice City Beachfront Ocean",
+    "incident_type": "Next-Gen Wave Simulation & Hurricane",
+    "stream_time_formatted": "00:10:00 (Minute 10)",
+    "tags": [
+      "GTA6",
+      "WaterPhysics",
+      "Gaming",
+      "Trending",
+      "Shorts"
+    ],
+    "views_count": 550000,
+    "retention_rate": 98.5,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": "2026-11-23 21:30:00",
+    "chat_burst_score": 10.0,
+    "peak_chatters": 6800,
+    "reaction_emojis": [
+      "\ud83c\udf0a",
+      "\ud83e\udd2f",
+      "\u26a1",
+      "\ud83d\udd25"
+    ],
+    "framing_mode": "fill_player_track",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-trend-02-crowd",
+    "video_id": "vid-trending-daily-viral",
+    "title": "\ud83e\udd2f ROGUE NPC CROWD PANIC & EMERGENCY AI",
+    "hook_text": "THESE GTA 6 NPCS HAVE REAL EMOTIONS! \ud83e\udd2f",
+    "description": "Emergent artificial intelligence showcase: 200+ distinct pedestrians dynamically reacting to an explosion with authentic ragdoll physics and 911 calls.",
+    "start_time": 45,
+    "end_time": 60,
+    "duration": 15,
+    "virality_score": 99.7,
+    "score_breakdown": {
+      "hook": 99.8,
+      "emotion": 99.6,
+      "pacing": 99.0,
+      "story": 98,
+      "trend": 100
+    },
+    "virality_reason": "High-interest AI topic showcasing emergent pedestrian behavior algorithms.",
+    "status": "rendered",
+    "output_path": "clips/clip-inc-08-ai.mp4",
+    "thumbnail_path": "/clips/clip-inc-08-ai_thumb.jpg",
+    "captions_data": "[{\"word\":\"EVERY NPC HAS AI!\",\"start\":0,\"end\":1.5},{\"word\":\"DYNAMIC FOOTPRINTS!\",\"start\":1.5,\"end\":3.5},{\"word\":\"CALLING 911 IN REAL TIME!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Ocean Drive Promenade",
+    "incident_type": "Photorealistic Crowd AI Panic Engine",
+    "stream_time_formatted": "00:45:00 (Minute 45)",
+    "tags": [
+      "GTA6",
+      "NPCAI",
+      "Gaming",
+      "Viral",
+      "Shorts"
+    ],
+    "views_count": 410000,
+    "retention_rate": 96.5,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.8,
+    "peak_chatters": 4900,
+    "reaction_emojis": [
+      "\ud83e\udd2f",
+      "\ud83d\udc80",
+      "\ud83d\udcf1",
+      "\ud83d\udea8"
+    ],
+    "framing_mode": "fill_player_track",
+    "caption_position": "safe_center"
+  },
+  {
+    "id": "clip-trend-03-supercar",
+    "video_id": "vid-trending-daily-viral",
+    "title": "\ud83c\udfce\ufe0f 300MPH VICE HIGHWAY PURSUIT AT SUNSET",
+    "hook_text": "SUNSET CAR CHASE WITH RAY TRACING! \ud83c\udf05",
+    "description": "Ultra high-speed coastal highway interception with dynamic volumetric ray-traced sunset lighting over the ocean.",
+    "start_time": 80,
+    "end_time": 95,
+    "duration": 15,
+    "virality_score": 99.5,
+    "score_breakdown": {
+      "hook": 99.6,
+      "emotion": 99.2,
+      "pacing": 99.5,
+      "story": 95,
+      "trend": 100
+    },
+    "virality_reason": "Stunning ray-traced visual fidelity paired with ultra-high speed highway weave.",
+    "status": "rendered",
+    "output_path": "clips/clip-speed-01-crash.mp4",
+    "thumbnail_path": "/clips/clip-speed-01-crash_thumb.jpg",
+    "captions_data": "[{\"word\":\"RAY TRACED SUNSET!\",\"start\":0,\"end\":1.5},{\"word\":\"300 ON THE DASH!\",\"start\":1.5,\"end\":3.5},{\"word\":\"HIGHWAY WEAVE!\",\"start\":3.5,\"end\":5.5}]",
+    "youtube_video_id": null,
+    "youtube_publish_time": null,
+    "location": "Venetian Causeway Bridge",
+    "incident_type": "Golden Hour Supercar Police Interception",
+    "stream_time_formatted": "01:20:00 (Minute 80)",
+    "tags": [
+      "GTA6",
+      "Graphics",
+      "RayTracing",
+      "Supercar",
+      "Shorts"
+    ],
+    "views_count": 390000,
+    "retention_rate": 95.8,
+    "created_at": "2026-11-23T18:00:00Z",
+    "scheduled_publish_time": null,
+    "chat_burst_score": 9.6,
+    "peak_chatters": 4200,
+    "reaction_emojis": [
+      "\ud83c\udfce\ufe0f",
+      "\ud83c\udf05",
+      "\u26a1",
+      "\ud83d\udd25"
+    ],
+    "framing_mode": "fill_player_track",
     "caption_position": "safe_center"
   }
 ];
