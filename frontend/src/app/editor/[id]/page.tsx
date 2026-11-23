@@ -320,12 +320,16 @@ export default function ClipEditorPage() {
 
   const isSpeedProject = id === 'vid-speed-gta-crash' || video?.creator_name === 'IShowSpeed';
   const isCarryProject = id === 'a5d7460f-90e1-4e4e-9051-210d35430446' || (video?.creator_name || '').toLowerCase().includes('carry');
+  const isTrendingProject = id === 'vid-trending-daily-viral' || (video?.creator_name || '').toLowerCase().includes('mrbeast');
 
   const sanitizedClips = clips.filter((c) => {
-    if (isSpeedProject && (c.thumbnail_path?.includes('clip-inc') || c.output_path?.includes('clip-inc') || c.tags?.some((t) => t.toLowerCase().includes('carry')))) {
+    if (isSpeedProject && (c.thumbnail_path?.includes('clip-inc') || c.output_path?.includes('clip-inc') || c.tags?.some((t) => t.toLowerCase().includes('carry')) || c.id.startsWith('clip-trend-'))) {
       return false;
     }
-    if (isCarryProject && (c.thumbnail_path?.includes('clip-speed') || c.output_path?.includes('clip-speed') || c.tags?.some((t) => t.toLowerCase().includes('speed')))) {
+    if (isCarryProject && (c.thumbnail_path?.includes('clip-speed') || c.output_path?.includes('clip-speed') || c.tags?.some((t) => t.toLowerCase().includes('speed')) || c.id.startsWith('clip-trend-'))) {
+      return false;
+    }
+    if (isTrendingProject && (c.id.startsWith('clip-inc-') || c.id.startsWith('clip-speed-') || c.thumbnail_path?.includes('clip-inc') || c.thumbnail_path?.includes('clip-speed'))) {
       return false;
     }
     return true;

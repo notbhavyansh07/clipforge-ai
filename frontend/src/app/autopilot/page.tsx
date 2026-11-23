@@ -313,31 +313,31 @@ export default function AutoPilotPage() {
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span>Daily Trending Video Discovery Radar (Slot #3 Engine)</span>
+              <span>Internet Viral Video Discovery Radar (Slot #3 Engine)</span>
             </h2>
             <p className="text-xs text-gray-400">
-              Scans YouTube Trending &amp; Twitch 24/7 to auto-ingest and clip viral gaming moments alongside Carry and Speed.
+              Scans YouTube Trending &amp; Internet viral sensations 24/7 to auto-ingest and clip viral videos from top internet creators alongside Carry and Speed.
             </p>
           </div>
           <Link
             href="/editor/vid-trending-daily-viral"
             className="px-4 py-2 rounded-xl text-xs font-bold bg-[#181c2e] hover:bg-[#232842] text-purple-300 border border-purple-500/30 transition flex items-center gap-1.5 shrink-0"
           >
-            <span>Open Trending Video Editor</span>
+            <span>Open Internet Viral Editor</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
           <div className="p-3.5 rounded-2xl bg-[#161828] border border-gray-800 space-y-1">
-            <span className="text-[10px] text-gray-400 font-mono">Today's Trending Source</span>
-            <div className="text-xs font-bold text-white">GTA 6 Next-Gen Graphics &amp; Water Simulation</div>
-            <span className="text-[10px] text-emerald-400 font-mono">● 2.4M Views in 24h</span>
+            <span className="text-[10px] text-gray-400 font-mono">Today's Internet Viral Source</span>
+            <div className="text-xs font-bold text-white">MrBeast - $456,000 Squid Game In Real Life!</div>
+            <span className="text-[10px] text-emerald-400 font-mono">● 650M+ Views Worldwide</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-[#161828] border border-gray-800 space-y-1">
             <span className="text-[10px] text-gray-400 font-mono">Top Viral Moment</span>
-            <div className="text-xs font-bold text-white">🌊 Ultra-Realistic Hurricane Physics</div>
+            <div className="text-xs font-bold text-white">🔴 Red Light, Green Light Elimination</div>
             <span className="text-[10px] text-purple-400 font-mono">99.9 Virality Index</span>
           </div>
 

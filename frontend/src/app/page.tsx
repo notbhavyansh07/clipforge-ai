@@ -150,7 +150,7 @@ export default function DashboardPage() {
                   href="/editor/vid-trending-daily-viral"
                   className="px-2.5 py-1 rounded-lg bg-gray-900/80 hover:bg-gray-800 border border-gray-800 text-gray-300 text-xs transition flex items-center gap-1.5"
                 >
-                  <span>🔥 Daily Trending</span>
+                  <span>🌐 Internet Viral (MrBeast)</span>
                   <span className="text-[10px] text-amber-400 font-mono">3 Clips</span>
                 </Link>
               </div>

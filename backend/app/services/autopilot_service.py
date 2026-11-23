@@ -72,8 +72,8 @@ class AutopilotService:
         # Slot 2: IShowSpeed 400ft Mega Ramp Rocket Jump
         cls.schedule_clip("clip-speed-09-stuntramp", slot_2_today)
 
-        # Slot 3: Daily Trending GTA 6 Fluid Simulation
-        cls.schedule_clip("clip-trend-01-water", slot_3_today)
+        # Slot 3: Daily Trending Internet Viral Reel (MrBeast $456,000 Squid Game)
+        cls.schedule_clip("clip-trend-01-mrbeast", slot_3_today)
 
     @classmethod
     def execute_daily_cycle(cls) -> Dict[str, Any]:

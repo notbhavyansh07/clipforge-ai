@@ -13,8 +13,8 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v11';
-const VIDEOS_KEY = 'clipforge_videos_v11';
+const CLIPS_KEY = 'clipforge_clips_v12';
+const VIDEOS_KEY = 'clipforge_videos_v12';
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
@@ -652,14 +652,14 @@ export const api = {
     // 3. Slot 3: Daily Trending Viral Discovery (9:30 PM IST)
     const trendClips = allClips.filter(
       (c) =>
-        (c.video_id === 'vid-trending-daily-viral' || c.id.startsWith('clip-trend-')) &&
+        (c.video_id === 'vid-trending-daily-viral' || c.id.startsWith('clip-trend-') || (c.tags && c.tags.some((t) => t.toLowerCase().includes('mrbeast')))) &&
         !c.id.startsWith('clip-inc-') &&
         !c.id.startsWith('clip-speed-') &&
         !c.thumbnail_path?.includes('clip-inc') &&
         !c.thumbnail_path?.includes('clip-speed')
     );
     const scheduledTrend =
-      trendClips.find((c) => c.id === 'clip-trend-01-water') ||
+      trendClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
       trendClips.find((c) => c.status === 'scheduled') ||
       trendClips[0];
 
@@ -690,15 +690,15 @@ export const api = {
       },
       {
         slot_number: 3,
-        target_time_label: '9:30 PM IST (Late Night Gaming Binge)',
+        target_time_label: '9:30 PM IST (Late Night Global Viral Binge)',
         target_time_ist: '21:30:00',
-        creator_name: 'Daily Trending Viral Radar',
+        creator_name: 'MrBeast (Internet Viral Radar)',
         video_id: 'vid-trending-daily-viral',
         clip: scheduledTrend || null,
         status: scheduledTrend?.status || 'scheduled',
-        peak_strategy: 'Late night algorithmic discovery binge on next-gen viral gaming moments',
-        youtube_video_id: scheduledTrend?.youtube_video_id || 'IDChCwdIHFM',
-        youtube_url: scheduledTrend?.youtube_video_id ? `https://youtube.com/shorts/${scheduledTrend.youtube_video_id}` : 'https://youtube.com/shorts/IDChCwdIHFM',
+        peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
+        youtube_video_id: scheduledTrend?.youtube_video_id || '0e3GPea1Tyg',
+        youtube_url: scheduledTrend?.youtube_video_id ? `https://youtube.com/shorts/${scheduledTrend.youtube_video_id}` : 'https://youtube.com/shorts/0e3GPea1Tyg',
       },
     ];
 
