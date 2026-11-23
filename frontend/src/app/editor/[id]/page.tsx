@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -39,6 +40,19 @@ import ComparisonPlayer from '@/components/ComparisonPlayer';
 import { INITIAL_VIDEOS, INITIAL_CLIPS } from '@/lib/seedData';
 import { generateDaVinciEDL, generateDaVinciFCPXML, downloadFile } from '@/lib/davinciExport';
 
+const RemotionShortPlayer = dynamic(
+  () => import('@/components/remotion/RemotionShortPlayer'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-black text-purple-400 gap-2">
+        <Loader2 className="w-6 h-6 animate-spin" />
+        <span className="text-[11px] font-mono">Loading Remotion Engine...</span>
+      </div>
+    ),
+  }
+);
+
 export default function ClipEditorPage() {
   const { id } = useParams<{ id: string }>();
 
@@ -61,6 +75,7 @@ export default function ClipEditorPage() {
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [streamFilter, setStreamFilter] = useState<'all' | 'top' | 'pursuits' | 'heists' | 'crashes'>('all');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [playerMode, setPlayerMode] = useState<'remotion' | 'native'>('remotion');
 
   // Editable clip metadata
   const [clipTitle, setClipTitle] = useState('');
@@ -400,6 +415,18 @@ export default function ClipEditorPage() {
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
+                onClick={() => setPlayerMode(playerMode === 'remotion' ? 'native' : 'remotion')}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono transition border ${
+                  playerMode === 'remotion'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-purple-400 shadow-sm'
+                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
+                }`}
+                title="Toggle between Remotion React Engine & Native Video"
+              >
+                {playerMode === 'remotion' ? '⚡ Remotion' : '🎥 Native'}
+              </button>
+              <button
+                type="button"
                 onClick={() => setShowSafeZoneOverlay(!showSafeZoneOverlay)}
                 className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono transition border ${
                   showSafeZoneOverlay
@@ -418,7 +445,17 @@ export default function ClipEditorPage() {
 
           {/* 9:16 Video Player Container */}
           <div className="relative w-[300px] sm:w-[320px] h-[534px] sm:h-[568px] bg-black rounded-3xl overflow-hidden border-2 border-purple-500/40 shadow-2xl flex items-center justify-center group">
-            {selectedClip ? (
+            {playerMode === 'remotion' && selectedClip && video ? (
+              <RemotionShortPlayer
+                clip={selectedClip}
+                video={video}
+                renderOptions={renderOptions}
+                videoUrl={getVideoUrl(selectedClip)}
+                posterUrl={getPosterUrl(selectedClip)}
+                onTimeUpdate={(t) => setCurrentTime(t)}
+                onPlayStateChange={(playing) => setIsPlaying(playing)}
+              />
+            ) : selectedClip ? (
               <video
                 ref={videoRef}
                 key={selectedClip.id}

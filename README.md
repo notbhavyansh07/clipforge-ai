@@ -338,4 +338,17 @@ ClipForge integrates with the [samuelgursky/davinci-resolve-mcp](https://github.
 - **FCPXML 1.9/1.10 Vertical Timelines**: Import auto-generated 9:16 vertical shorts directly into DaVinci Resolve Studio & Free editions with synchronized split facecam tracks, normalized audio, and markers.
 - **Offline Subtitle & Grade Codec**: Leverages DaVinci Resolve MCP's offline editorial interchange and subtitle timeline parsing to allow round-tripping between ClipForge AI and DaVinci Resolve.
 
+---
+
+## ⚡ 9. Remotion Programmatic Video Engine
+
+ClipForge integrates [remotion-dev/remotion](https://github.com/remotion-dev/remotion) and `@remotion/player` for frame-accurate in-browser programmatic video composition and kinetic captioning:
+
+- **Frame-Accurate React Player**: Renders a true 1080×1920 (9:16) composition at 30/60 FPS with deterministic timeline synchronization.
+- **Kinetic Spring Subtitles**: Uses Remotion's `spring()` and `interpolate()` physics engines to animate active word tokens with spring damping (`stiffness: 180, damping: 14`), thick SVG/canvas text strokes, and dynamic highlight pops (Hormozi Gold `#FACC15`, Cyber Neon `#4ADE80`, and Clean Minimal).
+- **Programmatic Split-Screen FaceCam**: Combines streamer facecam and 9:16 gameplay with dynamic audio pulses and neon dividers.
+- **Retention Hook Progress Bar**: Integrates a frame-synchronized top progress bar to optimize retention on YouTube Shorts, TikTok, and Instagram Reels.
+- **Engine Toggle**: Creators can switch seamlessly between the **⚡ Remotion Engine** and the **🎥 Native** HTML5 video player.
+
+
 
