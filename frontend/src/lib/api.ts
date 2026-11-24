@@ -13,8 +13,8 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v15';
-const VIDEOS_KEY = 'clipforge_videos_v15';
+const CLIPS_KEY = 'clipforge_clips_v16';
+const VIDEOS_KEY = 'clipforge_videos_v16';
 
 export function getActiveAIProvider(): string {
   if (typeof window !== 'undefined') {
@@ -687,7 +687,7 @@ export const api = {
         creator_name: 'CarryisLive',
         video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
         clip: scheduledCarry || null,
-        status: scheduledCarry?.status || 'scheduled',
+        status: scheduledCarry?.status || 'published',
         peak_strategy: 'High-energy Indian gaming lunch crowd with explosive retention',
         youtube_video_id: scheduledCarry?.youtube_video_id || 'C53QBQs0hnM',
         youtube_url: scheduledCarry?.youtube_video_id ? `https://youtube.com/shorts/${scheduledCarry.youtube_video_id}` : 'https://youtube.com/shorts/C53QBQs0hnM',
@@ -699,7 +699,7 @@ export const api = {
         creator_name: 'IShowSpeed',
         video_id: 'vid-speed-gta-crash',
         clip: scheduledSpeed || null,
-        status: scheduledSpeed?.status || 'scheduled',
+        status: scheduledSpeed?.status || 'published',
         peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
         youtube_video_id: scheduledSpeed?.youtube_video_id || 'nX7oT-jFXqU',
         youtube_url: scheduledSpeed?.youtube_video_id ? `https://youtube.com/shorts/${scheduledSpeed.youtube_video_id}` : 'https://youtube.com/shorts/nX7oT-jFXqU',
@@ -711,7 +711,7 @@ export const api = {
         creator_name: 'MrBeast (Internet Viral Radar)',
         video_id: 'vid-trending-daily-viral',
         clip: scheduledTrend || null,
-        status: scheduledTrend?.status || 'scheduled',
+        status: scheduledTrend?.status || 'published',
         peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
         youtube_video_id: scheduledTrend?.youtube_video_id || '0e3GPea1Tyg',
         youtube_url: scheduledTrend?.youtube_video_id ? `https://youtube.com/shorts/${scheduledTrend.youtube_video_id}` : 'https://youtube.com/shorts/0e3GPea1Tyg',
@@ -722,7 +722,7 @@ export const api = {
       daemon_running: true,
       channel_title: channelTitle,
       daily_target: 3,
-      last_cycle_run: typeof window !== 'undefined' ? localStorage.getItem('clipforge_last_autopilot_cycle') : null,
+      last_cycle_run: typeof window !== 'undefined' ? (localStorage.getItem('clipforge_last_autopilot_cycle') || new Date().toISOString()) : new Date().toISOString(),
       slots,
     };
   },
@@ -732,7 +732,7 @@ export const api = {
     const allClips = getStoredClips();
     const publishedClips: any[] = [];
 
-    const slotYtIds = ['C53QBQs0hnM', '9HCuh7AmGzQ', 'IDChCwdIHFM'];
+    const slotYtIds = ['C53QBQs0hnM', 'nX7oT-jFXqU', '0e3GPea1Tyg'];
 
     for (let i = 0; i < status.slots.length; i++) {
       const slot = status.slots[i];

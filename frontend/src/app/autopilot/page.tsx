@@ -446,10 +446,11 @@ export default function AutoPilotPage() {
                       href={slot.youtube_url || 'https://youtube.com'}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full py-2.5 px-3 rounded-xl bg-[#1c2236] hover:bg-[#252d47] text-emerald-400 text-xs font-bold transition flex items-center justify-center gap-2 border border-emerald-500/30"
+                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:opacity-95 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40"
                     >
+                      <Youtube className="w-4 h-4 text-red-300 fill-current" />
                       <span>Watch Live on YouTube Shorts</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <ExternalLink className="w-3.5 h-3.5 ml-1" />
                     </a>
                   ) : (
                     <button
