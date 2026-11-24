@@ -99,6 +99,7 @@ export default function AIModelHarnessModal({
                 <div
                   key={p.id}
                   onClick={() => {
+                    api.setActiveAIProvider(p.id);
                     onSelectProvider(p.id);
                     onClose();
                   }}

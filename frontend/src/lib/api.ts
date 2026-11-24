@@ -13,8 +13,27 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v14';
-const VIDEOS_KEY = 'clipforge_videos_v14';
+const CLIPS_KEY = 'clipforge_clips_v15';
+const VIDEOS_KEY = 'clipforge_videos_v15';
+
+export function getActiveAIProvider(): string {
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('clipforge_active_ai_provider');
+      if (stored) return stored;
+    } catch {}
+  }
+  return 'gemini-free';
+}
+
+export function setActiveAIProvider(providerId: string): void {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('clipforge_active_ai_provider', providerId);
+      window.dispatchEvent(new CustomEvent('clipforge_ai_provider_changed', { detail: { providerId } }));
+    } catch {}
+  }
+}
 
 function getStoredVideos(): Video[] {
   if (typeof window === 'undefined') return INITIAL_VIDEOS;
@@ -52,7 +71,7 @@ function getStoredClips(): Clip[] {
       const parsed: Clip[] = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const initMap = new Map(INITIAL_CLIPS.map((c) => [c.id, c]));
-        // Keep initial clips authoritative for output_path, thumbnail_path, location, incident_type, and title
+        // Keep initial clips authoritative for base properties
         const merged = INITIAL_CLIPS.map((ic) => {
           const userC = parsed.find((p) => p.id === ic.id);
           if (userC) {
@@ -65,12 +84,7 @@ function getStoredClips(): Clip[] {
           return ic;
         });
 
-        // Filter out duplicate cards, legacy repetitive clips, and cross-creator leaks
-        const seenLocations = new Set(INITIAL_CLIPS.map((c) => (c.location || '').toLowerCase().trim()));
-        const seenIncidents = new Set(INITIAL_CLIPS.map((c) => (c.incident_type || '').toLowerCase().trim()));
-        const seenTitles = new Set(INITIAL_CLIPS.map((c) => (c.title || '').toLowerCase().trim()));
-        const seenPaths = new Set(INITIAL_CLIPS.map((c) => (c.output_path || '').trim()));
-
+        // Filter custom clips: strictly purge cross-creator contamination, but NEVER drop user-generated clips
         const custom = parsed.filter((p) => {
           if (initMap.has(p.id)) return false;
           // Strictly purge any CarryMinati clips from Speed's livestream
@@ -82,27 +96,12 @@ function getStoredClips(): Clip[] {
             return false;
           }
           // Strictly purge cross-contamination from Daily Trending
-          if (p.video_id === 'vid-trending-daily-viral' && (p.thumbnail_path?.includes('clip-speed') || p.thumbnail_path?.includes('clip-inc-04'))) {
+          if (p.video_id === 'vid-trending-daily-viral' && (p.thumbnail_path?.includes('clip-speed') || p.thumbnail_path?.includes('clip-inc'))) {
             return false;
           }
-
-          const loc = (p.location || '').toLowerCase().trim();
-          const inc = (p.incident_type || '').toLowerCase().trim();
-          const t = (p.title || '').toLowerCase().trim();
-          const path = (p.output_path || '').trim();
-
-          if (path && seenPaths.has(path)) return false;
-          if (loc && seenLocations.has(loc)) return false;
-          if (inc && seenIncidents.has(inc)) return false;
-          if (t && seenTitles.has(t)) return false;
-
-          if (path) seenPaths.add(path);
-          if (loc) seenLocations.add(loc);
-          if (inc) seenIncidents.add(inc);
-          if (t) seenTitles.add(t);
           return true;
         });
-        return [...merged, ...custom];
+        return [...custom, ...merged];
       }
     }
   } catch {}
@@ -430,6 +429,7 @@ export const api = {
 
     const q = query.toLowerCase();
     const isSpeed = videoId === 'vid-speed-gta-crash' || videoId.toLowerCase().includes('speed');
+    const isTrending = videoId === 'vid-trending-daily-viral' || videoId.toLowerCase().includes('mrbeast') || videoId.toLowerCase().includes('trend');
 
     let sample: {
       video: string;
@@ -440,23 +440,37 @@ export const api = {
       time: number;
     };
 
-    if (isSpeed) {
-      if (q.includes('scream') || q.includes('mic') || q.includes('smash') || q.includes('loud') || q.includes('headphone')) {
+    if (isTrending) {
+      if (q.includes('glass') || q.includes('bridge') || q.includes('fall') || q.includes('drop')) {
+        sample = { video: 'clip-trend-mrbeast-squid', location: 'Suspended Glass Skybridge', incident: 'Glass Bridge 50ft Plunge', icon: '🌉', hook: 'NORMAL GLASS OR TEMPERED GLASS?! 🌉💥', time: 60 };
+      } else if (q.includes('dalgona') || q.includes('honeycomb') || q.includes('needle') || q.includes('candy')) {
+        sample = { video: 'clip-trend-mrbeast-squid', location: 'Honeycomb Playground', incident: 'Dalgona Candy Precision Survival', icon: '🍪', hook: 'ONE CRACK AND YOU ARE OUT! 🍪😱', time: 35 };
+      } else if (q.includes('money') || q.includes('cash') || q.includes('piggy') || q.includes('dollar') || q.includes('win')) {
+        sample = { video: 'clip-trend-mrbeast-squid', location: 'Giant Glass Piggy Bank Ceiling', incident: '$456,000 Cash Drop Celebration', icon: '💰', hook: 'LITERAL MILLIONS DROPPING FROM THE CEILING! 💵', time: 85 };
+      } else {
+        sample = { video: 'clip-trend-mrbeast-squid', location: 'Giant Doll Elimination Arena', incident: 'Red Light Green Light Elimination', icon: '🔴', hook: '456 PEOPLE COMPETING FOR $456,000! 💰🚨', time: 10 };
+      }
+    } else if (isSpeed) {
+      if (q.includes('robot') || q.includes('dog') || q.includes('flame') || q.includes('fire') || q.includes('pool') || q.includes('bark')) {
+        sample = { video: 'clip-speed-robotdog', location: "Speed's Streaming Backyard", incident: 'AI Robot Dog Flamethrower Blast', icon: '🐕‍🦺', hook: 'BARKING FOR HIS LIFE! 💀🔥', time: 5 };
+      } else if (q.includes('ronaldo') || q.includes('siuu') || q.includes('cristiano') || q.includes('tears') || q.includes('idol')) {
+        sample = { video: 'clip-speed-07-shock', location: 'Estádio da Luz VIP Lounge', incident: 'Meeting Cristiano Ronaldo IRL', icon: '🇵🇹', hook: 'HE FINALLY MET CRISTIANO RONALDO! 🇵🇹😭', time: 52 };
+      } else if (q.includes('india') || q.includes('mumbai') || q.includes('mob') || q.includes('fan') || q.includes('crowd')) {
+        sample = { video: 'clip-speed-08-deskslam', location: 'Marine Drive Mumbai', incident: '50,000 Fan Street Mob IRL', icon: '🇮🇳', hook: '50,000 FANS IN MUMBAI SHUT DOWN THE STREET! 🇮🇳🔥', time: 258 };
+      } else if (q.includes('scream') || q.includes('mic') || q.includes('smash') || q.includes('loud') || q.includes('headphone')) {
         sample = { video: 'clip-speed-08-deskslam', location: 'Studio Facecam Redline', incident: 'Mic Peaking Rage & Desk Slam', icon: '💥', hook: 'SPEED MIC BLEW OUT 40,000 HEADPHONES! 🔊', time: 190 };
       } else if (q.includes('chat') || q.includes('roast') || q.includes('shock') || q.includes('disbelief') || q.includes('laugh')) {
         sample = { video: 'clip-speed-07-shock', location: 'Pit Lane Stop', incident: 'Streamer Chat Reaction & Disbelief', icon: '😳', hook: 'SPEED COULD NOT BELIEVE WHAT CHAT SAID! 😭', time: 120 };
       } else if (q.includes('nitro') || q.includes('highway') || q.includes('sprint') || q.includes('fast') || q.includes('weave')) {
         sample = { video: 'clip-speed-06-accel', location: 'Los Santos Highway Bypass', incident: '250MPH Nitro Speed Run', icon: '⚡', hook: 'SPEED FLOORING THE THROTTLE TO 250MPH! ⚡', time: 30 };
       } else if (q.includes('jumpscare') || q.includes('face') || q.includes('scare') || q.includes('close') || q.includes('911')) {
-        sample = { video: 'clip-speed-05-jumpscare', location: 'Ultra Close-Up Webcam', incident: '0-Inch Lens Jumpscare', icon: '💀', hook: 'SPEED JUMPSCARES 65,000 VIEWERS! 💀', time: 218 };
+        sample = { video: 'clip-speed-05-jumpscare', location: 'Ultra Close-Up Webcam', incident: '0-Inch Lens Jumpscare', icon: '💀', hook: 'SPEED JUMPED OUT OF HIS CHAIR! 💀😱', time: 18 };
       } else if (q.includes('rage') || q.includes('desk') || q.includes('break') || q.includes('freakout') || q.includes('hands')) {
-        sample = { video: 'clip-speed-04-rage', location: 'Streamer Studio Setup', incident: 'Streamer Freakout & Desk Slam', icon: '🤬', hook: 'SPEED BROKE HIS SETUP IN TOTAL RAGE! 😭', time: 168 };
-      } else if (q.includes('tire') || q.includes('barrier') || q.includes('wall') || q.includes('caution') || q.includes('yellow')) {
-        sample = { video: 'clip-speed-03-barrier', location: 'Grandstand Chicane', incident: 'Tire Barrier Impact & Yellow Flag', icon: '🛑', hook: 'SLAMMED DIRECTLY INTO SAFETY TIRES! 💥', time: 48 };
+        sample = { video: 'clip-speed-04-rage', location: 'Gaming Bedroom Studio', incident: 'Desktop Setup Destruction & Rage', icon: '🤬', hook: 'HE SMASHED HIS $5,000 SETUP! 🤬🖥️', time: 45 };
       } else if (q.includes('drift') || q.includes('corner') || q.includes('turn') || q.includes('wheel') || q.includes('miss')) {
-        sample = { video: 'clip-speed-02-drift', location: 'Senna S-Curve Hairpin', incident: '150MPH Drift & Near Miss', icon: '🏎️', hook: 'SPEED ALMOST LOST CONTROL ON S-TURN! 🚨', time: 7 };
+        sample = { video: 'clip-speed-02-drift', location: 'Del Perro Coastal Highway', incident: 'Coastal Cliff Hairpin Drift', icon: '🏎️', hook: 'HOW DID HE NOT HIT THE WALL?! 🏎️💨', time: 160 };
       } else {
-        sample = { video: 'clip-speed-01-crash', location: 'Del Perro Freeway', incident: '300MPH Violent Vehicle Crash', icon: '💥', hook: 'SPEED WENT FLYING AT 300MPH! 💀', time: 96 };
+        sample = { video: 'clip-speed-01-crash', location: 'Los Santos Freeway Bridge', incident: '300MPH Violent Vehicle Crash', icon: '💥', hook: 'SPEED WENT FLYING AT 300MPH! 💀', time: 96 };
       }
     } else {
       // CarryMinati incidents
@@ -661,7 +675,9 @@ export const api = {
     const scheduledTrend =
       trendClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
       trendClips.find((c) => c.status === 'scheduled') ||
-      trendClips[0];
+      trendClips[0] ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-trend-01-mrbeast') ||
+      null;
 
     const slots = [
       {
@@ -865,17 +881,29 @@ export const api = {
     };
   },
 
+  getActiveAIProvider(): string {
+    return getActiveAIProvider();
+  },
+
+  setActiveAIProvider(providerId: string): void {
+    setActiveAIProvider(providerId);
+  },
+
   async generateAIHook(data: {
     title: string;
     incident_type?: string;
     location?: string;
     provider_id?: string;
   }): Promise<any> {
+    const payload = {
+      ...data,
+      provider_id: data.provider_id || getActiveAIProvider(),
+    };
     try {
       const res = await fetch(`${BASE_URL}/ai/generate-hook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (res.ok) return await res.json();
     } catch {}
@@ -883,7 +911,7 @@ export const api = {
     const loc = data.location || 'STREAM';
     return {
       success: true,
-      provider_used: data.provider_id || 'gemini-free',
+      provider_used: payload.provider_id,
       opening_hook: `YOU WON'T BELIEVE WHAT HAPPENED AT ${loc.toUpperCase()}! 😱`,
       suggested_title: `⚡ ${data.title.toUpperCase()}`,
       caption_style_recommended: 'karaoke_bold',

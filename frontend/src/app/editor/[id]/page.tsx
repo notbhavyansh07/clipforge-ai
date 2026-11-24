@@ -40,6 +40,7 @@ import { api } from '@/lib/api';
 import { Video, Clip, RenderOptions } from '@/lib/types';
 import PublishModal from '@/components/PublishModal';
 import ClipGeneratorModal from '@/components/ClipGeneratorModal';
+import AIModelHarnessModal from '@/components/AIModelHarnessModal';
 import ClipCard from '@/components/ClipCard';
 import TranscriptTrimmer from '@/components/TranscriptTrimmer';
 import ComparisonPlayer from '@/components/ComparisonPlayer';
@@ -76,6 +77,8 @@ export default function ClipEditorPage() {
   const [rendering, setRendering] = useState(false);
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [isGenModalOpen, setIsGenModalOpen] = useState(false);
+  const [isAIHarnessOpen, setIsAIHarnessOpen] = useState(false);
+  const [activeAIModel, setActiveAIModel] = useState<string>('gemini-free');
   const [activeTab, setActiveTab] = useState<'studio' | 'compare'>('studio');
   const [showSafeZoneOverlay, setShowSafeZoneOverlay] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1.0);
@@ -113,15 +116,28 @@ export default function ClipEditorPage() {
   const selectedClipRef = useRef<Clip | null>(null);
 
   useEffect(() => {
+    setActiveAIModel(api.getActiveAIProvider());
+    const onProviderChange = (e: any) => {
+      if (e.detail?.providerId) setActiveAIModel(e.detail.providerId);
+    };
+    window.addEventListener('clipforge_ai_provider_changed', onProviderChange);
+    return () => window.removeEventListener('clipforge_ai_provider_changed', onProviderChange);
+  }, []);
+
+  const isSpeedProject = id === 'vid-speed-gta-crash' || video?.creator_name === 'IShowSpeed';
+  const isCarryProject = id === 'a5d7460f-90e1-4e4e-9051-210d35430446' || (video?.creator_name || '').toLowerCase().includes('carry');
+  const isTrendingProject = id === 'vid-trending-daily-viral' || (video?.creator_name || '').toLowerCase().includes('mrbeast');
+
+  useEffect(() => {
     if (selectedClip) {
-      const isSplit = selectedClip.framing_mode === 'split_facecam';
+      const isSplit = selectedClip.framing_mode === 'split_facecam' && !isTrendingProject;
       setRenderOptions((prev) => ({
         ...prev,
         split_screen: isSplit,
         framing_mode: isSplit ? 'split_facecam' : 'fill_player_track',
       }));
     }
-  }, [selectedClip?.id, selectedClip?.framing_mode]);
+  }, [selectedClip?.id, selectedClip?.framing_mode, isTrendingProject]);
 
   // VoiceStudio AI Voiceover Narrator state
   const [voiceHookStyle, setVoiceHookStyle] = useState<'hype' | 'trailer' | 'shock' | 'cyber'>('hype');
@@ -329,10 +345,6 @@ export default function ClipEditorPage() {
     }
   };
 
-  const isSpeedProject = id === 'vid-speed-gta-crash' || video?.creator_name === 'IShowSpeed';
-  const isCarryProject = id === 'a5d7460f-90e1-4e4e-9051-210d35430446' || (video?.creator_name || '').toLowerCase().includes('carry');
-  const isTrendingProject = id === 'vid-trending-daily-viral' || (video?.creator_name || '').toLowerCase().includes('mrbeast');
-
   const sanitizedClips = clips.filter((c) => {
     if (isSpeedProject && (c.thumbnail_path?.includes('clip-inc') || c.output_path?.includes('clip-inc') || c.tags?.some((t) => t.toLowerCase().includes('carry')) || c.id.startsWith('clip-trend-'))) {
       return false;
@@ -348,28 +360,12 @@ export default function ClipEditorPage() {
 
   const sortedClips = [...sanitizedClips].sort((a, b) => (b.virality_score || 0) - (a.virality_score || 0));
 
-  // Deduplicate strictly so EVERY card has a unique location, incident, situation, and output video file
-  const seenPaths = new Set<string>();
-  const seenLocations = new Set<string>();
-  const seenIncidents = new Set<string>();
-  const seenTitles = new Set<string>();
-
+  // Deduplicate strictly by clip ID so every generated clip is preserved and visible
+  const seenClipIds = new Set<string>();
   const uniqueClips: Clip[] = [];
   for (const c of sortedClips) {
-    const p = (c.output_path || '').trim();
-    const loc = (c.location || '').trim().toLowerCase();
-    const inc = (c.incident_type || '').trim().toLowerCase();
-    const title = (c.title || '').trim().toLowerCase();
-
-    if (p && seenPaths.has(p)) continue;
-    if (loc && seenLocations.has(loc)) continue;
-    if (inc && seenIncidents.has(inc)) continue;
-    if (title && seenTitles.has(title)) continue;
-
-    if (p) seenPaths.add(p);
-    if (loc) seenLocations.add(loc);
-    if (inc) seenIncidents.add(inc);
-    if (title) seenTitles.add(title);
+    if (!c.id || seenClipIds.has(c.id)) continue;
+    seenClipIds.add(c.id);
     uniqueClips.push(c);
   }
 
@@ -454,6 +450,16 @@ export default function ClipEditorPage() {
 
         {/* Global Action Bar */}
         <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={() => setIsAIHarnessOpen(true)}
+            className="px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-[#151726] hover:bg-[#1e2136] text-purple-300 border border-purple-500/40 hover:border-purple-400 transition flex items-center gap-2 shadow-sm"
+            title="Switch Free AI Model Gateway (Gemini, DeepSeek, Ollama, Claude)"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>AI: {activeAIModel === 'openrouter-free' ? 'DeepSeek R1' : activeAIModel === 'ollama-local' ? 'Local Ollama' : activeAIModel === 'claude-code-proxy' ? 'Claude Proxy' : 'Gemini 2.5 Flash'}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
           <button
             onClick={() => setIsGenModalOpen(true)}
             className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white transition flex items-center gap-2 shadow-md shadow-purple-600/30"
@@ -599,8 +605,8 @@ export default function ClipEditorPage() {
               </div>
             )}
 
-            {/* Live Split-Screen FaceCam HUD Overlay (Native Mode Only) */}
-            {playerMode === 'native' && selectedClip && renderOptions.split_screen && (
+            {/* Live Split-Screen FaceCam HUD Overlay (Native Mode Only, strictly for split_facecam on livestreams) */}
+            {playerMode === 'native' && selectedClip && renderOptions.split_screen && renderOptions.framing_mode === 'split_facecam' && !isTrendingProject && (
               <div className="absolute top-0 inset-x-0 h-[38%] pointer-events-none z-10 border-b-2 border-purple-500/80 bg-gradient-to-b from-purple-950/60 via-purple-900/20 to-transparent flex flex-col justify-between p-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-black/85 text-purple-300 border border-purple-500/50 flex items-center gap-1.5 shadow-md">
@@ -1379,6 +1385,17 @@ export default function ClipEditorPage() {
           }}
         />
       )}
+
+      {/* Free Multi-Provider AI Harness Modal */}
+      <AIModelHarnessModal
+        isOpen={isAIHarnessOpen}
+        onClose={() => setIsAIHarnessOpen(false)}
+        activeProviderId={activeAIModel}
+        onSelectProvider={(pId) => {
+          api.setActiveAIProvider(pId);
+          setActiveAIModel(pId);
+        }}
+      />
     </div>
   );
 }

@@ -84,8 +84,9 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
   // Retention progress bar at top of video
   const progressPercent = (frame / durationInFrames) * 100;
 
-  // Split-screen calculation: only split if explicitly requested AND not a single-track clip
-  const isSplitScreen = renderOptions.split_screen && renderOptions.framing_mode === 'split_facecam';
+  // Split-screen calculation: only split if explicitly requested AND not MrBeast / trending internet video
+  const isTrending = video.id === 'vid-trending-daily-viral' || (video.creator_name || '').toLowerCase().includes('mrbeast');
+  const isSplitScreen = !isTrending && renderOptions.split_screen && renderOptions.framing_mode === 'split_facecam';
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#000000', overflow: 'hidden' }}>

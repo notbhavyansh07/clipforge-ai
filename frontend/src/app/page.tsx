@@ -45,6 +45,15 @@ export default function DashboardPage() {
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [activeVisualizerTab, setActiveVisualizerTab] = useState<'preview' | 'benchmark'>('preview');
 
+  useEffect(() => {
+    setActiveAIProvider(api.getActiveAIProvider());
+    const onProviderChange = (e: any) => {
+      if (e.detail?.providerId) setActiveAIProvider(e.detail.providerId);
+    };
+    window.addEventListener('clipforge_ai_provider_changed', onProviderChange);
+    return () => window.removeEventListener('clipforge_ai_provider_changed', onProviderChange);
+  }, []);
+
   const fetchVideos = async () => {
     try {
       const data = await api.listVideos();
@@ -533,7 +542,10 @@ export default function DashboardPage() {
         isOpen={isAIHarnessOpen}
         onClose={() => setIsAIHarnessOpen(false)}
         activeProviderId={activeAIProvider}
-        onSelectProvider={(id) => setActiveAIProvider(id)}
+        onSelectProvider={(id) => {
+          api.setActiveAIProvider(id);
+          setActiveAIProvider(id);
+        }}
       />
     </div>
   );

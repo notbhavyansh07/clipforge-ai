@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AutopilotStatus, AutopilotSlot } from '@/lib/types';
+import AIModelHarnessModal from '@/components/AIModelHarnessModal';
 
 export default function AutoPilotPage() {
   const [status, setStatus] = useState<AutopilotStatus | null>(null);
@@ -34,6 +35,17 @@ export default function AutoPilotPage() {
   const [cycleResult, setCycleResult] = useState<any | null>(null);
   const [squadData, setSquadData] = useState<any | null>(null);
   const [heartbeating, setHeartbeating] = useState(false);
+  const [isAIHarnessOpen, setIsAIHarnessOpen] = useState(false);
+  const [activeAIModel, setActiveAIModel] = useState<string>('gemini-free');
+
+  useEffect(() => {
+    setActiveAIModel(api.getActiveAIProvider());
+    const onProviderChange = (e: any) => {
+      if (e.detail?.providerId) setActiveAIModel(e.detail.providerId);
+    };
+    window.addEventListener('clipforge_ai_provider_changed', onProviderChange);
+    return () => window.removeEventListener('clipforge_ai_provider_changed', onProviderChange);
+  }, []);
 
   const loadStatus = async () => {
     try {
@@ -124,6 +136,16 @@ export default function AutoPilotPage() {
 
         {/* Global Controls */}
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setIsAIHarnessOpen(true)}
+            className="px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#151726] hover:bg-[#1e2136] text-purple-300 border border-purple-500/40 hover:border-purple-400 transition flex items-center gap-2 shadow-sm"
+            title="Switch Free AI Model Gateway (Gemini, DeepSeek, Ollama, Claude)"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>AI: {activeAIModel === 'openrouter-free' ? 'DeepSeek R1' : activeAIModel === 'ollama-local' ? 'Local Ollama' : activeAIModel === 'claude-code-proxy' ? 'Claude Proxy' : 'Gemini 2.5 Flash'}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
           <button
             onClick={loadStatus}
             disabled={loading}
@@ -457,6 +479,17 @@ export default function AutoPilotPage() {
           </div>
         </div>
       </div>
+
+      {/* Free Multi-Provider AI Harness Modal */}
+      <AIModelHarnessModal
+        isOpen={isAIHarnessOpen}
+        onClose={() => setIsAIHarnessOpen(false)}
+        activeProviderId={activeAIModel}
+        onSelectProvider={(id) => {
+          api.setActiveAIProvider(id);
+          setActiveAIModel(id);
+        }}
+      />
     </div>
   );
 }
