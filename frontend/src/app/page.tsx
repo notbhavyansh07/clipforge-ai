@@ -25,8 +25,12 @@ import {
   ChevronRight,
   ShieldCheck,
   Video as VideoIcon,
+  DownloadCloud,
+  Cpu,
 } from 'lucide-react';
 import IngestModal from '@/components/IngestModal';
+import GhostDownloaderModal from '@/components/GhostDownloaderModal';
+import AIModelHarnessModal from '@/components/AIModelHarnessModal';
 import { api } from '@/lib/api';
 import { Video } from '@/lib/types';
 import { INITIAL_VIDEOS } from '@/lib/seedData';
@@ -35,6 +39,9 @@ export default function DashboardPage() {
   const [videos, setVideos] = useState<Video[]>(INITIAL_VIDEOS);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGhostModalOpen, setIsGhostModalOpen] = useState(false);
+  const [isAIHarnessOpen, setIsAIHarnessOpen] = useState(false);
+  const [activeAIProvider, setActiveAIProvider] = useState('gemini-free');
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [activeVisualizerTab, setActiveVisualizerTab] = useState<'preview' | 'benchmark'>('preview');
 
@@ -120,12 +127,30 @@ export default function DashboardPage() {
                   <span>Ingest Stream URL or MP4</span>
                 </button>
 
+                <button
+                  onClick={() => setIsGhostModalOpen(true)}
+                  className="px-5 py-3.5 rounded-2xl font-bold text-sm bg-[#11192e] hover:bg-[#162240] border border-cyan-500/50 text-cyan-300 transition flex items-center gap-2 shadow-lg shadow-cyan-950/30"
+                  title="Accelerated M3U8 Live Stream Sniffer & Smart Chunking"
+                >
+                  <DownloadCloud className="w-4 h-4 text-cyan-400" />
+                  <span>Ghost Stream Sniffer (4K/M3U8)</span>
+                </button>
+
+                <button
+                  onClick={() => setIsAIHarnessOpen(true)}
+                  className="px-4 py-3.5 rounded-2xl font-bold text-sm bg-[#161226] hover:bg-[#1f1a36] border border-purple-500/40 text-purple-200 transition flex items-center gap-2"
+                  title="Multi-Provider Free AI Gateway"
+                >
+                  <Cpu className="w-4 h-4 text-purple-400" />
+                  <span>Free AI Models</span>
+                </button>
+
                 <Link
                   href="/editor/vid-speed-gta-crash"
                   className="px-5 py-3.5 rounded-2xl font-bold text-sm bg-[#161826] hover:bg-[#1d2033] border border-purple-500/40 text-purple-300 transition flex items-center gap-2"
                 >
                   <Flame className="w-4 h-4 text-red-400" />
-                  <span>Open Speed 300MPH Crash (8 Clips)</span>
+                  <span>Open Speed 300MPH Crash</span>
                 </Link>
               </div>
 
@@ -493,6 +518,22 @@ export default function DashboardPage() {
           setIsModalOpen(false);
           fetchVideos();
         }}
+      />
+
+      <GhostDownloaderModal
+        isOpen={isGhostModalOpen}
+        onClose={() => setIsGhostModalOpen(false)}
+        onSuccess={() => {
+          setIsGhostModalOpen(false);
+          fetchVideos();
+        }}
+      />
+
+      <AIModelHarnessModal
+        isOpen={isAIHarnessOpen}
+        onClose={() => setIsAIHarnessOpen(false)}
+        activeProviderId={activeAIProvider}
+        onSelectProvider={(id) => setActiveAIProvider(id)}
       />
     </div>
   );

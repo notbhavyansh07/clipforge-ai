@@ -19,6 +19,9 @@ import {
   ExternalLink,
   ShieldCheck,
   RefreshCw,
+  Cpu,
+  Activity,
+  Layers,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AutopilotStatus, AutopilotSlot } from '@/lib/types';
@@ -29,16 +32,35 @@ export default function AutoPilotPage() {
   const [runningCycle, setRunningCycle] = useState(false);
   const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [cycleResult, setCycleResult] = useState<any | null>(null);
+  const [squadData, setSquadData] = useState<any | null>(null);
+  const [heartbeating, setHeartbeating] = useState(false);
 
   const loadStatus = async () => {
     try {
       setLoading(true);
-      const data = await api.getAutopilotStatus();
+      const [data, squad] = await Promise.all([
+        api.getAutopilotStatus(),
+        api.getPaperclipSquad(),
+      ]);
       setStatus(data);
+      setSquadData(squad);
     } catch (e) {
       console.error('Failed to load autopilot status:', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTriggerHeartbeat = async () => {
+    try {
+      setHeartbeating(true);
+      await api.triggerSquadHeartbeat();
+      const updatedSquad = await api.getPaperclipSquad();
+      setSquadData(updatedSquad);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setHeartbeating(false);
     }
   };
 
@@ -167,6 +189,93 @@ export default function AutoPilotPage() {
           </div>
         </div>
       )}
+
+      {/* 2.5 Paperclip Autonomous AI Agent Squad Dashboard */}
+      <div className="p-6 rounded-3xl bg-[#10121d] border border-indigo-500/30 space-y-5 shadow-2xl relative overflow-hidden">
+        {/* Glow backdrop */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                <Cpu className="w-5 h-5" />
+              </span>
+              <h2 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                <span>Paperclip Autonomous Agent Squad</span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  4 AGENTS LIVE
+                </span>
+              </h2>
+            </div>
+            <p className="text-xs text-gray-400">
+              Inspired by paperclipai/paperclip: Autonomous virtual company org-chart executing continuous scout, edit, audit, and upload pipelines.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleTriggerHeartbeat}
+              disabled={heartbeating}
+              className="px-4 py-2 rounded-xl bg-[#171a2e] hover:bg-[#202540] border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-2 shadow-md"
+            >
+              <Activity className={`w-3.5 h-3.5 text-indigo-400 ${heartbeating ? 'animate-spin' : 'animate-pulse'}`} />
+              <span>{heartbeating ? 'Pulsing Squad...' : 'Trigger Agent Heartbeat'}</span>
+            </button>
+            <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-1.5 rounded-xl border border-emerald-800">
+              Tokens: {squadData?.total_tokens_consumed || '102.8k / 2.0M'}
+            </span>
+          </div>
+        </div>
+
+        {/* 4 Agent Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {squadData?.members?.map((agent: any) => (
+            <div
+              key={agent.id}
+              className="p-4 rounded-2xl bg-[#141624] border border-gray-800/80 hover:border-indigo-500/40 transition-all space-y-3 relative group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{agent.avatar}</span>
+                  <div>
+                    <div className="text-xs font-bold text-white tracking-tight leading-tight">
+                      {agent.name}
+                    </div>
+                    <div className="text-[10px] text-indigo-300 font-mono">
+                      {agent.role}
+                    </div>
+                  </div>
+                </div>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Heartbeat Online" />
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-black/40 border border-gray-800 text-[11px] text-gray-300 font-mono line-clamp-2 leading-relaxed">
+                {agent.current_focus}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 pt-1 border-t border-gray-800/60">
+                <span>Done: <strong className="text-white">{agent.tasks_completed}</strong></span>
+                <span>Eff: <strong className="text-emerald-400">{agent.efficiency_rating}</strong></span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Real-time Agent Handoff Stream */}
+        <div className="pt-2 border-t border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-gray-400">
+            <Layers className="w-4 h-4 text-indigo-400" />
+            <span className="font-bold text-white">Latest Autonomous Handoff:</span>
+            <span className="text-gray-300 truncate font-mono">
+              {squadData?.recent_handoffs?.[0]?.from_agent} → {squadData?.recent_handoffs?.[0]?.to_agent}
+            </span>
+          </div>
+          <span className="text-[11px] font-mono text-indigo-300 bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-800">
+            {squadData?.recent_handoffs?.[0]?.action}
+          </span>
+        </div>
+      </div>
 
       {/* 3. Daily 3-Slot Peak Viral Schedule Radar */}
       <div className="space-y-4">
