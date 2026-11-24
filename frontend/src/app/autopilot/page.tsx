@@ -22,6 +22,7 @@ import {
   Cpu,
   Activity,
   Layers,
+  X,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AutopilotStatus, AutopilotSlot } from '@/lib/types';
@@ -38,6 +39,7 @@ export default function AutoPilotPage() {
   const [isAIHarnessOpen, setIsAIHarnessOpen] = useState(false);
   const [activeAIModel, setActiveAIModel] = useState<string>('gemini-free');
   const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
+  const [previewClip, setPreviewClip] = useState<any | null>(null);
 
   useEffect(() => {
     setActiveAIModel(api.getActiveAIProvider());
@@ -440,18 +442,30 @@ export default function AutoPilotPage() {
                 )}
 
                 {/* Slot Action Footer */}
-                <div className="pt-2">
+                <div className="pt-2 flex flex-col gap-2">
                   {isPublished ? (
-                    <a
-                      href={slot.youtube_url || 'https://youtube.com'}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:opacity-95 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40"
-                    >
-                      <Youtube className="w-4 h-4 text-red-300 fill-current" />
-                      <span>Watch Live on YouTube Shorts</span>
-                      <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                    </a>
+                    <>
+                      <a
+                        href={slot.youtube_url || (slot.youtube_video_id ? `https://youtube.com/shorts/${slot.youtube_video_id}` : 'https://youtube.com')}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:opacity-95 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40"
+                      >
+                        <Youtube className="w-4 h-4 text-red-300 fill-current" />
+                        <span>Watch Live on YouTube Shorts</span>
+                        <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                      </a>
+                      {slot.clip && (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewClip(slot.clip)}
+                          className="w-full py-2 px-3 rounded-xl bg-[#161928] hover:bg-[#20253d] text-purple-300 hover:text-white text-xs font-semibold border border-purple-900/40 transition flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-current text-purple-400" />
+                          <span>Preview Rendered Short (In-App)</span>
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <button
                       type="button"
@@ -531,6 +545,60 @@ export default function AutoPilotPage() {
           setActiveAIModel(id);
         }}
       />
+
+      {/* In-App 1080x1920 Short Video Player Modal */}
+      {previewClip && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <div className="relative w-full max-w-sm rounded-3xl bg-[#0f111a] border border-purple-500/40 p-4 shadow-2xl flex flex-col items-center">
+            <div className="w-full flex items-center justify-between pb-3 border-b border-gray-800">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                  1080×1920 Short Preview
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewClip(null)}
+                className="p-1.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="w-full my-3 aspect-[9/16] rounded-2xl overflow-hidden bg-black border border-gray-800 relative shadow-inner">
+              <video
+                src={previewClip.output_path?.startsWith('/') ? previewClip.output_path : `/${previewClip.output_path}`}
+                poster={previewClip.thumbnail_path}
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="w-full space-y-2 text-left">
+              <h4 className="text-xs font-bold text-white line-clamp-1">{previewClip.title}</h4>
+              <div className="flex items-center justify-between text-[11px] font-mono text-gray-400">
+                <span className="text-emerald-400 font-bold">Virality: {previewClip.virality_score}/100</span>
+                <span>{previewClip.duration}s • 60 FPS</span>
+              </div>
+              {previewClip.youtube_video_id && (
+                <a
+                  href={`https://youtube.com/shorts/${previewClip.youtube_video_id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full mt-2 py-2 px-3 rounded-xl bg-red-600/90 hover:bg-red-500 text-white text-xs font-bold transition flex items-center justify-center gap-2"
+                >
+                  <Youtube className="w-4 h-4 fill-current" />
+                  <span>Open on YouTube Shorts</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

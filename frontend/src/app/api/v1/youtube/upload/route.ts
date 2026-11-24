@@ -165,11 +165,12 @@ export async function POST(request: Request) {
       'clip-speed-03-barrier': 'JigGsq0q5iY',
       'clip-speed-04-rage': 'ghZdV6UuanU',
       'clip-speed-05-jumpscare': 'x9QuUyucZjY',
-      'clip-speed-robotdog': 'nX7oT-jFXqU',
-      'clip-inc-04-crash': 'C53QBQs0hnM',
+      'clip-speed-robotdog': '1wzzrOvl_Jg',
+      'clip-inc-04-crash': 'YqlbuN5v-tg',
       'clip-inc-06-freakout': 'IDChCwdIHFM',
-      'clip-inc-11-stunt': 'C53QBQs0hnM',
-      'clip-trend-01-mrbeast': '0e3GPea1Tyg',
+      'clip-inc-11-stunt': 'YqlbuN5v-tg',
+      'clip-trend-01-mrbeast': 'dnbLdUyozKM',
+      'clip-trend-mrbeast-squid': 'dnbLdUyozKM',
     };
 
     let ytId = (existing?.youtube_video_id && !existing.youtube_video_id.startsWith('CF_'))

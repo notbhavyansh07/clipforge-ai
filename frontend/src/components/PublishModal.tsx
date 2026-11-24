@@ -37,8 +37,11 @@ const VERIFIED_SAMPLE_SHORTS: Record<string, string> = {
   'clip-speed-03-barrier': 'JigGsq0q5iY',
   'clip-speed-04-rage': 'ghZdV6UuanU',
   'clip-speed-05-jumpscare': 'x9QuUyucZjY',
-  'clip-inc-04-crash': 'C53QBQs0hnM',
+  'clip-inc-04-crash': 'YqlbuN5v-tg',
+  'clip-inc-11-stunt': 'YqlbuN5v-tg',
   'clip-inc-06-freakout': 'IDChCwdIHFM',
+  'clip-speed-robotdog': '1wzzrOvl_Jg',
+  'clip-trend-01-mrbeast': 'dnbLdUyozKM',
 };
 
 export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }: PublishModalProps) {

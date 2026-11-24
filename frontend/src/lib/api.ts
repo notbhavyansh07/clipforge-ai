@@ -13,7 +13,7 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v16';
+const CLIPS_KEY = 'clipforge_clips_v18';
 const VIDEOS_KEY = 'clipforge_videos_v16';
 
 export function getActiveAIProvider(): string {
@@ -78,7 +78,7 @@ function getStoredClips(): Clip[] {
             return {
               ...ic,
               status: userC.status || ic.status,
-              youtube_video_id: userC.youtube_video_id || ic.youtube_video_id,
+              youtube_video_id: (userC.youtube_video_id && userC.youtube_video_id !== 'C53QBQs0hnM') ? userC.youtube_video_id : ic.youtube_video_id,
             };
           }
           return ic;
@@ -594,8 +594,11 @@ export const api = {
       'clip-speed-03-barrier': 'JigGsq0q5iY',
       'clip-speed-04-rage': 'ghZdV6UuanU',
       'clip-speed-05-jumpscare': 'x9QuUyucZjY',
-      'clip-inc-04-crash': 'C53QBQs0hnM',
+      'clip-inc-04-crash': 'YqlbuN5v-tg',
+      'clip-inc-11-stunt': 'YqlbuN5v-tg',
       'clip-inc-06-freakout': 'IDChCwdIHFM',
+      'clip-speed-robotdog': '1wzzrOvl_Jg',
+      'clip-trend-mrbeast-squid': 'dnbLdUyozKM',
     };
     const defaultYtId = KNOWN_LIVE_IDS[payload.clip_id] || '9HCuh7AmGzQ';
     const igUrl = 'https://www.instagram.com/reels/create';
@@ -689,8 +692,8 @@ export const api = {
         clip: scheduledCarry || null,
         status: scheduledCarry?.status || 'published',
         peak_strategy: 'High-energy Indian gaming lunch crowd with explosive retention',
-        youtube_video_id: scheduledCarry?.youtube_video_id || 'C53QBQs0hnM',
-        youtube_url: scheduledCarry?.youtube_video_id ? `https://youtube.com/shorts/${scheduledCarry.youtube_video_id}` : 'https://youtube.com/shorts/C53QBQs0hnM',
+        youtube_video_id: (scheduledCarry?.youtube_video_id && scheduledCarry.youtube_video_id !== 'C53QBQs0hnM') ? scheduledCarry.youtube_video_id : 'YqlbuN5v-tg',
+        youtube_url: `https://youtube.com/shorts/${(scheduledCarry?.youtube_video_id && scheduledCarry.youtube_video_id !== 'C53QBQs0hnM') ? scheduledCarry.youtube_video_id : 'YqlbuN5v-tg'}`,
       },
       {
         slot_number: 2,
@@ -701,8 +704,8 @@ export const api = {
         clip: scheduledSpeed || null,
         status: scheduledSpeed?.status || 'published',
         peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
-        youtube_video_id: scheduledSpeed?.youtube_video_id || 'nX7oT-jFXqU',
-        youtube_url: scheduledSpeed?.youtube_video_id ? `https://youtube.com/shorts/${scheduledSpeed.youtube_video_id}` : 'https://youtube.com/shorts/nX7oT-jFXqU',
+        youtube_video_id: scheduledSpeed?.youtube_video_id || '1wzzrOvl_Jg',
+        youtube_url: `https://youtube.com/shorts/${scheduledSpeed?.youtube_video_id || '1wzzrOvl_Jg'}`,
       },
       {
         slot_number: 3,
@@ -713,8 +716,8 @@ export const api = {
         clip: scheduledTrend || null,
         status: scheduledTrend?.status || 'published',
         peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
-        youtube_video_id: scheduledTrend?.youtube_video_id || '0e3GPea1Tyg',
-        youtube_url: scheduledTrend?.youtube_video_id ? `https://youtube.com/shorts/${scheduledTrend.youtube_video_id}` : 'https://youtube.com/shorts/0e3GPea1Tyg',
+        youtube_video_id: (scheduledTrend?.youtube_video_id && scheduledTrend.youtube_video_id !== '0e3GPea1Tyg') ? scheduledTrend.youtube_video_id : 'dnbLdUyozKM',
+        youtube_url: `https://youtube.com/shorts/${(scheduledTrend?.youtube_video_id && scheduledTrend.youtube_video_id !== '0e3GPea1Tyg') ? scheduledTrend.youtube_video_id : 'dnbLdUyozKM'}`,
       },
     ];
 
@@ -732,7 +735,7 @@ export const api = {
     const allClips = getStoredClips();
     const publishedClips: any[] = [];
 
-    const slotYtIds = ['C53QBQs0hnM', 'nX7oT-jFXqU', '0e3GPea1Tyg'];
+    const slotYtIds = ['YqlbuN5v-tg', '1wzzrOvl_Jg', 'dnbLdUyozKM'];
 
     for (let i = 0; i < status.slots.length; i++) {
       const slot = status.slots[i];
