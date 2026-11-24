@@ -126,6 +126,7 @@ export interface AutopilotSlot {
   slot_number: 1 | 2 | 3;
   target_time_label: string;
   target_time_ist: string;
+  target_date?: string;
   creator_name: string;
   video_id: string;
   clip: Clip | null;
@@ -143,5 +144,6 @@ export interface AutopilotStatus {
   last_cycle_run?: string;
   next_slot?: AutopilotSlot;
   slots: AutopilotSlot[];
+  tomorrow_slots?: AutopilotSlot[];
 }
 

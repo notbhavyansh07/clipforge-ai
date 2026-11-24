@@ -75,6 +75,16 @@ class AutopilotService:
         # Slot 3: Daily Trending Internet Viral Reel (MrBeast $456,000 Squid Game)
         cls.schedule_clip("clip-trend-01-mrbeast", slot_3_today)
 
+        # Tomorrow Slots (2026-11-25 Peak Schedule)
+        tomorrow_date = today_date + timedelta(days=1)
+        slot_1_tomorrow = datetime(tomorrow_date.year, tomorrow_date.month, tomorrow_date.day, 13, 30, 0, tzinfo=IST)
+        slot_2_tomorrow = datetime(tomorrow_date.year, tomorrow_date.month, tomorrow_date.day, 18, 0, 0, tzinfo=IST)
+        slot_3_tomorrow = datetime(tomorrow_date.year, tomorrow_date.month, tomorrow_date.day, 21, 30, 0, tzinfo=IST)
+
+        cls.schedule_clip("clip-tomorrow-carry-heist", slot_1_tomorrow)
+        cls.schedule_clip("clip-tomorrow-speed-ronaldo", slot_2_tomorrow)
+        cls.schedule_clip("clip-tomorrow-trend-yacht", slot_3_tomorrow)
+
     @classmethod
     def execute_daily_cycle(cls) -> Dict[str, Any]:
         """Executes full daily cycle, uploading clips across all 3 peak viral slots."""

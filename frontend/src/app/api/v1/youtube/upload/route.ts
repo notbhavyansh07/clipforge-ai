@@ -171,6 +171,9 @@ export async function POST(request: Request) {
       'clip-inc-11-stunt': 'YqlbuN5v-tg',
       'clip-trend-01-mrbeast': 'dnbLdUyozKM',
       'clip-trend-mrbeast-squid': 'dnbLdUyozKM',
+      'clip-tomorrow-carry-heist': 'mZFaBmKB7qY',
+      'clip-tomorrow-speed-ronaldo': 'friwdO_FIb0',
+      'clip-tomorrow-trend-yacht': 'sHpEqeSByPI',
     };
 
     let ytId = (existing?.youtube_video_id && !existing.youtube_video_id.startsWith('CF_'))

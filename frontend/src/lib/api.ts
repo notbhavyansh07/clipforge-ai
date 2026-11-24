@@ -13,7 +13,7 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v18';
+const CLIPS_KEY = 'clipforge_clips_v19';
 const VIDEOS_KEY = 'clipforge_videos_v16';
 
 export function getActiveAIProvider(): string {
@@ -599,6 +599,9 @@ export const api = {
       'clip-inc-06-freakout': 'IDChCwdIHFM',
       'clip-speed-robotdog': '1wzzrOvl_Jg',
       'clip-trend-mrbeast-squid': 'dnbLdUyozKM',
+      'clip-tomorrow-carry-heist': 'mZFaBmKB7qY',
+      'clip-tomorrow-speed-ronaldo': 'friwdO_FIb0',
+      'clip-tomorrow-trend-yacht': 'sHpEqeSByPI',
     };
     const defaultYtId = KNOWN_LIVE_IDS[payload.clip_id] || '9HCuh7AmGzQ';
     const igUrl = 'https://www.instagram.com/reels/create';
@@ -721,12 +724,67 @@ export const api = {
       },
     ];
 
+    const tomorrowCarry =
+      allClips.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-carry-heist') || null;
+
+    const tomorrowSpeed =
+      allClips.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') || null;
+
+    const tomorrowTrend =
+      allClips.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-trend-yacht') || null;
+
+    const tomorrow_slots = [
+      {
+        slot_number: 1 as const,
+        target_time_label: '1:30 PM IST (Tomorrow Lunch Surge)',
+        target_date: '2026-11-25',
+        target_time_ist: '13:30:00',
+        creator_name: 'CarryisLive',
+        video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
+        clip: tomorrowCarry,
+        status: (tomorrowCarry?.status as any) || 'scheduled',
+        peak_strategy: '$100M Casino Heist Rooftop Escape with massive Indian gaming midday audience',
+        youtube_video_id: tomorrowCarry?.youtube_video_id || 'mZFaBmKB7qY',
+        youtube_url: `https://youtube.com/shorts/${tomorrowCarry?.youtube_video_id || 'mZFaBmKB7qY'}`,
+      },
+      {
+        slot_number: 2 as const,
+        target_time_label: '6:00 PM IST (Tomorrow Global Golden Hour)',
+        target_date: '2026-11-25',
+        target_time_ist: '18:00:00',
+        creator_name: 'IShowSpeed',
+        video_id: 'vid-speed-gta-crash',
+        clip: tomorrowSpeed,
+        status: (tomorrowSpeed?.status as any) || 'scheduled',
+        peak_strategy: 'Historic global streaming moment: Speed meeting Cristiano Ronaldo IRL with 250M+ impressions',
+        youtube_video_id: tomorrowSpeed?.youtube_video_id || 'friwdO_FIb0',
+        youtube_url: `https://youtube.com/shorts/${tomorrowSpeed?.youtube_video_id || 'friwdO_FIb0'}`,
+      },
+      {
+        slot_number: 3 as const,
+        target_time_label: '9:30 PM IST (Tomorrow Late Night Viral Binge)',
+        target_date: '2026-11-25',
+        target_time_ist: '21:30:00',
+        creator_name: 'MrBeast (Internet Viral Radar)',
+        video_id: 'vid-trending-daily-viral',
+        clip: tomorrowTrend,
+        status: (tomorrowTrend?.status as any) || 'scheduled',
+        peak_strategy: '$1 Billion Mega-Yacht challenge: Top viral internet phenomenon with maximum global retention hold',
+        youtube_video_id: tomorrowTrend?.youtube_video_id || 'sHpEqeSByPI',
+        youtube_url: `https://youtube.com/shorts/${tomorrowTrend?.youtube_video_id || 'sHpEqeSByPI'}`,
+      },
+    ];
+
     return {
       daemon_running: true,
       channel_title: channelTitle,
       daily_target: 3,
       last_cycle_run: typeof window !== 'undefined' ? (localStorage.getItem('clipforge_last_autopilot_cycle') || new Date().toISOString()) : new Date().toISOString(),
       slots,
+      tomorrow_slots,
     };
   },
 
@@ -775,9 +833,10 @@ export const api = {
     };
   },
 
-  async triggerSlotUpload(slotNumber: number): Promise<any> {
+  async triggerSlotUpload(slotNumber: number, isTomorrow: boolean = false): Promise<any> {
     const status = await this.getAutopilotStatus();
-    const targetSlot = status.slots.find((s: any) => s.slot_number === slotNumber);
+    const sourceSlots = isTomorrow ? (status.tomorrow_slots || []) : status.slots;
+    const targetSlot = sourceSlots.find((s: any) => s.slot_number === slotNumber);
     if (!targetSlot || !targetSlot.clip) throw new Error('No clip assigned to this slot');
 
     return await this.publishToYouTube({

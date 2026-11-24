@@ -40,6 +40,7 @@ export default function AutoPilotPage() {
   const [activeAIModel, setActiveAIModel] = useState<string>('gemini-free');
   const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
   const [previewClip, setPreviewClip] = useState<any | null>(null);
+  const [scheduleDay, setScheduleDay] = useState<'today' | 'tomorrow'>('today');
 
   useEffect(() => {
     setActiveAIModel(api.getActiveAIProvider());
@@ -117,7 +118,7 @@ export default function AutoPilotPage() {
   const handleUploadSingleSlot = async (slotNumber: number) => {
     try {
       setUploadingSlot(slotNumber);
-      await api.triggerSlotUpload(slotNumber);
+      await api.triggerSlotUpload(slotNumber, scheduleDay === 'tomorrow');
       await loadStatus();
     } catch (e: any) {
       alert(`Upload error: ${e.message}`);
@@ -342,21 +343,60 @@ export default function AutoPilotPage() {
           </div>
         </div>
 
+        {/* Day Selector Tabs */}
+        <div className="flex items-center gap-2 border-b border-gray-800/80 pb-3">
+          <button
+            type="button"
+            onClick={() => setScheduleDay('today')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              scheduleDay === 'today'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                : 'bg-[#151726] text-gray-400 hover:text-white border border-gray-800'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5" />
+            <span>Today's Peak Schedule (Nov 24)</span>
+            <span className="text-[10px] bg-purple-900/80 text-purple-200 px-2 py-0.5 rounded-full font-mono">
+              3 Slots
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setScheduleDay('tomorrow')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              scheduleDay === 'tomorrow'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30'
+                : 'bg-[#151726] text-gray-400 hover:text-white border border-gray-800'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Tomorrow's Viral Queue (Nov 25)</span>
+            <span className="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full font-mono border border-emerald-800">
+              3 NEW CLIPS LOCKED
+            </span>
+          </button>
+        </div>
+
         {/* Live Timing Window Banner */}
         <div className="p-3.5 rounded-2xl bg-[#141727] border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5">
             <Calendar className="w-4 h-4 text-purple-400 shrink-0" />
             <span className="text-gray-300">
-              Next algorithmic upload: <strong className="text-white">Slot #1 (CarryisLive - 1:30 PM IST Lunch Break Surge)</strong>
+              {scheduleDay === 'today' ? (
+                <>Next algorithmic upload: <strong className="text-white">Slot #1 (CarryisLive - 1:30 PM IST Lunch Break Surge)</strong></>
+              ) : (
+                <>Tomorrow's Viral Lineup (Nov 25): <strong className="text-emerald-300">3 Fresh Viral Clips with 99+ Retention Ready for 1:30 PM, 6:00 PM, and 9:30 PM IST</strong></>
+              )}
             </span>
           </div>
           <span className="text-[11px] font-mono text-purple-300 font-bold bg-purple-900/50 px-2.5 py-1 rounded-lg border border-purple-700">
-            Autonomous Daemon: Active &amp; Ready
+            {scheduleDay === 'today' ? 'Autonomous Daemon: Active & Ready' : 'Tomorrow Queue: Locked & Synced'}
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {status?.slots?.map((slot: AutopilotSlot) => {
+          {(scheduleDay === 'tomorrow' ? (status?.tomorrow_slots || []) : (status?.slots || [])).map((slot: AutopilotSlot) => {
             const isPublished = slot.status === 'published';
             const isTargetLoading = uploadingSlot === slot.slot_number;
 

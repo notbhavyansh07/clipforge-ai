@@ -42,6 +42,9 @@ const VERIFIED_SAMPLE_SHORTS: Record<string, string> = {
   'clip-inc-06-freakout': 'IDChCwdIHFM',
   'clip-speed-robotdog': '1wzzrOvl_Jg',
   'clip-trend-01-mrbeast': 'dnbLdUyozKM',
+  'clip-tomorrow-carry-heist': 'mZFaBmKB7qY',
+  'clip-tomorrow-speed-ronaldo': 'friwdO_FIb0',
+  'clip-tomorrow-trend-yacht': 'sHpEqeSByPI',
 };
 
 export default function PublishModal({ clip, video, isOpen, onClose, onSuccess }: PublishModalProps) {
