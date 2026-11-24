@@ -37,6 +37,7 @@ export default function AutoPilotPage() {
   const [heartbeating, setHeartbeating] = useState(false);
   const [isAIHarnessOpen, setIsAIHarnessOpen] = useState(false);
   const [activeAIModel, setActiveAIModel] = useState<string>('gemini-free');
+  const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
 
   useEffect(() => {
     setActiveAIModel(api.getActiveAIProvider());
@@ -45,6 +46,23 @@ export default function AutoPilotPage() {
     };
     window.addEventListener('clipforge_ai_provider_changed', onProviderChange);
     return () => window.removeEventListener('clipforge_ai_provider_changed', onProviderChange);
+  }, []);
+
+  // Live IST Clock & 15-second background sync
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const ist = new Date(utc + (3600000 * 5.5));
+      setCurrentTimeStr(ist.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+    updateTime();
+    const timeInterval = setInterval(updateTime, 1000);
+    const syncInterval = setInterval(loadStatus, 15000);
+    return () => {
+      clearInterval(timeInterval);
+      clearInterval(syncInterval);
+    };
   }, []);
 
   const loadStatus = async () => {
@@ -301,7 +319,7 @@ export default function AutoPilotPage() {
 
       {/* 3. Daily 3-Slot Peak Viral Schedule Radar */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Clock className="w-5 h-5 text-purple-400" />
@@ -311,8 +329,27 @@ export default function AutoPilotPage() {
               Each slot targets peak viewer attention on YouTube Shorts with automatic algorithmic timing.
             </p>
           </div>
-          <span className="text-xs font-mono text-purple-300 bg-purple-950/80 px-3 py-1 rounded-xl border border-purple-800">
-            Auto-Sync: Connected to @salviashu02
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-mono text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-800 flex items-center gap-1.5 font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>IST Clock: {currentTimeStr || '11:28:00 AM'}</span>
+            </span>
+            <span className="text-xs font-mono text-purple-300 bg-purple-950/80 px-3 py-1 rounded-xl border border-purple-800">
+              Auto-Sync: Connected to @salviashu02
+            </span>
+          </div>
+        </div>
+
+        {/* Live Timing Window Banner */}
+        <div className="p-3.5 rounded-2xl bg-[#141727] border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <Calendar className="w-4 h-4 text-purple-400 shrink-0" />
+            <span className="text-gray-300">
+              Next algorithmic upload: <strong className="text-white">Slot #1 (CarryisLive - 1:30 PM IST Lunch Break Surge)</strong>
+            </span>
+          </div>
+          <span className="text-[11px] font-mono text-purple-300 font-bold bg-purple-900/50 px-2.5 py-1 rounded-lg border border-purple-700">
+            Autonomous Daemon: Active &amp; Ready
           </span>
         </div>
 
@@ -350,8 +387,11 @@ export default function AutoPilotPage() {
 
                   <div>
                     <h3 className="text-base font-black text-white">{slot.target_time_label}</h3>
-                    <div className="text-xs text-purple-300 font-semibold mt-0.5">
-                      Target Creator: {slot.creator_name}
+                    <div className="flex items-center justify-between text-xs mt-1">
+                      <span className="text-purple-300 font-semibold">Target Creator: {slot.creator_name}</span>
+                      <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
+                        {isPublished ? '● Live on Shorts' : `Peak: ${slot.target_time_ist} IST`}
+                      </span>
                     </div>
                   </div>
 

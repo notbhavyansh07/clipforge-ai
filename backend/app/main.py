@@ -15,6 +15,17 @@ try:
 except Exception as e:
     print(f"[Main] Seeder notice: {e}")
 
+# Start Autopilot Viral Timing Background Daemon
+import threading
+try:
+    from backend.app.services.autopilot_service import AutopilotService
+    AutopilotService.setup_initial_viral_queue()
+    daemon_thread = threading.Thread(target=AutopilotService.run_daemon_loop, kwargs={"poll_interval_seconds": 30}, daemon=True)
+    daemon_thread.start()
+    print("[Main] Autopilot viral scheduler daemon successfully started in background.")
+except Exception as e:
+    print(f"[Main] Autopilot daemon startup notice: {e}")
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
