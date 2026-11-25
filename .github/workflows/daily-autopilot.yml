@@ -1,0 +1,33 @@
+name: Daily 3-Slot Viral Auto-Pilot
+
+on:
+  schedule:
+    # Slot #1: 1:30 PM IST (08:00 UTC) - CarryisLive Lunch Surge
+    - cron: '0 8 * * *'
+    # Slot #2: 6:00 PM IST (12:30 UTC) - IShowSpeed Global Golden Hour
+    - cron: '30 12 * * *'
+    # Slot #3: 9:30 PM IST (16:00 UTC) - Daily Viral Binge
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Optional slot number (1, 2, or 3)'
+        required: false
+        default: ''
+
+jobs:
+  trigger-autopilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake Render Free Tier
+        run: |
+          curl -s -o /dev/null -w "Status: %{http_code}\n" https://clipforge-frontend-04i1.onrender.com/api/v1/youtube/status
+          sleep 10
+
+      - name: Trigger Scheduled Auto-Pilot Slot
+        run: |
+          SLOT_PARAM=""
+          if [ -n "${{ github.event.inputs.slot }}" ]; then
+            SLOT_PARAM="?slot=${{ github.event.inputs.slot }}"
+          fi
+          curl -sS -f "https://clipforge-frontend-04i1.onrender.com/api/v1/youtube/autopilot/cron${SLOT_PARAM}"
