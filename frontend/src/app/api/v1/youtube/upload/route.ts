@@ -177,31 +177,31 @@ export async function POST(request: Request) {
       'clip-tomorrow-trend-yacht': 'sHpEqeSByPI',
     };
 
-    let ytId = (existing?.youtube_video_id && !existing.youtube_video_id.startsWith('CF_'))
-      ? existing.youtube_video_id
-      : (KNOWN_LIVE_IDS[clip_id] || '9HCuh7AmGzQ');
+    let ytId: string | null = null;
     let ytError: string | null = null;
     let ytSuccess = false;
+    let uploadedToChannel = false;
 
-    // 1. YouTube Upload Execution
+    // 1. YouTube Upload Execution (Real OAuth Only — never fake with another creator's video)
     if (platforms.includes('youtube')) {
-      if (fileInfo && fs.existsSync(fileInfo.fullPath)) {
+      if (!process.env.GOOGLE_REFRESH_TOKEN) {
+        ytError = 'YouTube OAuth not authorized yet. Click "Authorize Real YouTube Upload" to post to @salviashu02.';
+      } else if (fileInfo && fs.existsSync(fileInfo.fullPath)) {
         try {
           const finalTitle = title.includes('#Shorts') ? title : `${title} #Shorts`;
           ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags);
           ytSuccess = true;
+          uploadedToChannel = true;
         } catch (err: any) {
           console.error('[YouTube Upload Error]:', err.message);
           ytError = err.message;
-          // Gracefully fallback to confirmed live ID so user gets live preview
-          ytSuccess = true;
         }
       } else {
-        ytSuccess = true;
+        ytError = `Rendered video file not found for clip ${clip_id}.`;
       }
     }
 
-    const ytUrl = `https://youtube.com/shorts/${ytId}`;
+    const ytUrl = ytId ? `https://youtube.com/shorts/${ytId}` : null;
 
     // 2. Instagram Reels Execution
     let igSuccess = false;
@@ -248,8 +248,8 @@ export async function POST(request: Request) {
       ? `https://www.instagram.com/reel/${igMediaId}`
       : 'https://www.instagram.com/reels/create';
 
-    // Update in-memory seed data
-    if (existing) {
+    // Update in-memory seed data ONLY if genuinely uploaded to user's channel
+    if (existing && uploadedToChannel && ytId) {
       existing.status = 'published';
       existing.youtube_video_id = ytId;
       existing.youtube_publish_time = new Date().toISOString();
@@ -261,16 +261,22 @@ export async function POST(request: Request) {
     }
 
     const platformNames: string[] = [];
-    if (platforms.includes('youtube')) platformNames.push('YouTube Shorts');
-    if (platforms.includes('instagram')) platformNames.push('Instagram Reels');
+    if (uploadedToChannel) platformNames.push('YouTube Shorts');
+    if (platforms.includes('instagram') && igSuccess) platformNames.push('Instagram Reels');
 
     return NextResponse.json({
-      success: true,
-      message: `Clip published successfully to ${platformNames.join(' & ')}!`,
+      success: uploadedToChannel || igSuccess,
+      preview_only: !uploadedToChannel,
+      message: uploadedToChannel
+        ? `Clip uploaded to your YouTube channel (@salviashu02)!`
+        : ytError || 'Preview mode: authorize YouTube OAuth to upload to @salviashu02.',
       youtube: {
         success: ytSuccess,
+        uploaded_to_channel: uploadedToChannel,
+        preview_only: !uploadedToChannel,
         video_id: ytId,
         url: ytUrl,
+        preview_url: publicVideoUrl,
         error: ytError,
       },
       instagram: {
@@ -283,6 +289,7 @@ export async function POST(request: Request) {
       },
       youtube_video_id: ytId,
       youtube_url: ytUrl,
+      preview_url: publicVideoUrl,
       instagram_url: igUrl,
     });
   } catch (error: any) {

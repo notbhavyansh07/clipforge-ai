@@ -511,45 +511,53 @@ export default function AutoPilotPage() {
 
                 {/* Slot Action Footer */}
                 <div className="pt-2 flex flex-col gap-2">
-                  {isPublished ? (
-                    <>
-                      <a
-                        href={slot.youtube_url || (slot.youtube_video_id ? `https://youtube.com/shorts/${slot.youtube_video_id}` : 'https://youtube.com')}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:opacity-95 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40"
-                      >
-                        <Youtube className="w-4 h-4 text-red-300 fill-current" />
-                        <span>Watch Live on YouTube Shorts</span>
-                        <ExternalLink className="w-3.5 h-3.5 ml-1" />
-                      </a>
-                      {slot.clip && (
-                        <button
-                          type="button"
-                          onClick={() => setPreviewClip(slot.clip)}
-                          className="w-full py-2 px-3 rounded-xl bg-[#161928] hover:bg-[#20253d] text-purple-300 hover:text-white text-xs font-semibold border border-purple-900/40 transition flex items-center justify-center gap-2 shadow-sm"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-current text-purple-400" />
-                          <span>Preview Rendered Short (In-App)</span>
-                        </button>
-                      )}
-                    </>
+                  {slot.clip && (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewClip(slot.clip)}
+                      className="w-full py-2 px-3 rounded-xl bg-[#161928] hover:bg-[#20253d] text-purple-300 hover:text-white text-xs font-semibold border border-purple-900/40 transition flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-current text-purple-400" />
+                      <span>Preview Rendered Short (In-App)</span>
+                    </button>
+                  )}
+
+                  {isPublished && slot.youtube_url ? (
+                    <a
+                      href={slot.youtube_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:opacity-95 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40"
+                    >
+                      <Youtube className="w-4 h-4 text-red-300 fill-current" />
+                      <span>Watch Live on Your YouTube</span>
+                      <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                    </a>
                   ) : (
                     <button
                       type="button"
-                      onClick={() => handleUploadSingleSlot(slot.slot_number)}
+                      onClick={() => {
+                        if (!status?.oauth_ready) {
+                          setOauthBanner({
+                            type: 'error',
+                            text: 'YouTube OAuth is not authorized yet. Click "Authorize Real YouTube Upload" above to connect @salviashu02 and post for real.',
+                          });
+                          return;
+                        }
+                        handleUploadSingleSlot(slot.slot_number);
+                      }}
                       disabled={isTargetLoading}
                       className="w-full py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-purple-600/20"
                     >
                       {isTargetLoading ? (
                         <>
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>Publishing to YouTube...</span>
+                          <span>Uploading to @salviashu02...</span>
                         </>
                       ) : (
                         <>
                           <Youtube className="w-3.5 h-3.5 text-red-400" />
-                          <span>Auto-Upload Slot #{slot.slot_number} Now</span>
+                          <span>{status?.oauth_ready ? `Upload Slot #${slot.slot_number} to YouTube` : `Authorize YouTube to Upload #${slot.slot_number}`}</span>
                         </>
                       )}
                     </button>

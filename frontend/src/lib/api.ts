@@ -13,7 +13,7 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v20';
+const CLIPS_KEY = 'clipforge_clips_v21';
 const VIDEOS_KEY = 'clipforge_videos_v16';
 
 export function getActiveAIProvider(): string {
@@ -652,13 +652,15 @@ export const api = {
       });
       if (res.ok) {
         const data = await res.json();
-        const allClips = getStoredClips();
-        const idx = allClips.findIndex((c) => c.id === payload.clip_id);
-        if (idx !== -1) {
-          allClips[idx].status = 'published';
-          if (data.youtube_video_id) allClips[idx].youtube_video_id = data.youtube_video_id;
-          if (data.instagram_url) allClips[idx].instagram_url = data.instagram_url;
-          saveStoredClips(allClips);
+        if (data.youtube?.uploaded_to_channel && data.youtube_video_id) {
+          const allClips = getStoredClips();
+          const idx = allClips.findIndex((c) => c.id === payload.clip_id);
+          if (idx !== -1) {
+            allClips[idx].status = 'published';
+            allClips[idx].youtube_video_id = data.youtube_video_id;
+            if (data.instagram_url) allClips[idx].instagram_url = data.instagram_url;
+            saveStoredClips(allClips);
+          }
         }
         return data;
       }
@@ -841,8 +843,8 @@ export const api = {
       },
     ];
 
-    // Autonomous Daemon Check: Auto-publish any scheduled slot whose peak IST time has arrived today
-    if (autoExecuteDue && typeof window !== 'undefined') {
+    // Autonomous Daemon Check: Auto-publish due scheduled slots ONLY when real YouTube OAuth is authorized
+    if (autoExecuteDue && ytStatus?.oauth_ready && typeof window !== 'undefined') {
       let didAutoPublish = false;
       for (const slot of slots) {
         if (slot.clip && slot.status !== 'published' && istTime24 >= slot.target_time_ist) {
@@ -854,21 +856,23 @@ export const api = {
               include_attribution: true,
               platforms: ['youtube'],
             });
-            slot.status = 'published';
-            slot.youtube_video_id = res.youtube_video_id || slot.youtube_video_id;
-            slot.youtube_url = res.youtube_url || slot.youtube_url;
-            if (slot.clip) {
-              slot.clip.status = 'published';
-              slot.clip.youtube_video_id = slot.youtube_video_id;
+            if (res.youtube?.uploaded_to_channel && res.youtube_video_id) {
+              slot.status = 'published';
+              slot.youtube_video_id = res.youtube_video_id;
+              slot.youtube_url = res.youtube_url;
+              if (slot.clip) {
+                slot.clip.status = 'published';
+                slot.clip.youtube_video_id = res.youtube_video_id;
+              }
+              this._appendAutopilotLog({
+                slot: slot.slot_number,
+                creator: slot.creator_name,
+                title: slot.clip.title,
+                message: `Auto-uploaded to @salviashu02 (peak window ${slot.target_time_ist} IST)`,
+                youtube_url: slot.youtube_url,
+              });
+              didAutoPublish = true;
             }
-            this._appendAutopilotLog({
-              slot: slot.slot_number,
-              creator: slot.creator_name,
-              title: slot.clip.title,
-              message: `Auto-uploaded on schedule (peak window ${slot.target_time_ist} IST reached)`,
-              youtube_url: slot.youtube_url,
-            });
-            didAutoPublish = true;
           } catch {}
         }
       }
