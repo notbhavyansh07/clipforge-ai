@@ -21,11 +21,15 @@ function upsertEnvVar(filePath: string, key: string, value: string) {
 
 export async function GET(request: Request) {
   const reqUrl = new URL(request.url);
+  const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || reqUrl.host;
+  const forwardedProto = request.headers.get('x-forwarded-proto') || (forwardedHost.includes('localhost') || forwardedHost.includes('127.0.0.1') ? 'http' : 'https');
+  const publicOrigin = `${forwardedProto}://${forwardedHost}`;
+
   const code = reqUrl.searchParams.get('code');
   const error = reqUrl.searchParams.get('error');
 
   if (error) {
-    return NextResponse.redirect(`${reqUrl.origin}/autopilot?oauth=error&reason=${encodeURIComponent(error)}`);
+    return NextResponse.redirect(`${publicOrigin}/autopilot?oauth=error&reason=${encodeURIComponent(error)}`);
   }
 
   if (!code) {
@@ -34,7 +38,7 @@ export async function GET(request: Request) {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = `${reqUrl.origin}/api/v1/youtube/oauth/callback`;
+  const redirectUri = `${publicOrigin}/api/v1/youtube/oauth/callback`;
 
   if (!clientId || !clientSecret) {
     return NextResponse.json({ error: 'Google OAuth client credentials missing' }, { status: 500 });
@@ -56,7 +60,7 @@ export async function GET(request: Request) {
     const tokenData = await tokenRes.json();
     if (!tokenRes.ok || !tokenData.access_token) {
       return NextResponse.redirect(
-        `${reqUrl.origin}/autopilot?oauth=error&reason=${encodeURIComponent(tokenData.error_description || tokenData.error || 'Token exchange failed')}`
+        `${publicOrigin}/autopilot?oauth=error&reason=${encodeURIComponent(tokenData.error_description || tokenData.error || 'Token exchange failed')}`
       );
     }
 
@@ -88,12 +92,12 @@ export async function GET(request: Request) {
     } catch {}
 
     const response = NextResponse.redirect(
-      `${reqUrl.origin}/autopilot?oauth=success&channel=${encodeURIComponent(channelTitle)}`
+      `${publicOrigin}/autopilot?oauth=success&channel=${encodeURIComponent(channelTitle)}`
     );
     if (refreshToken) {
       response.cookies.set('clipforge_yt_rt', refreshToken, {
         httpOnly: true,
-        secure: reqUrl.protocol === 'https:',
+        secure: forwardedProto === 'https',
         sameSite: 'lax',
         path: '/',
         maxAge: 60 * 60 * 24 * 365,
@@ -102,7 +106,7 @@ export async function GET(request: Request) {
     return response;
   } catch (err: any) {
     return NextResponse.redirect(
-      `${reqUrl.origin}/autopilot?oauth=error&reason=${encodeURIComponent(err.message || 'OAuth callback failed')}`
+      `${publicOrigin}/autopilot?oauth=error&reason=${encodeURIComponent(err.message || 'OAuth callback failed')}`
     );
   }
 }

@@ -129,7 +129,10 @@ function ensurePort8000OAuthBridge(frontendOrigin: string) {
 export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const reqUrl = new URL(request.url);
-  const isLocal = reqUrl.hostname === 'localhost' || reqUrl.hostname === '127.0.0.1';
+  const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || reqUrl.host;
+  const forwardedProto = request.headers.get('x-forwarded-proto') || (forwardedHost.includes('localhost') || forwardedHost.includes('127.0.0.1') ? 'http' : 'https');
+  const publicOrigin = `${forwardedProto}://${forwardedHost}`;
+  const isLocal = forwardedHost.startsWith('localhost') || forwardedHost.startsWith('127.0.0.1');
 
   if (!clientId) {
     return NextResponse.json({
@@ -142,10 +145,10 @@ export async function GET(request: Request) {
 
   const effectiveRedirectUri = isLocal
     ? REDIRECT_URI
-    : `${reqUrl.origin}/api/v1/youtube/oauth/callback`;
+    : `${publicOrigin}/api/v1/youtube/oauth/callback`;
 
   if (isLocal) {
-    ensurePort8000OAuthBridge(reqUrl.origin);
+    ensurePort8000OAuthBridge(publicOrigin);
   }
 
   const params = new URLSearchParams({
