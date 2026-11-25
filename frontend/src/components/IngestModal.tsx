@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 interface IngestModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (video?: any) => void;
 }
 
 export default function IngestModal({ isOpen, onClose, onSuccess }: IngestModalProps) {
@@ -34,13 +34,14 @@ export default function IngestModal({ isOpen, onClose, onSuccess }: IngestModalP
 
     try {
       setLoading(true);
+      let createdVideo: any = null;
       if (activeTab === 'url') {
         if (!url.trim()) {
           setError('Please provide a valid YouTube or Twitch URL.');
           setLoading(false);
           return;
         }
-        await api.ingestUrl({
+        createdVideo = await api.ingestUrl({
           url: url.trim(),
           has_permission: hasPermission,
           creator_name: creatorName.trim() || undefined,
@@ -59,10 +60,10 @@ export default function IngestModal({ isOpen, onClose, onSuccess }: IngestModalP
         if (creatorName) formData.append('creator_name', creatorName);
         if (creatorUrl) formData.append('creator_url', creatorUrl);
 
-        await api.ingestUpload(formData);
+        createdVideo = await api.ingestUpload(formData);
       }
 
-      onSuccess();
+      onSuccess(createdVideo);
       onClose();
     } catch (err: any) {
       setError(err.message || 'Failed to submit ingest request.');

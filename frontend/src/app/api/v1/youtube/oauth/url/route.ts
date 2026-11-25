@@ -128,23 +128,29 @@ function ensurePort8000OAuthBridge(frontendOrigin: string) {
 
 export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
+  const reqUrl = new URL(request.url);
+  const isLocal = reqUrl.hostname === 'localhost' || reqUrl.hostname === '127.0.0.1';
+
   if (!clientId) {
-    return NextResponse.json(
-      {
-        configured: false,
-        authorization_url: null,
-        message: 'GOOGLE_CLIENT_ID is not configured.',
-      },
-      { status: 400 }
-    );
+    return NextResponse.json({
+      configured: false,
+      fallback_direct: true,
+      authorization_url: null,
+      message: 'Google OAuth credentials are not configured on this server. Direct Channel Sync (@salviashu02) is active.',
+    });
   }
 
-  const reqUrl = new URL(request.url);
-  ensurePort8000OAuthBridge(reqUrl.origin);
+  const effectiveRedirectUri = isLocal
+    ? REDIRECT_URI
+    : `${reqUrl.origin}/api/v1/youtube/oauth/callback`;
+
+  if (isLocal) {
+    ensurePort8000OAuthBridge(reqUrl.origin);
+  }
 
   const params = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: effectiveRedirectUri,
     response_type: 'code',
     scope: 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly',
     access_type: 'offline',
@@ -156,6 +162,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     configured: true,
     authorization_url: authUrl,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: effectiveRedirectUri,
   });
 }

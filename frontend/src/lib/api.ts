@@ -249,7 +249,11 @@ export const api = {
         method: 'POST',
         body: formData,
       });
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const result = await res.json();
+        saveStoredVideos([result, ...getStoredVideos()]);
+        return result;
+      }
     } catch {}
 
     const file = formData.get('file') as File | null;

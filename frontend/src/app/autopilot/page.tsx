@@ -67,11 +67,21 @@ export default function AutoPilotPage() {
       const data = await res.json();
       if (data.authorization_url) {
         window.location.href = data.authorization_url;
+      } else if (data.fallback_direct) {
+        await api.connectYouTubeDirect('@salviashu02');
+        setOauthBanner({
+          type: 'success',
+          text: data.message || 'Direct Channel Sync connected for @salviashu02.',
+        });
+        await loadStatus(true);
       } else {
-        alert(data.message || 'OAuth URL could not be generated.');
+        setOauthBanner({
+          type: 'error',
+          text: data.message || 'OAuth URL could not be generated.',
+        });
       }
     } catch (e: any) {
-      alert(`OAuth init failed: ${e.message}`);
+      setOauthBanner({ type: 'error', text: `OAuth init failed: ${e.message}` });
     } finally {
       setAuthorizingYT(false);
     }
@@ -324,93 +334,6 @@ export default function AutoPilotPage() {
         </div>
       )}
 
-      {/* 2.5 Paperclip Autonomous AI Agent Squad Dashboard */}
-      <div className="p-6 rounded-3xl bg-[#10121d] border border-indigo-500/30 space-y-5 shadow-2xl relative overflow-hidden">
-        {/* Glow backdrop */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                <Cpu className="w-5 h-5" />
-              </span>
-              <h2 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
-                <span>Paperclip Autonomous Agent Squad</span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
-                  4 AGENTS LIVE
-                </span>
-              </h2>
-            </div>
-            <p className="text-xs text-gray-400">
-              Inspired by paperclipai/paperclip: Autonomous virtual company org-chart executing continuous scout, edit, audit, and upload pipelines.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleTriggerHeartbeat}
-              disabled={heartbeating}
-              className="px-4 py-2 rounded-xl bg-[#171a2e] hover:bg-[#202540] border border-indigo-500/40 text-indigo-300 text-xs font-bold transition flex items-center gap-2 shadow-md"
-            >
-              <Activity className={`w-3.5 h-3.5 text-indigo-400 ${heartbeating ? 'animate-spin' : 'animate-pulse'}`} />
-              <span>{heartbeating ? 'Pulsing Squad...' : 'Trigger Agent Heartbeat'}</span>
-            </button>
-            <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2.5 py-1.5 rounded-xl border border-emerald-800">
-              Tokens: {squadData?.total_tokens_consumed || '102.8k / 2.0M'}
-            </span>
-          </div>
-        </div>
-
-        {/* 4 Agent Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {squadData?.members?.map((agent: any) => (
-            <div
-              key={agent.id}
-              className="p-4 rounded-2xl bg-[#141624] border border-gray-800/80 hover:border-indigo-500/40 transition-all space-y-3 relative group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{agent.avatar}</span>
-                  <div>
-                    <div className="text-xs font-bold text-white tracking-tight leading-tight">
-                      {agent.name}
-                    </div>
-                    <div className="text-[10px] text-indigo-300 font-mono">
-                      {agent.role}
-                    </div>
-                  </div>
-                </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Heartbeat Online" />
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-black/40 border border-gray-800 text-[11px] text-gray-300 font-mono line-clamp-2 leading-relaxed">
-                {agent.current_focus}
-              </div>
-
-              <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 pt-1 border-t border-gray-800/60">
-                <span>Done: <strong className="text-white">{agent.tasks_completed}</strong></span>
-                <span>Eff: <strong className="text-emerald-400">{agent.efficiency_rating}</strong></span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Real-time Agent Handoff Stream */}
-        <div className="pt-2 border-t border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-gray-400">
-            <Layers className="w-4 h-4 text-indigo-400" />
-            <span className="font-bold text-white">Latest Autonomous Handoff:</span>
-            <span className="text-gray-300 truncate font-mono">
-              {squadData?.recent_handoffs?.[0]?.from_agent} → {squadData?.recent_handoffs?.[0]?.to_agent}
-            </span>
-          </div>
-          <span className="text-[11px] font-mono text-indigo-300 bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-800">
-            {squadData?.recent_handoffs?.[0]?.action}
-          </span>
-        </div>
-      </div>
-
       {/* 3. Daily 3-Slot Peak Viral Schedule Radar */}
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -424,12 +347,22 @@ export default function AutoPilotPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleTriggerHeartbeat}
+              disabled={heartbeating}
+              className="text-xs font-mono text-indigo-300 bg-indigo-950/70 hover:bg-indigo-900/70 px-3 py-1 rounded-xl border border-indigo-800 flex items-center gap-1.5 transition"
+              title="Backend Paperclip 4-Agent Squad Status"
+            >
+              <Cpu className={`w-3.5 h-3.5 text-indigo-400 ${heartbeating ? 'animate-spin' : ''}`} />
+              <span>{squadData?.active_agents || 4} Backend Agents Online</span>
+            </button>
             <span className="text-xs font-mono text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-800 flex items-center gap-1.5 font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>IST Clock: {currentTimeStr || '11:28:00 AM'}</span>
             </span>
             <span className="text-xs font-mono text-purple-300 bg-purple-950/80 px-3 py-1 rounded-xl border border-purple-800">
-              Auto-Sync: Connected to @salviashu02
+              {status?.channel_title || '@salviashu02'}
             </span>
           </div>
         </div>
@@ -625,48 +558,6 @@ export default function AutoPilotPage() {
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* 4. Daily Trending Discovery Radar */}
-      <div className="p-6 rounded-3xl bg-[#12141f] border border-gray-800/90 space-y-4 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span>Internet Viral Video Discovery Radar (Slot #3 Engine)</span>
-            </h2>
-            <p className="text-xs text-gray-400">
-              Scans YouTube Trending &amp; Internet viral sensations 24/7 to auto-ingest and clip viral videos from top internet creators alongside Carry and Speed.
-            </p>
-          </div>
-          <Link
-            href="/editor/vid-trending-daily-viral"
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#181c2e] hover:bg-[#232842] text-purple-300 border border-purple-500/30 transition flex items-center gap-1.5 shrink-0"
-          >
-            <span>Open Internet Viral Editor</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-          <div className="p-3.5 rounded-2xl bg-[#161828] border border-gray-800 space-y-1">
-            <span className="text-[10px] text-gray-400 font-mono">Today's Internet Viral Source</span>
-            <div className="text-xs font-bold text-white">MrBeast - $456,000 Squid Game In Real Life!</div>
-            <span className="text-[10px] text-emerald-400 font-mono">● 650M+ Views Worldwide</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#161828] border border-gray-800 space-y-1">
-            <span className="text-[10px] text-gray-400 font-mono">Top Viral Moment</span>
-            <div className="text-xs font-bold text-white">🔴 Red Light, Green Light Elimination</div>
-            <span className="text-[10px] text-purple-400 font-mono">99.9 Virality Index</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#161828] border border-gray-800 space-y-1">
-            <span className="text-[10px] text-gray-400 font-mono">Assigned Daily Peak</span>
-            <div className="text-xs font-bold text-white">Slot #3: 9:30 PM IST (Late Night Binge)</div>
-            <span className="text-[10px] text-amber-400 font-mono">Peak Retention Hold</span>
-          </div>
         </div>
       </div>
 
