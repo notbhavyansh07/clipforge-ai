@@ -30,8 +30,9 @@ async function getGoogleAccessToken(): Promise<string> {
   return data.access_token;
 }
 
-function findClipFile(clipId: string): { fullPath: string; fileName: string } | null {
+function findClipFile(clipId: string, outputPath?: string | null): { fullPath: string; fileName: string } | null {
   const candidateNames = [
+    ...(outputPath ? [path.basename(outputPath)] : []),
     `${clipId}.mp4`,
     `${clipId}.MP4`,
   ];
@@ -151,7 +152,7 @@ export async function POST(request: Request) {
     const clipIndex = INITIAL_CLIPS.findIndex((c) => c.id === clip_id);
     const existing = clipIndex !== -1 ? INITIAL_CLIPS[clipIndex] : null;
 
-    const fileInfo = findClipFile(clip_id);
+    const fileInfo = findClipFile(clip_id, existing?.output_path);
     const fileName = fileInfo ? fileInfo.fileName : `${clip_id}.mp4`;
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL ||

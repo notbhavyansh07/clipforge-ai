@@ -51,28 +51,48 @@ export default function AutoPilotPage() {
     return () => window.removeEventListener('clipforge_ai_provider_changed', onProviderChange);
   }, []);
 
-  // Live IST Clock & 15-second background sync
+  // Live IST Clock & 10-second autonomous daemon poll
+  const [istTime24, setIstTime24] = useState<string>('');
+
+  const getCountdownToSlot = (targetTime24: string, isTomorrow: boolean) => {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const ist = new Date(utc + 3600000 * 5.5);
+    const [hh, mm, ss] = targetTime24.split(':').map(Number);
+    const target = new Date(ist);
+    if (isTomorrow) target.setDate(target.getDate() + 1);
+    target.setHours(hh, mm, ss || 0, 0);
+    const diffSec = Math.floor((target.getTime() - ist.getTime()) / 1000);
+    if (diffSec <= 0) return 'Due now (Auto-uploading...)';
+    const h = Math.floor(diffSec / 3600);
+    const m = Math.floor((diffSec % 3600) / 60);
+    const s = diffSec % 60;
+    return `In ${h}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
+  };
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       const ist = new Date(utc + (3600000 * 5.5));
       setCurrentTimeStr(ist.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      const pad = (n: number) => String(n).padStart(2, '0');
+      setIstTime24(`${pad(ist.getHours())}:${pad(ist.getMinutes())}:${pad(ist.getSeconds())}`);
     };
     updateTime();
     const timeInterval = setInterval(updateTime, 1000);
-    const syncInterval = setInterval(loadStatus, 15000);
+    const syncInterval = setInterval(() => loadStatus(true), 10000);
     return () => {
       clearInterval(timeInterval);
       clearInterval(syncInterval);
     };
   }, []);
 
-  const loadStatus = async () => {
+  const loadStatus = async (silent: boolean = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const [data, squad] = await Promise.all([
-        api.getAutopilotStatus(),
+        api.getAutopilotStatus(true),
         api.getPaperclipSquad(),
       ]);
       setStatus(data);
@@ -80,7 +100,7 @@ export default function AutoPilotPage() {
     } catch (e) {
       console.error('Failed to load autopilot status:', e);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -105,9 +125,9 @@ export default function AutoPilotPage() {
     try {
       setRunningCycle(true);
       setCycleResult(null);
-      const res = await api.triggerDailyAutoPilotCycle();
+      const res = await api.triggerDailyAutoPilotCycle(scheduleDay === 'tomorrow');
       setCycleResult(res);
-      await loadStatus();
+      await loadStatus(true);
     } catch (e: any) {
       alert(`Auto-pilot cycle error: ${e.message}`);
     } finally {
@@ -168,7 +188,7 @@ export default function AutoPilotPage() {
           </button>
 
           <button
-            onClick={loadStatus}
+            onClick={() => loadStatus(false)}
             disabled={loading}
             className="p-2.5 rounded-xl bg-[#151724] hover:bg-[#1e2133] border border-gray-800 text-gray-300 hover:text-white transition"
             title="Refresh Schedule Status"
@@ -344,7 +364,7 @@ export default function AutoPilotPage() {
         </div>
 
         {/* Day Selector Tabs */}
-        <div className="flex items-center gap-2 border-b border-gray-800/80 pb-3">
+        <div className="flex items-center gap-2 border-b border-gray-800/80 pb-3 flex-wrap">
           <button
             type="button"
             onClick={() => setScheduleDay('today')}
@@ -355,7 +375,7 @@ export default function AutoPilotPage() {
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>Today's Peak Schedule (Nov 24)</span>
+            <span>Today&apos;s Peak Schedule ({status?.today_label || 'Today'})</span>
             <span className="text-[10px] bg-purple-900/80 text-purple-200 px-2 py-0.5 rounded-full font-mono">
               3 Slots
             </span>
@@ -371,7 +391,7 @@ export default function AutoPilotPage() {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Tomorrow's Viral Queue (Nov 25)</span>
+            <span>Tomorrow&apos;s Viral Queue ({status?.tomorrow_label || 'Tomorrow'})</span>
             <span className="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded-full font-mono border border-emerald-800">
               3 NEW CLIPS LOCKED
             </span>
@@ -384,14 +404,18 @@ export default function AutoPilotPage() {
             <Calendar className="w-4 h-4 text-purple-400 shrink-0" />
             <span className="text-gray-300">
               {scheduleDay === 'today' ? (
-                <>Next algorithmic upload: <strong className="text-white">Slot #1 (CarryisLive - 1:30 PM IST Lunch Break Surge)</strong></>
+                status?.next_slot && status.next_slot.status !== 'published' ? (
+                  <>Next algorithmic upload: <strong className="text-white">Slot #{status.next_slot.slot_number} ({status.next_slot.creator_name} - {status.next_slot.target_time_ist} IST)</strong> <span className="text-amber-300 font-mono ml-1">({getCountdownToSlot(status.next_slot.target_time_ist, false)})</span></>
+                ) : (
+                  <>All 3 peak viral slots for <strong className="text-emerald-300">{status?.today_label || 'Today'}</strong> are <strong className="text-emerald-300">PUBLISHED LIVE</strong>!</>
+                )
               ) : (
-                <>Tomorrow's Viral Lineup (Nov 25): <strong className="text-emerald-300">3 Fresh Viral Clips with 99+ Retention Ready for 1:30 PM, 6:00 PM, and 9:30 PM IST</strong></>
+                <>Tomorrow&apos;s Viral Lineup ({status?.tomorrow_label || 'Tomorrow'}): <strong className="text-emerald-300">3 Fresh Viral Clips with 99+ Retention Ready for 1:30 PM, 6:00 PM, and 9:30 PM IST</strong></>
               )}
             </span>
           </div>
-          <span className="text-[11px] font-mono text-purple-300 font-bold bg-purple-900/50 px-2.5 py-1 rounded-lg border border-purple-700">
-            {scheduleDay === 'today' ? 'Autonomous Daemon: Active & Ready' : 'Tomorrow Queue: Locked & Synced'}
+          <span className="text-[11px] font-mono text-purple-300 font-bold bg-purple-900/50 px-2.5 py-1 rounded-lg border border-purple-700 shrink-0">
+            {scheduleDay === 'today' ? 'Autonomous Daemon: Active (10s Poll)' : 'Tomorrow Queue: Locked & Synced'}
           </span>
         </div>
 
@@ -429,10 +453,10 @@ export default function AutoPilotPage() {
 
                   <div>
                     <h3 className="text-base font-black text-white">{slot.target_time_label}</h3>
-                    <div className="flex items-center justify-between text-xs mt-1">
+                    <div className="flex items-center justify-between text-xs mt-1 gap-2 flex-wrap">
                       <span className="text-purple-300 font-semibold">Target Creator: {slot.creator_name}</span>
                       <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">
-                        {isPublished ? '● Live on Shorts' : `Peak: ${slot.target_time_ist} IST`}
+                        {isPublished ? '● Live on Shorts' : getCountdownToSlot(slot.target_time_ist, scheduleDay === 'tomorrow')}
                       </span>
                     </div>
                   </div>
@@ -574,6 +598,49 @@ export default function AutoPilotPage() {
           </div>
         </div>
       </div>
+
+      {/* 5. Autonomous Daemon Execution Log */}
+      {status?.logs && status.logs.length > 0 && (
+        <div className="p-5 rounded-3xl bg-[#0f111a] border border-emerald-500/30 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Activity className="w-4 h-4 text-emerald-400" />
+              <span>Autonomous Daemon Execution Log</span>
+            </h3>
+            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
+              {status.logs.length} Event{status.logs.length === 1 ? '' : 's'} Recorded
+            </span>
+          </div>
+          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            {status.logs.map((log: any) => (
+              <div
+                key={log.id}
+                className="p-2.5 rounded-xl bg-[#161926] border border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] font-mono text-gray-500 shrink-0">{log.timestamp}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-purple-950 text-purple-300 font-mono text-[10px] shrink-0">
+                    Slot #{log.slot}
+                  </span>
+                  <span className="text-emerald-300 font-semibold truncate">{log.message}</span>
+                  <span className="text-gray-400 truncate hidden md:inline">• {log.title}</span>
+                </div>
+                {log.youtube_url && (
+                  <a
+                    href={log.youtube_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] text-purple-300 hover:text-white underline shrink-0 flex items-center gap-1"
+                  >
+                    <span>YouTube</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Free Multi-Provider AI Harness Modal */}
       <AIModelHarnessModal

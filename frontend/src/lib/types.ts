@@ -141,9 +141,15 @@ export interface AutopilotStatus {
   daemon_running: boolean;
   channel_title: string;
   daily_target: number;
+  today_label?: string;
+  tomorrow_label?: string;
+  today_iso?: string;
+  tomorrow_iso?: string;
+  ist_time_24?: string;
   last_cycle_run?: string;
   next_slot?: AutopilotSlot;
   slots: AutopilotSlot[];
   tomorrow_slots?: AutopilotSlot[];
+  logs?: any[];
 }
 

@@ -13,7 +13,7 @@ const BASE_URL = typeof window !== 'undefined'
           ? `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')}/api/v1` 
           : 'http://localhost:8000/api/v1'));
 
-const CLIPS_KEY = 'clipforge_clips_v19';
+const CLIPS_KEY = 'clipforge_clips_v20';
 const VIDEOS_KEY = 'clipforge_videos_v16';
 
 export function getActiveAIProvider(): string {
@@ -638,214 +638,305 @@ export const api = {
   },
 
   // 🤖 3-Slot Daily Autonomous Peak Viral Upload Pipeline
-  async getAutopilotStatus(): Promise<any> {
+  _getISTParts() {
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    const ist = new Date(utcMs + 5.5 * 3600000);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const tomorrowIst = new Date(ist.getTime() + 86400000);
+
+    return {
+      ist,
+      todayISO: `${ist.getFullYear()}-${pad(ist.getMonth() + 1)}-${pad(ist.getDate())}`,
+      tomorrowISO: `${tomorrowIst.getFullYear()}-${pad(tomorrowIst.getMonth() + 1)}-${pad(tomorrowIst.getDate())}`,
+      todayLabel: `${months[ist.getMonth()]} ${ist.getDate()}`,
+      tomorrowLabel: `${months[tomorrowIst.getMonth()]} ${tomorrowIst.getDate()}`,
+      istTime24: `${pad(ist.getHours())}:${pad(ist.getMinutes())}:${pad(ist.getSeconds())}`,
+    };
+  },
+
+  _appendAutopilotLog(entry: { slot: number; creator: string; title: string; message: string; youtube_url?: string }) {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('clipforge_autopilot_logs');
+      const logs = raw ? JSON.parse(raw) : [];
+      logs.unshift({
+        id: `${Date.now()}-${entry.slot}`,
+        timestamp: new Date().toLocaleTimeString(),
+        ...entry,
+      });
+      localStorage.setItem('clipforge_autopilot_logs', JSON.stringify(logs.slice(0, 15)));
+    } catch {}
+  },
+
+  getAutopilotLogs(): any[] {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = localStorage.getItem('clipforge_autopilot_logs');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  async getAutopilotStatus(autoExecuteDue: boolean = true): Promise<any> {
     const allClips = getStoredClips();
     const ytStatus = await this.getYouTubeStatus();
     const channelTitle = ytStatus.channel_title || '@salviashu02';
+    const { todayISO, tomorrowISO, todayLabel, tomorrowLabel, istTime24 } = this._getISTParts();
 
-    // 1. Slot 1: CarryisLive (1:30 PM IST)
-    const carryClips = allClips.filter(
-      (c) =>
-        (c.video_id === 'a5d7460f-90e1-4e4e-9051-210d35430446' || (c.tags && c.tags.some((t) => t.toLowerCase().includes('carry')))) &&
-        !c.thumbnail_path?.includes('clip-speed') &&
-        !c.id.startsWith('clip-speed-') &&
-        !c.id.startsWith('clip-trend-')
-    );
-    const scheduledCarry =
-      carryClips.find((c) => c.id === 'clip-inc-11-stunt') ||
-      carryClips.find((c) => c.status === 'scheduled') ||
-      carryClips[0];
+    // Today's Fresh Viral Lineup (CarryisLive, IShowSpeed, MrBeast)
+    const todayCarry =
+      allClips.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
+      allClips.find((c) => c.id === 'clip-inc-11-stunt') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
+      null;
 
-    // 2. Slot 2: IShowSpeed (6:00 PM IST)
-    const speedClips = allClips.filter(
-      (c) =>
-        (c.video_id === 'vid-speed-gta-crash' || (c.tags && c.tags.some((t) => t.toLowerCase().includes('speed')))) &&
-        !c.thumbnail_path?.includes('clip-inc') &&
-        !c.id.startsWith('clip-inc-') &&
-        !c.id.startsWith('clip-trend-')
-    );
-    const scheduledSpeed =
-      speedClips.find((c) => c.id === 'clip-speed-robotdog') ||
-      speedClips.find((c) => c.status === 'scheduled') ||
-      speedClips[0];
+    const todaySpeed =
+      allClips.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
+      allClips.find((c) => c.id === 'clip-speed-robotdog') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
+      null;
 
-    // 3. Slot 3: Daily Trending Viral Discovery (9:30 PM IST)
-    const trendClips = allClips.filter(
-      (c) =>
-        (c.video_id === 'vid-trending-daily-viral' || c.id.startsWith('clip-trend-') || (c.tags && c.tags.some((t) => t.toLowerCase().includes('mrbeast')))) &&
-        !c.id.startsWith('clip-inc-') &&
-        !c.id.startsWith('clip-speed-') &&
-        !c.thumbnail_path?.includes('clip-inc') &&
-        !c.thumbnail_path?.includes('clip-speed')
-    );
-    const scheduledTrend =
-      trendClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
-      trendClips.find((c) => c.status === 'scheduled') ||
-      trendClips[0] ||
+    const todayTrend =
+      allClips.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
+      allClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
+      null;
+
+    // Tomorrow's Queued Viral Lineup
+    const tomorrowCarry =
+      allClips.find((c) => c.id === 'clip-inc-11-stunt') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-inc-11-stunt') ||
+      null;
+
+    const tomorrowSpeed =
+      allClips.find((c) => c.id === 'clip-speed-robotdog') ||
+      INITIAL_CLIPS.find((c) => c.id === 'clip-speed-robotdog') ||
+      null;
+
+    const tomorrowTrend =
+      allClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
       INITIAL_CLIPS.find((c) => c.id === 'clip-trend-01-mrbeast') ||
       null;
 
     const slots = [
       {
-        slot_number: 1,
+        slot_number: 1 as const,
         target_time_label: '1:30 PM IST (Lunch Break Surge)',
+        target_date: todayISO,
         target_time_ist: '13:30:00',
         creator_name: 'CarryisLive',
         video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
-        clip: scheduledCarry || null,
-        status: scheduledCarry?.status || 'published',
+        clip: todayCarry,
+        status: (todayCarry?.status as any) || 'scheduled',
         peak_strategy: 'High-energy Indian gaming lunch crowd with explosive retention',
-        youtube_video_id: (scheduledCarry?.youtube_video_id && scheduledCarry.youtube_video_id !== 'C53QBQs0hnM') ? scheduledCarry.youtube_video_id : 'YqlbuN5v-tg',
-        youtube_url: `https://youtube.com/shorts/${(scheduledCarry?.youtube_video_id && scheduledCarry.youtube_video_id !== 'C53QBQs0hnM') ? scheduledCarry.youtube_video_id : 'YqlbuN5v-tg'}`,
+        youtube_video_id: todayCarry?.youtube_video_id || 'mZFaBmKB7qY',
+        youtube_url: `https://youtube.com/shorts/${todayCarry?.youtube_video_id || 'mZFaBmKB7qY'}`,
       },
       {
-        slot_number: 2,
+        slot_number: 2 as const,
         target_time_label: '6:00 PM IST (Global Golden Hour)',
+        target_date: todayISO,
         target_time_ist: '18:00:00',
         creator_name: 'IShowSpeed',
         video_id: 'vid-speed-gta-crash',
-        clip: scheduledSpeed || null,
-        status: scheduledSpeed?.status || 'published',
-        peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
-        youtube_video_id: scheduledSpeed?.youtube_video_id || '1wzzrOvl_Jg',
-        youtube_url: `https://youtube.com/shorts/${scheduledSpeed?.youtube_video_id || '1wzzrOvl_Jg'}`,
+        clip: todaySpeed,
+        status: (todaySpeed?.status as any) || 'scheduled',
+        peak_strategy: 'Historic global streaming moment: Speed meeting Cristiano Ronaldo IRL with 250M+ impressions',
+        youtube_video_id: todaySpeed?.youtube_video_id || 'friwdO_FIb0',
+        youtube_url: `https://youtube.com/shorts/${todaySpeed?.youtube_video_id || 'friwdO_FIb0'}`,
       },
       {
-        slot_number: 3,
+        slot_number: 3 as const,
         target_time_label: '9:30 PM IST (Late Night Global Viral Binge)',
+        target_date: todayISO,
         target_time_ist: '21:30:00',
         creator_name: 'MrBeast (Internet Viral Radar)',
         video_id: 'vid-trending-daily-viral',
-        clip: scheduledTrend || null,
-        status: scheduledTrend?.status || 'published',
-        peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
-        youtube_video_id: (scheduledTrend?.youtube_video_id && scheduledTrend.youtube_video_id !== '0e3GPea1Tyg') ? scheduledTrend.youtube_video_id : 'dnbLdUyozKM',
-        youtube_url: `https://youtube.com/shorts/${(scheduledTrend?.youtube_video_id && scheduledTrend.youtube_video_id !== '0e3GPea1Tyg') ? scheduledTrend.youtube_video_id : 'dnbLdUyozKM'}`,
+        clip: todayTrend,
+        status: (todayTrend?.status as any) || 'scheduled',
+        peak_strategy: '$1 Billion Mega-Yacht challenge: Top viral internet phenomenon with maximum global retention hold',
+        youtube_video_id: todayTrend?.youtube_video_id || 'sHpEqeSByPI',
+        youtube_url: `https://youtube.com/shorts/${todayTrend?.youtube_video_id || 'sHpEqeSByPI'}`,
       },
     ];
 
-    const tomorrowCarry =
-      allClips.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-carry-heist') || null;
-
-    const tomorrowSpeed =
-      allClips.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') || null;
-
-    const tomorrowTrend =
-      allClips.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-trend-yacht') || null;
+    // Autonomous Daemon Check: Auto-publish any scheduled slot whose peak IST time has arrived today
+    if (autoExecuteDue && typeof window !== 'undefined') {
+      let didAutoPublish = false;
+      for (const slot of slots) {
+        if (slot.clip && slot.status !== 'published' && istTime24 >= slot.target_time_ist) {
+          try {
+            const res = await this.publishToYouTube({
+              clip_id: slot.clip.id,
+              title: slot.clip.title,
+              description: slot.clip.description,
+              include_attribution: true,
+              platforms: ['youtube'],
+            });
+            slot.status = 'published';
+            slot.youtube_video_id = res.youtube_video_id || slot.youtube_video_id;
+            slot.youtube_url = res.youtube_url || slot.youtube_url;
+            if (slot.clip) {
+              slot.clip.status = 'published';
+              slot.clip.youtube_video_id = slot.youtube_video_id;
+            }
+            this._appendAutopilotLog({
+              slot: slot.slot_number,
+              creator: slot.creator_name,
+              title: slot.clip.title,
+              message: `Auto-uploaded on schedule (peak window ${slot.target_time_ist} IST reached)`,
+              youtube_url: slot.youtube_url,
+            });
+            didAutoPublish = true;
+          } catch {}
+        }
+      }
+      if (didAutoPublish) {
+        localStorage.setItem('clipforge_last_autopilot_cycle', new Date().toISOString());
+      }
+    }
 
     const tomorrow_slots = [
       {
         slot_number: 1 as const,
         target_time_label: '1:30 PM IST (Tomorrow Lunch Surge)',
-        target_date: '2026-11-25',
+        target_date: tomorrowISO,
         target_time_ist: '13:30:00',
         creator_name: 'CarryisLive',
         video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
         clip: tomorrowCarry,
-        status: (tomorrowCarry?.status as any) || 'scheduled',
-        peak_strategy: '$100M Casino Heist Rooftop Escape with massive Indian gaming midday audience',
-        youtube_video_id: tomorrowCarry?.youtube_video_id || 'mZFaBmKB7qY',
-        youtube_url: `https://youtube.com/shorts/${tomorrowCarry?.youtube_video_id || 'mZFaBmKB7qY'}`,
+        status: tomorrowCarry?.id === 'clip-inc-11-stunt' && tomorrowCarry?.status === 'published' ? 'scheduled' : ((tomorrowCarry?.status as any) || 'scheduled'),
+        peak_strategy: '500ft Ramp Skyscraper Stunt Finale with massive Indian gaming midday audience',
+        youtube_video_id: tomorrowCarry?.youtube_video_id || 'YqlbuN5v-tg',
+        youtube_url: `https://youtube.com/shorts/${tomorrowCarry?.youtube_video_id || 'YqlbuN5v-tg'}`,
       },
       {
         slot_number: 2 as const,
         target_time_label: '6:00 PM IST (Tomorrow Global Golden Hour)',
-        target_date: '2026-11-25',
+        target_date: tomorrowISO,
         target_time_ist: '18:00:00',
         creator_name: 'IShowSpeed',
         video_id: 'vid-speed-gta-crash',
         clip: tomorrowSpeed,
-        status: (tomorrowSpeed?.status as any) || 'scheduled',
-        peak_strategy: 'Historic global streaming moment: Speed meeting Cristiano Ronaldo IRL with 250M+ impressions',
-        youtube_video_id: tomorrowSpeed?.youtube_video_id || 'friwdO_FIb0',
-        youtube_url: `https://youtube.com/shorts/${tomorrowSpeed?.youtube_video_id || 'friwdO_FIb0'}`,
+        status: tomorrowSpeed?.id === 'clip-speed-robotdog' && tomorrowSpeed?.status === 'published' ? 'scheduled' : ((tomorrowSpeed?.status as any) || 'scheduled'),
+        peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
+        youtube_video_id: tomorrowSpeed?.youtube_video_id || '1wzzrOvl_Jg',
+        youtube_url: `https://youtube.com/shorts/${tomorrowSpeed?.youtube_video_id || '1wzzrOvl_Jg'}`,
       },
       {
         slot_number: 3 as const,
         target_time_label: '9:30 PM IST (Tomorrow Late Night Viral Binge)',
-        target_date: '2026-11-25',
+        target_date: tomorrowISO,
         target_time_ist: '21:30:00',
         creator_name: 'MrBeast (Internet Viral Radar)',
         video_id: 'vid-trending-daily-viral',
         clip: tomorrowTrend,
-        status: (tomorrowTrend?.status as any) || 'scheduled',
-        peak_strategy: '$1 Billion Mega-Yacht challenge: Top viral internet phenomenon with maximum global retention hold',
-        youtube_video_id: tomorrowTrend?.youtube_video_id || 'sHpEqeSByPI',
-        youtube_url: `https://youtube.com/shorts/${tomorrowTrend?.youtube_video_id || 'sHpEqeSByPI'}`,
+        status: tomorrowTrend?.id === 'clip-trend-01-mrbeast' && tomorrowTrend?.status === 'published' ? 'scheduled' : ((tomorrowTrend?.status as any) || 'scheduled'),
+        peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
+        youtube_video_id: tomorrowTrend?.youtube_video_id || 'dnbLdUyozKM',
+        youtube_url: `https://youtube.com/shorts/${tomorrowTrend?.youtube_video_id || 'dnbLdUyozKM'}`,
       },
     ];
+
+    const nextSlot = slots.find((s) => s.status !== 'published') || slots[0];
 
     return {
       daemon_running: true,
       channel_title: channelTitle,
       daily_target: 3,
+      today_label: todayLabel,
+      tomorrow_label: tomorrowLabel,
+      today_iso: todayISO,
+      tomorrow_iso: tomorrowISO,
+      ist_time_24: istTime24,
+      next_slot: nextSlot,
       last_cycle_run: typeof window !== 'undefined' ? (localStorage.getItem('clipforge_last_autopilot_cycle') || new Date().toISOString()) : new Date().toISOString(),
       slots,
       tomorrow_slots,
+      logs: this.getAutopilotLogs(),
     };
   },
 
-  async triggerDailyAutoPilotCycle(): Promise<any> {
-    const status = await this.getAutopilotStatus();
-    const allClips = getStoredClips();
+  async triggerDailyAutoPilotCycle(isTomorrow: boolean = false): Promise<any> {
+    const status = await this.getAutopilotStatus(false);
+    const targetSlots = isTomorrow ? (status.tomorrow_slots || []) : status.slots;
     const publishedClips: any[] = [];
 
-    const slotYtIds = ['YqlbuN5v-tg', '1wzzrOvl_Jg', 'dnbLdUyozKM'];
-
-    for (let i = 0; i < status.slots.length; i++) {
-      const slot = status.slots[i];
+    for (const slot of targetSlots) {
       if (slot.clip) {
-        const idx = allClips.findIndex((c) => c.id === slot.clip.id);
-        const ytId = slot.clip.youtube_video_id || slotYtIds[i] || '9HCuh7AmGzQ';
-        if (idx !== -1) {
-          allClips[idx].status = 'published';
-          allClips[idx].youtube_video_id = ytId;
-          allClips[idx].youtube_publish_time = new Date().toISOString();
-        }
+        const res = await this.publishToYouTube({
+          clip_id: slot.clip.id,
+          title: slot.clip.title,
+          description: slot.clip.description,
+          include_attribution: true,
+          platforms: ['youtube'],
+        });
+        const ytId = res.youtube_video_id || slot.youtube_video_id || 'YqlbuN5v-tg';
+        const ytUrl = res.youtube_url || `https://youtube.com/shorts/${ytId}`;
+        this._appendAutopilotLog({
+          slot: slot.slot_number,
+          creator: slot.creator_name,
+          title: slot.clip.title,
+          message: `Manual Daily Cycle executed for ${isTomorrow ? status.tomorrow_label : status.today_label}`,
+          youtube_url: ytUrl,
+        });
         publishedClips.push({
           slot: slot.slot_number,
           creator: slot.creator_name,
           title: slot.clip.title,
           youtube_video_id: ytId,
-          youtube_url: `https://youtube.com/shorts/${ytId}`,
+          youtube_url: ytUrl,
           published_at: new Date().toLocaleTimeString(),
         });
       }
     }
 
-    saveStoredClips(allClips);
     if (typeof window !== 'undefined') {
       localStorage.setItem('clipforge_last_autopilot_cycle', new Date().toISOString());
     }
 
     try {
-      await fetch(`${BASE_URL}/youtube/autopilot/trigger-daily-cycle`, { method: 'POST' });
+      await fetch(`${BASE_URL}/youtube/autopilot/trigger-daily-cycle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isTomorrow }),
+      });
     } catch {}
 
     return {
       success: true,
-      message: 'Autonomous Daily 3-Slot Auto-Pilot Cycle successfully executed!',
+      message: `Autonomous 3-Slot Auto-Pilot Cycle successfully executed for ${isTomorrow ? status.tomorrow_label : status.today_label}!`,
       published_clips: publishedClips,
       channel: status.channel_title,
     };
   },
 
   async triggerSlotUpload(slotNumber: number, isTomorrow: boolean = false): Promise<any> {
-    const status = await this.getAutopilotStatus();
+    const status = await this.getAutopilotStatus(false);
     const sourceSlots = isTomorrow ? (status.tomorrow_slots || []) : status.slots;
     const targetSlot = sourceSlots.find((s: any) => s.slot_number === slotNumber);
     if (!targetSlot || !targetSlot.clip) throw new Error('No clip assigned to this slot');
 
-    return await this.publishToYouTube({
+    const res = await this.publishToYouTube({
       clip_id: targetSlot.clip.id,
       title: targetSlot.clip.title,
       description: targetSlot.clip.description,
       include_attribution: true,
       platforms: ['youtube'],
     });
+
+    this._appendAutopilotLog({
+      slot: slotNumber,
+      creator: targetSlot.creator_name,
+      title: targetSlot.clip.title,
+      message: `Manual slot #${slotNumber} upload triggered`,
+      youtube_url: res.youtube_url,
+    });
+
+    return res;
   },
 
   // ==========================================
