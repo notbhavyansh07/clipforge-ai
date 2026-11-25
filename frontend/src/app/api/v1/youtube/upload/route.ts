@@ -3,6 +3,9 @@ import { INITIAL_CLIPS } from '@/lib/seedData';
 import fs from 'fs';
 import path from 'path';
 
+// Track uploaded clip files in server memory to prevent duplicate uploads to channel
+const uploadedClips = new Map<string, { ytId: string; timestamp: number }>();
+
 function getCookie(req: Request, name: string): string | null {
   const cookieHeader = req.headers.get('cookie') || '';
   const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
@@ -189,10 +192,19 @@ export async function POST(request: Request) {
     let ytSuccess = false;
     let uploadedToChannel = false;
 
+    // Server-side deduplication check: If this exact clip file was uploaded recently, return existing ID
+    const dedupKey = fileInfo?.fullPath || clip_id;
+    if (uploadedClips.has(dedupKey)) {
+      const existingUpload = uploadedClips.get(dedupKey)!;
+      ytId = existingUpload.ytId;
+      ytSuccess = true;
+      uploadedToChannel = true;
+    }
+
     // 1. YouTube Upload Execution (Real OAuth Only — never fake with another creator's video)
     const cookieRefreshToken = getCookie(request, 'clipforge_yt_rt');
     const hasRefreshToken = Boolean(process.env.GOOGLE_REFRESH_TOKEN || cookieRefreshToken);
-    if (platforms.includes('youtube')) {
+    if (platforms.includes('youtube') && !uploadedToChannel) {
       if (!hasRefreshToken) {
         ytError = 'YouTube OAuth not authorized yet. Click "Authorize Real YouTube Upload" to post to @salviashu02.';
       } else if (fileInfo && fs.existsSync(fileInfo.fullPath)) {
@@ -201,6 +213,9 @@ export async function POST(request: Request) {
           ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags, cookieRefreshToken);
           ytSuccess = true;
           uploadedToChannel = true;
+          if (ytId) {
+            uploadedClips.set(dedupKey, { ytId, timestamp: Date.now() });
+          }
         } catch (err: any) {
           console.error('[YouTube Upload Error]:', err.message);
           ytError = err.message;

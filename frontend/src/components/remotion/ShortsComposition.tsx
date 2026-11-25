@@ -66,7 +66,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
 
   const activeWord = activeWordInfo?.word || clip.hook_text || clip.title || 'WAIT FOR THIS PART! 😱';
 
-  // Remotion spring bounce for the active word
+  // Remotion spring bounce for the active word with smooth easing
   const wordStartFrame = activeWordInfo ? Math.round((activeWordInfo.start - clip.start_time) * fps) : 0;
   const relativeWordFrame = Math.max(0, frame - wordStartFrame);
 
@@ -74,12 +74,22 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
     frame: relativeWordFrame,
     fps,
     config: {
-      damping: 14,
-      stiffness: 180,
+      damping: 12,
+      stiffness: 200,
+      mass: 0.8,
     },
   });
 
-  const wordScale = interpolate(bounce, [0, 1], [0.85, 1.1]);
+  const wordScale = interpolate(bounce, [0, 1], [0.82, 1.08]);
+
+  // Cinematic Entrance Animation for virality badge
+  const badgeSpring = spring({
+    frame,
+    fps,
+    config: { damping: 14, stiffness: 160 },
+  });
+  const badgeTranslateY = interpolate(badgeSpring, [0, 1], [-60, 0]);
+  const badgeOpacity = interpolate(badgeSpring, [0, 1], [0, 1]);
 
   // Retention progress bar at top of video
   const progressPercent = (frame / durationInFrames) * 100;
@@ -299,7 +309,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
         </div>
       )}
 
-      {/* Remotion Kinetic Subtitle Overlay Engine */}
+      {/* Remotion Kinetic Subtitle Overlay Engine (Studio-Grade Typography) */}
       {renderOptions.enable_animated_captions && activeWord && (
         <div
           style={{
@@ -315,16 +325,16 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
           }}
         >
           {renderOptions.caption_preset === 'karaoke_bold' ? (
-            // Hormozi Gold Style (Bold Black Stroke + Yellow Pop)
+            // Hormozi Gold Style (Multi-layer 3D Shadow + Vibrant Pop)
             <div
               style={{
-                backgroundColor: 'rgba(0, 0, 0, 0.88)',
-                padding: '16px 36px',
-                borderRadius: 28,
+                backgroundColor: 'rgba(0, 0, 0, 0.92)',
+                padding: '18px 40px',
+                borderRadius: 24,
                 border: '4px solid #facc15',
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.9)',
+                boxShadow: '0 16px 48px rgba(0, 0, 0, 0.95), 0 0 25px rgba(250, 204, 21, 0.4)',
                 transform: `scale(${wordScale})`,
-                transition: 'transform 0.08s ease-out',
+                transition: 'transform 0.06s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 maxWidth: '92%',
                 textAlign: 'center',
               }}
@@ -332,12 +342,12 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
               <span
                 style={{
                   color: '#facc15',
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  fontFamily: 'Montserrat, Impact, system-ui, -apple-system, sans-serif',
                   fontWeight: 900,
-                  fontSize: 54,
+                  fontSize: 56,
                   textTransform: 'uppercase',
-                  letterSpacing: '2px',
-                  textShadow: '0 4px 12px rgba(0, 0, 0, 1)',
+                  letterSpacing: '3px',
+                  textShadow: '3px 3px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 0px 6px 16px rgba(0,0,0,0.9)',
                   display: 'inline-block',
                 }}
               >
@@ -348,11 +358,11 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
             // Cyber Neon Style (Glitch Green + Cyan Glow)
             <div
               style={{
-                backgroundColor: 'rgba(5, 46, 22, 0.92)',
-                padding: '16px 36px',
+                backgroundColor: 'rgba(5, 46, 22, 0.95)',
+                padding: '18px 40px',
                 borderRadius: 24,
-                border: '4px solid #4ade80',
-                boxShadow: '0 0 35px rgba(74, 222, 128, 0.7)',
+                border: '3px solid #4ade80',
+                boxShadow: '0 0 40px rgba(74, 222, 128, 0.8), 0 12px 36px rgba(0, 0, 0, 0.9)',
                 transform: `scale(${wordScale})`,
                 maxWidth: '92%',
                 textAlign: 'center',
@@ -361,11 +371,12 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
               <span
                 style={{
                   color: '#4ade80',
-                  fontFamily: 'monospace',
+                  fontFamily: 'monospace, system-ui',
                   fontWeight: 900,
                   fontSize: 52,
                   textTransform: 'uppercase',
-                  letterSpacing: '3px',
+                  letterSpacing: '4px',
+                  textShadow: '0 0 20px rgba(74, 222, 128, 0.9), 2px 2px 0px #000',
                   display: 'inline-block',
                 }}
               >
@@ -373,14 +384,16 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
               </span>
             </div>
           ) : (
-            // Clean Minimal Style
+            // Clean Minimal Style (Polished Frosted Glass)
             <div
               style={{
-                backgroundColor: 'rgba(17, 24, 39, 0.85)',
-                padding: '14px 32px',
+                backgroundColor: 'rgba(15, 23, 42, 0.88)',
+                backdropFilter: 'blur(12px)',
+                padding: '16px 36px',
                 borderRadius: 20,
-                border: '2px solid rgba(255, 255, 255, 0.25)',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.8)',
+                border: '2px solid rgba(255, 255, 255, 0.35)',
+                boxShadow: '0 12px 36px rgba(0, 0, 0, 0.85)',
+                transform: `scale(${wordScale})`,
                 maxWidth: '92%',
                 textAlign: 'center',
               }}
@@ -389,9 +402,10 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
                 style={{
                   color: '#ffffff',
                   fontFamily: 'system-ui, -apple-system, sans-serif',
-                  fontWeight: 700,
-                  fontSize: 44,
-                  letterSpacing: '1px',
+                  fontWeight: 800,
+                  fontSize: 46,
+                  letterSpacing: '1.5px',
+                  textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)',
                   display: 'inline-block',
                 }}
               >
@@ -402,7 +416,7 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
         </div>
       )}
 
-      {/* Virality Floating Score Pill */}
+      {/* Virality Floating Score Pill (With Smooth Spring Entry) */}
       <div
         style={{
           position: 'absolute',
@@ -413,14 +427,16 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
           gap: 8,
           padding: '8px 20px',
           borderRadius: 9999,
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          border: '2px solid rgba(16, 185, 129, 0.7)',
+          backgroundColor: 'rgba(0, 0, 0, 0.88)',
+          border: '2px solid rgba(16, 185, 129, 0.8)',
           color: '#34d399',
           fontFamily: 'system-ui, sans-serif',
           fontSize: 26,
           fontWeight: 900,
           zIndex: 35,
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.8)',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.85)',
+          transform: `translateY(${badgeTranslateY}px)`,
+          opacity: badgeOpacity,
         }}
       >
         <span>⚡</span>

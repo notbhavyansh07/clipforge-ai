@@ -833,10 +833,19 @@ export const api = {
     ];
 
     // Autonomous Daemon Check: Auto-publish due scheduled slots ONLY when real YouTube OAuth is authorized
+    // Prevent bulk uploads: check per-slot deduplication and publish at most ONE due slot per cycle
     if (autoExecuteDue && ytStatus?.oauth_ready && typeof window !== 'undefined') {
       let didAutoPublish = false;
       for (const slot of slots) {
-        if (slot.clip && slot.status !== 'published' && istTime24 >= slot.target_time_ist) {
+        const slotDedupeKey = `clipforge_uploaded_${todayISO}_slot_${slot.slot_number}`;
+        const alreadyUploadedLocally = localStorage.getItem(slotDedupeKey);
+
+        if (
+          slot.clip &&
+          slot.status !== 'published' &&
+          !alreadyUploadedLocally &&
+          istTime24 >= slot.target_time_ist
+        ) {
           try {
             const res = await this.publishToYouTube({
               clip_id: slot.clip.id,
@@ -853,6 +862,7 @@ export const api = {
                 slot.clip.status = 'published';
                 slot.clip.youtube_video_id = res.youtube_video_id;
               }
+              localStorage.setItem(slotDedupeKey, res.youtube_video_id);
               this._appendAutopilotLog({
                 slot: slot.slot_number,
                 creator: slot.creator_name,
@@ -861,6 +871,8 @@ export const api = {
                 youtube_url: slot.youtube_url,
               });
               didAutoPublish = true;
+              // Break after uploading 1 due slot to prevent rapid-fire bulk uploads
+              break;
             }
           } catch {}
         }
