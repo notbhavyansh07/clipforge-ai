@@ -3,10 +3,16 @@ import { INITIAL_CLIPS } from '@/lib/seedData';
 import fs from 'fs';
 import path from 'path';
 
-async function getGoogleAccessToken(): Promise<string> {
+function getCookie(req: Request, name: string): string | null {
+  const cookieHeader = req.headers.get('cookie') || '';
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function getGoogleAccessToken(overrideRefreshToken?: string | null): Promise<string> {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN || overrideRefreshToken;
 
   if (!clientId || !clientSecret || !refreshToken) {
     throw new Error('Google OAuth credentials not configured in environment (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN).');
@@ -73,9 +79,10 @@ async function uploadToYouTube(
   filePath: string,
   title: string,
   description: string,
-  tags: string[]
+  tags: string[],
+  refreshTokenOverride?: string | null
 ): Promise<string> {
-  const token = await getGoogleAccessToken();
+  const token = await getGoogleAccessToken(refreshTokenOverride);
   const fileStats = fs.statSync(filePath);
   const fileSize = fileStats.size;
 
@@ -183,13 +190,15 @@ export async function POST(request: Request) {
     let uploadedToChannel = false;
 
     // 1. YouTube Upload Execution (Real OAuth Only — never fake with another creator's video)
+    const cookieRefreshToken = getCookie(request, 'clipforge_yt_rt');
+    const hasRefreshToken = Boolean(process.env.GOOGLE_REFRESH_TOKEN || cookieRefreshToken);
     if (platforms.includes('youtube')) {
-      if (!process.env.GOOGLE_REFRESH_TOKEN) {
+      if (!hasRefreshToken) {
         ytError = 'YouTube OAuth not authorized yet. Click "Authorize Real YouTube Upload" to post to @salviashu02.';
       } else if (fileInfo && fs.existsSync(fileInfo.fullPath)) {
         try {
           const finalTitle = title.includes('#Shorts') ? title : `${title} #Shorts`;
-          ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags);
+          ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags, cookieRefreshToken);
           ytSuccess = true;
           uploadedToChannel = true;
         } catch (err: any) {

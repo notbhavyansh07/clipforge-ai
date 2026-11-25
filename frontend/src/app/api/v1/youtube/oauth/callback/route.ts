@@ -87,9 +87,19 @@ export async function GET(request: Request) {
       }
     } catch {}
 
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       `${reqUrl.origin}/autopilot?oauth=success&channel=${encodeURIComponent(channelTitle)}`
     );
+    if (refreshToken) {
+      response.cookies.set('clipforge_yt_rt', refreshToken, {
+        httpOnly: true,
+        secure: reqUrl.protocol === 'https:',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+    return response;
   } catch (err: any) {
     return NextResponse.redirect(
       `${reqUrl.origin}/autopilot?oauth=error&reason=${encodeURIComponent(err.message || 'OAuth callback failed')}`
