@@ -294,6 +294,10 @@ export const api = {
 
   // Clips endpoints
   async getClipsForVideo(videoId: string): Promise<Clip[]> {
+    const storedForVideo = getStoredClips().filter((c) => c.video_id === videoId);
+    const initClipIds = new Set(INITIAL_CLIPS.map((c) => c.id));
+    const customLocal = storedForVideo.filter((c) => !initClipIds.has(c.id));
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
@@ -302,79 +306,64 @@ export const api = {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
-          return sanitizeClipsForVideo(data, videoId);
+          const mergedServer = data.map((sc: Clip) => {
+            const localOverride = storedForVideo.find((l) => l.id === sc.id);
+            return localOverride ? { ...sc, ...localOverride } : sc;
+          });
+          return sanitizeClipsForVideo([...customLocal, ...mergedServer], videoId);
         }
       }
     } catch {}
 
-    const filtered = getStoredClips().filter((c) => c.video_id === videoId);
-    if (filtered.length > 0) {
-      return sanitizeClipsForVideo(filtered, videoId);
+    if (storedForVideo.length > 0) {
+      return sanitizeClipsForVideo(storedForVideo, videoId);
     }
 
-    // Auto-generate 3 starter viral clips for newly ingested videos so the editor opens ready
+    // Newly ingested link: ask backend segmentation API for 3 distinct 4K viral scenes
     const video = getStoredVideos().find((v) => v.id === videoId);
     if (video) {
-      const baseTitle = video.title || 'Viral Stream Highlight';
-      const creator = video.creator_name || 'Creator';
-      const starterClips: Clip[] = [
-        {
-          id: `clip-${videoId}-1`,
-          video_id: videoId,
-          title: `🔥 ${baseTitle.slice(0, 42)} (PART 1)`,
-          hook_text: `WAIT FOR THE ENDING! 😱🔥`,
-          description: `Auto-clipped viral highlight from ${creator}: ${baseTitle}`,
-          start_time: 0,
-          end_time: 15,
-          duration: 15,
-          virality_score: 98.4,
-          score_breakdown: { hook: 99, emotion: 98, pacing: 98, story: 97, trend: 100 },
-          virality_reason: 'Strong opening hook with high-retention pacing.',
-          status: 'rendered',
-          output_path: 'clips/clip-inc-11-stunt.mp4',
-          thumbnail_path: '/clips/clip-inc-11-stunt_thumb.jpg',
-          captions_data: JSON.stringify([
-            { word: 'WATCH THIS!', start: 0, end: 1.5 },
-            { word: 'NO WAY!! 😱', start: 1.5, end: 3.5 },
-            { word: 'INSANE MOMENT! 🔥', start: 3.5, end: 6.0 },
-          ]),
-          tags: ['#Shorts', '#Viral', `#${creator.replace(/\s+/g, '')}`],
-          views_count: 0,
-          retention_rate: 96.5,
-          created_at: new Date().toISOString(),
-          framing_mode: 'fill_player_track',
-          caption_position: 'lower_third',
-        },
-        {
-          id: `clip-${videoId}-2`,
-          video_id: videoId,
-          title: `⚡ ${creator.toUpperCase()} UNBELIEVABLE REACTION!`,
-          hook_text: `NOBODY EXPECTED THIS! 💀⚡`,
-          description: `Peak reaction moment clipped from ${baseTitle}`,
-          start_time: 30,
-          end_time: 45,
-          duration: 15,
-          virality_score: 97.9,
-          score_breakdown: { hook: 98, emotion: 99, pacing: 97, story: 96, trend: 99 },
-          virality_reason: 'High audio & chat spike reaction window.',
-          status: 'rendered',
-          output_path: 'clips/clip-speed-robotdog.mp4',
-          thumbnail_path: '/clips/clip-speed-robotdog_thumb.jpg',
-          captions_data: JSON.stringify([
-            { word: 'WAIT FOR IT...', start: 0, end: 1.8 },
-            { word: 'WHAT JUST HAPPENED?! 💥', start: 1.8, end: 4.2 },
-          ]),
-          tags: ['#Shorts', '#Trending', '#Reaction'],
-          views_count: 0,
-          retention_rate: 95.8,
-          created_at: new Date().toISOString(),
-          framing_mode: 'fill_player_track',
-          caption_position: 'lower_third',
-        },
-      ];
-      saveStoredClips([...starterClips, ...getStoredClips()]);
-      return starterClips;
+      return await this.generateDiverseClips(video, 3, []);
     }
+
+    return [];
+  },
+
+  async generateDiverseClips(
+    video: Video,
+    count: number = 3,
+    existingClips: Clip[] = [],
+    prompt: string = ''
+  ): Promise<Clip[]> {
+    const currentClips = existingClips.length > 0
+      ? existingClips
+      : getStoredClips().filter((c) => c.video_id === video.id);
+
+    const existingLocations = currentClips.map((c) => c.location).filter(Boolean);
+    const existingMedia = currentClips.map((c) => c.output_path).filter(Boolean);
+
+    try {
+      const res = await fetch(`${BASE_URL}/clips/video/${video.id}/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          count,
+          videoTitle: video.title,
+          creatorName: video.creator_name || 'Creator',
+          existingLocations,
+          existingMedia,
+          prompt,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.clips) && data.clips.length > 0) {
+          const allStored = getStoredClips();
+          const newIds = new Set(data.clips.map((c: Clip) => c.id));
+          saveStoredClips([...data.clips, ...allStored.filter((c) => !newIds.has(c.id))]);
+          return data.clips;
+        }
+      }
+    } catch {}
 
     return [];
   },

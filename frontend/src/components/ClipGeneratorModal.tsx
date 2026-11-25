@@ -38,7 +38,7 @@ export default function ClipGeneratorModal({
   video,
   onClipCreated,
 }: ClipGeneratorModalProps) {
-  const [activeTab, setActiveTab] = useState<'presets' | 'autoscan' | 'slicer' | 'search'>('presets');
+  const [activeTab, setActiveTab] = useState<'presets' | 'autoscan' | 'slicer' | 'search'>('autoscan');
   const [loading, setLoading] = useState(false);
   const [scanProgress, setScanProgress] = useState<string | null>(null);
 
@@ -462,60 +462,25 @@ export default function ClipGeneratorModal({
     }
   };
 
-  // 1-Click Automated AI Stream Scan
+  // 1-Click Automated Backend Diverse Scene Segmentation (4K 60FPS)
   const handleAutoScan = async () => {
     try {
       setLoading(true);
-      setScanProgress(`Running ${selectedModel.toUpperCase()} acoustic energy & emotional peak detection...`);
-      await new Promise((r) => setTimeout(r, 400));
+      setScanProgress(`Scanning scene transitions & acoustic peaks (${selectedModel})...`);
 
-      setScanProgress('Detecting creator facecam coordinates & retention curve...');
-      await new Promise((r) => setTimeout(r, 400));
+      const existing = await api.getClipsForVideo(video.id);
+      setScanProgress('Extracting distinct locations & 4K 60FPS viral moments...');
+      const newClips = await api.generateDiverseClips(video, 3, existing);
 
-      setScanProgress('Generating dynamic kinetic karaoke captions...');
-      await new Promise((r) => setTimeout(r, 400));
-
-      // Always pick candidate presets to generate fresh viral clips
-      const unadded = PRESET_INCIDENTS.slice(0, 3);
-      let lastCreated: Clip | null = null;
-      for (const p of unadded) {
-        const uniqueId = `clip-${video.id.substring(0, 8)}-${p.id_suffix}-${Date.now().toString().slice(-4)}`;
-        const c: Clip = {
-          id: uniqueId,
-          video_id: video.id,
-          title: `⚡ ${p.title}`,
-          hook_text: p.headline,
-          description: p.description,
-          start_time: p.start_time,
-          end_time: p.start_time + p.duration,
-          duration: p.duration,
-          virality_score: p.virality_score,
-          score_breakdown: { hook: 99, emotion: 99, pacing: 98, story: 95, trend: 100 },
-          virality_reason: p.description,
-          status: 'rendered',
-          output_path: `clips/${p.video_file}.mp4`,
-          thumbnail_path: `/clips/${p.video_file}_thumb.jpg`,
-          location: p.category,
-          incident_type: p.incident_type || p.title,
-          stream_time_formatted: `00:${Math.floor(p.start_time / 60)
-            .toString()
-            .padStart(2, '0')}:00`,
-          tags: [
-            '#Shorts',
-            '#Viral',
-            isSpeedVideo ? '#IShowSpeed' : (isTrendingVideo ? '#MrBeast' : '#CarryMinati'),
-            `#${p.category.replace(/[^a-zA-Z0-9]/g, '')}`,
-          ],
-          views_count: Math.floor(p.virality_score * 1100),
-          retention_rate: 94.5,
-          created_at: new Date().toISOString(),
-          framing_mode: p.framing || 'fill_player_track',
-          chat_burst_score: 9.6,
-          peak_chatters: 2800,
-          reaction_emojis: ['🔥', p.icon],
-        };
-        lastCreated = await api.createClip(c);
-        onClipCreated(lastCreated);
+      if (newClips.length > 0) {
+        for (const c of newClips) {
+          onClipCreated(c);
+        }
+      } else {
+        // Fallback single preset if offline
+        const fallback = PRESET_INCIDENTS[existing.length % PRESET_INCIDENTS.length];
+        await handleSelectPreset(fallback);
+        return;
       }
 
       setScanProgress(null);

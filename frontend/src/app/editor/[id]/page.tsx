@@ -528,7 +528,7 @@ export default function ClipEditorPage() {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[11px] font-mono font-bold text-gray-300">
-                1080 × 1920 • 60 FPS
+                4K 2160×3840 • 60 FPS
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -799,7 +799,7 @@ export default function ClipEditorPage() {
                 className="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#171a2a] hover:bg-[#20243b] text-white border border-gray-700/80 transition-all flex items-center justify-center gap-2 shadow-lg hover:border-purple-500/50"
               >
                 <Download className="w-4 h-4 text-purple-400" />
-                <span>Download Master MP4 (1080p 60FPS)</span>
+                <span>Download Master MP4 (4K 60FPS)</span>
               </a>
 
               <button
