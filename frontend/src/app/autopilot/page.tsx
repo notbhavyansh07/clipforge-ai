@@ -41,6 +41,41 @@ export default function AutoPilotPage() {
   const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
   const [previewClip, setPreviewClip] = useState<any | null>(null);
   const [scheduleDay, setScheduleDay] = useState<'today' | 'tomorrow'>('today');
+  const [oauthBanner, setOauthBanner] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [authorizingYT, setAuthorizingYT] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const oauth = params.get('oauth');
+      if (oauth === 'success') {
+        const ch = params.get('channel') || '@salviashu02';
+        localStorage.setItem('clipforge_yt_channel', ch);
+        setOauthBanner({ type: 'success', text: `YouTube OAuth Authorized! Real Shorts uploads are now active for ${ch}.` });
+        window.history.replaceState({}, '', '/autopilot');
+      } else if (oauth === 'error') {
+        setOauthBanner({ type: 'error', text: `Google OAuth error: ${params.get('reason') || 'Authorization canceled'}` });
+        window.history.replaceState({}, '', '/autopilot');
+      }
+    }
+  }, []);
+
+  const handleConnectYouTubeOAuth = async () => {
+    try {
+      setAuthorizingYT(true);
+      const res = await fetch('/api/v1/youtube/oauth/url');
+      const data = await res.json();
+      if (data.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        alert(data.message || 'OAuth URL could not be generated.');
+      }
+    } catch (e: any) {
+      alert(`OAuth init failed: ${e.message}`);
+    } finally {
+      setAuthorizingYT(false);
+    }
+  };
 
   useEffect(() => {
     setActiveAIModel(api.getActiveAIProvider());
@@ -176,7 +211,24 @@ export default function AutoPilotPage() {
         </div>
 
         {/* Global Controls */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {!status?.oauth_ready ? (
+            <button
+              onClick={handleConnectYouTubeOAuth}
+              disabled={authorizingYT}
+              className="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-red-600/90 hover:bg-red-500 text-white transition flex items-center gap-2 shadow-lg shadow-red-600/25"
+              title="Authorize Google OAuth to upload real MP4 Shorts to your YouTube channel"
+            >
+              {authorizingYT ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Youtube className="w-4 h-4 fill-current" />}
+              <span>Authorize Real YouTube Upload</span>
+            </button>
+          ) : (
+            <span className="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-700 flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>YouTube API v3 Authorized</span>
+            </span>
+          )}
+
           <button
             onClick={() => setIsAIHarnessOpen(true)}
             className="px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold bg-[#151726] hover:bg-[#1e2136] text-purple-300 border border-purple-500/40 hover:border-purple-400 transition flex items-center gap-2 shadow-sm"
@@ -214,6 +266,25 @@ export default function AutoPilotPage() {
           </button>
         </div>
       </div>
+
+      {oauthBanner && (
+        <div
+          className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-semibold ${
+            oauthBanner.type === 'success'
+              ? 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300'
+              : 'bg-red-950/70 border-red-500/40 text-red-300'
+          }`}
+        >
+          <span>{oauthBanner.text}</span>
+          <button
+            type="button"
+            onClick={() => setOauthBanner(null)}
+            className="p-1 rounded-lg hover:bg-white/10"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* 2. Success Banner After Cycle Execution */}
       {cycleResult && (

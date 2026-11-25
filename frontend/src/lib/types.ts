@@ -140,6 +140,7 @@ export interface AutopilotSlot {
 export interface AutopilotStatus {
   daemon_running: boolean;
   channel_title: string;
+  oauth_ready?: boolean;
   daily_target: number;
   today_label?: string;
   tomorrow_label?: string;
