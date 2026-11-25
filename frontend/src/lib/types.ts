@@ -141,6 +141,7 @@ export interface AutopilotStatus {
   daemon_running: boolean;
   channel_title: string;
   oauth_ready?: boolean;
+  env_token_configured?: boolean;
   daily_target: number;
   today_label?: string;
   tomorrow_label?: string;

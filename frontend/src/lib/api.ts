@@ -929,6 +929,7 @@ export const api = {
       daemon_running: true,
       channel_title: channelTitle,
       oauth_ready: Boolean(ytStatus?.oauth_ready),
+      env_token_configured: Boolean(ytStatus?.env_token_configured),
       daily_target: 3,
       today_label: todayLabel,
       tomorrow_label: tomorrowLabel,

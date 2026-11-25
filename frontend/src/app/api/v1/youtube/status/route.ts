@@ -10,12 +10,14 @@ function getCookie(req: Request, name: string): string | null {
 
 export async function GET(request: Request) {
   const hasClient = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
-  const hasRefreshToken = Boolean(process.env.GOOGLE_REFRESH_TOKEN || getCookie(request, 'clipforge_yt_rt'));
+  const envRefreshToken = Boolean(process.env.GOOGLE_REFRESH_TOKEN);
+  const cookieRefreshToken = Boolean(getCookie(request, 'clipforge_yt_rt'));
 
   return NextResponse.json({
     connected: true,
     oauth_configured: hasClient,
-    oauth_ready: hasClient && hasRefreshToken,
+    oauth_ready: hasClient && (envRefreshToken || cookieRefreshToken),
+    env_token_configured: envRefreshToken,
     channel_title: '@salviashu02',
   });
 }

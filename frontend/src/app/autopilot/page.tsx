@@ -247,10 +247,38 @@ export default function AutoPilotPage() {
               <span>Authorize Real YouTube Upload</span>
             </button>
           ) : (
-            <span className="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-700 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>YouTube API v3 Authorized</span>
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-2 rounded-xl text-xs font-mono font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-700 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>YouTube API v3 Authorized</span>
+              </span>
+              {!status?.env_token_configured && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const r = await fetch('/api/v1/youtube/token-export');
+                      const d = await r.json();
+                      if (d.refresh_token) {
+                        await navigator.clipboard.writeText(d.refresh_token);
+                        setOauthBanner({
+                          type: 'success',
+                          text: 'Copied GOOGLE_REFRESH_TOKEN! Now paste it into Render → clipforge-frontend → Environment → Save, rebuild, and deploy for 24/7 closed-browser uploads.',
+                        });
+                      } else {
+                        setOauthBanner({ type: 'error', text: d.error || 'Could not export token.' });
+                      }
+                    } catch (e: any) {
+                      setOauthBanner({ type: 'error', text: e.message || 'Copy failed' });
+                    }
+                  }}
+                  className="px-3 py-2 rounded-xl text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition"
+                  title="Copy refresh token for Render Environment Variables"
+                >
+                  Copy Token for 24/7 Render Cron
+                </button>
+              )}
+            </div>
           )}
 
           <button
