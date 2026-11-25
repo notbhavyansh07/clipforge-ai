@@ -160,11 +160,32 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: `Media file not found for ${clip.id}` }, { status: 404 });
     }
 
+    const viralHashtags = Array.from(
+      new Set([
+        ...(clip.tags || []),
+        '#Shorts',
+        '#Viral',
+        '#Trending',
+        '#Gaming',
+        '#FYP',
+      ])
+    ).slice(0, 10);
+
+    const seoDescription = [
+      clip.hook_text ? `🔥 ${clip.hook_text}` : '',
+      clip.description || clip.title,
+      '',
+      'Subscribe for daily viral Shorts! 🚀',
+      viralHashtags.map((t) => (t.startsWith('#') ? t : `#${t}`)).join(' '),
+    ]
+      .filter(Boolean)
+      .join('\n');
+
     const videoId = await uploadShortDirect(
       mp4Path,
       clip.title,
-      clip.description || `${clip.title} #Shorts`,
-      clip.tags || ['#Shorts', '#Viral']
+      seoDescription,
+      viralHashtags.map((t) => t.replace(/^#/, ''))
     );
 
     uploadedToday.add(dedupeKey);

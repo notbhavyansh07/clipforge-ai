@@ -84,6 +84,32 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
   // Retention progress bar at top of video
   const progressPercent = (frame / durationInFrames) * 100;
 
+  // Dynamic Punch-In Zoom on Hook & Word Beats (real viral Shorts pacing)
+  const hookZoom = renderOptions.enable_punch_in_zoom
+    ? interpolate(frame, [0, fps * 2, durationInFrames], [1.08, 1.0, 1.05], {
+        extrapolateLeft: 'clamp',
+        extrapolateRight: 'clamp',
+      })
+    : 1;
+  const wordBeatZoom = renderOptions.enable_punch_in_zoom
+    ? interpolate(bounce, [0, 1], [1.03, 1.0])
+    : 1;
+  const dynamicZoom = Number((hookZoom * wordBeatZoom).toFixed(4));
+
+  // Viral Color Grading
+  const videoFilter =
+    renderOptions.color_preset === 'viral_vibrant'
+      ? 'contrast(1.08) saturate(1.18) brightness(1.02)'
+      : 'none';
+
+  // Opening 2.5s Hook Banner opacity
+  const hookBannerOpacity = interpolate(
+    frame,
+    [0, 8, fps * 2.2, fps * 2.7],
+    [0, 1, 1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
   // Split-screen calculation: only split if explicitly requested AND not MrBeast / trending internet video
   const isTrending = video.id === 'vid-trending-daily-viral' || (video.creator_name || '').toLowerCase().includes('mrbeast');
   const isSplitScreen = !isTrending && renderOptions.split_screen && renderOptions.framing_mode === 'split_facecam';
@@ -209,21 +235,67 @@ export const ShortsComposition: React.FC<ShortsCompositionProps> = ({
                 height: '100%',
                 objectFit: 'cover',
                 objectPosition: 'center 88%',
+                transform: `scale(${dynamicZoom})`,
+                filter: videoFilter,
               }}
             />
           </div>
         </div>
       ) : (
-        // Fullscreen 9:16 Centered Crop
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        // Fullscreen 9:16 Centered Crop with Dynamic Punch-In Zoom
+        <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
           <RemotionVideo
             src={videoUrl}
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
+              transform: `scale(${dynamicZoom})`,
+              filter: videoFilter,
             }}
           />
+        </div>
+      )}
+
+      {/* Opening 2.5s Viral Hook Overlay */}
+      {hookBannerOpacity > 0.02 && (clip.hook_text || clip.title) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 110,
+            left: 36,
+            right: 36,
+            display: 'flex',
+            justifyContent: 'center',
+            opacity: hookBannerOpacity,
+            zIndex: 36,
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(90deg, rgba(168,85,247,0.92), rgba(236,72,153,0.92))',
+              padding: '12px 28px',
+              borderRadius: 20,
+              border: '3px solid rgba(255,255,255,0.6)',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+              textAlign: 'center',
+              maxWidth: '90%',
+            }}
+          >
+            <span
+              style={{
+                color: '#ffffff',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontWeight: 900,
+                fontSize: 34,
+                letterSpacing: '0.5px',
+                textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+              }}
+            >
+              {clip.hook_text || clip.title}
+            </span>
+          </div>
         </div>
       )}
 
