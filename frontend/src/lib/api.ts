@@ -945,6 +945,16 @@ export const api = {
 
   async triggerDailyAutoPilotCycle(isTomorrow: boolean = false): Promise<any> {
     const status = await this.getAutopilotStatus(false);
+    if (!status.oauth_ready) {
+      return {
+        success: false,
+        oauth_required: true,
+        message: 'YouTube OAuth is not authorized yet. Click "Authorize Real YouTube Upload" first to connect @salviashu02 and post for real.',
+        published_clips: [],
+        channel: status.channel_title,
+      };
+    }
+
     const targetSlots = isTomorrow ? (status.tomorrow_slots || []) : status.slots;
     const publishedClips: any[] = [];
 
@@ -957,23 +967,25 @@ export const api = {
           include_attribution: true,
           platforms: ['youtube'],
         });
-        const ytId = res.youtube_video_id || slot.youtube_video_id || 'YqlbuN5v-tg';
-        const ytUrl = res.youtube_url || `https://youtube.com/shorts/${ytId}`;
-        this._appendAutopilotLog({
-          slot: slot.slot_number,
-          creator: slot.creator_name,
-          title: slot.clip.title,
-          message: `Manual Daily Cycle executed for ${isTomorrow ? status.tomorrow_label : status.today_label}`,
-          youtube_url: ytUrl,
-        });
-        publishedClips.push({
-          slot: slot.slot_number,
-          creator: slot.creator_name,
-          title: slot.clip.title,
-          youtube_video_id: ytId,
-          youtube_url: ytUrl,
-          published_at: new Date().toLocaleTimeString(),
-        });
+        if (res.youtube?.uploaded_to_channel && res.youtube_video_id) {
+          const ytId = res.youtube_video_id;
+          const ytUrl = res.youtube_url || `https://youtube.com/shorts/${ytId}`;
+          this._appendAutopilotLog({
+            slot: slot.slot_number,
+            creator: slot.creator_name,
+            title: slot.clip.title,
+            message: `Uploaded to @salviashu02 for ${isTomorrow ? status.tomorrow_label : status.today_label}`,
+            youtube_url: ytUrl,
+          });
+          publishedClips.push({
+            slot: slot.slot_number,
+            creator: slot.creator_name,
+            title: slot.clip.title,
+            youtube_video_id: ytId,
+            youtube_url: ytUrl,
+            published_at: new Date().toLocaleTimeString(),
+          });
+        }
       }
     }
 

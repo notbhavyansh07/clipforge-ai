@@ -167,11 +167,25 @@ export default function AutoPilotPage() {
   }, []);
 
   const handleRunDailyCycle = async () => {
+    if (!status?.oauth_ready) {
+      setOauthBanner({
+        type: 'error',
+        text: 'YouTube OAuth is not authorized yet. Click "Authorize Real YouTube Upload" above to connect @salviashu02 first.',
+      });
+      return;
+    }
     try {
       setRunningCycle(true);
       setCycleResult(null);
       const res = await api.triggerDailyAutoPilotCycle(scheduleDay === 'tomorrow');
-      setCycleResult(res);
+      if (res.oauth_required || !res.success) {
+        setOauthBanner({
+          type: 'error',
+          text: res.message || 'YouTube OAuth authorization required before posting.',
+        });
+      } else {
+        setCycleResult(res);
+      }
       await loadStatus(true);
     } catch (e: any) {
       alert(`Auto-pilot cycle error: ${e.message}`);
@@ -660,7 +674,7 @@ export default function AutoPilotPage() {
                 <span className="text-emerald-400 font-bold">Virality: {previewClip.virality_score}/100</span>
                 <span>{previewClip.duration}s • 60 FPS</span>
               </div>
-              {previewClip.youtube_video_id && (
+              {previewClip.status === 'published' && status?.oauth_ready && previewClip.youtube_video_id && (
                 <a
                   href={`https://youtube.com/shorts/${previewClip.youtube_video_id}`}
                   target="_blank"
@@ -668,7 +682,7 @@ export default function AutoPilotPage() {
                   className="w-full mt-2 py-2 px-3 rounded-xl bg-red-600/90 hover:bg-red-500 text-white text-xs font-bold transition flex items-center justify-center gap-2"
                 >
                   <Youtube className="w-4 h-4 fill-current" />
-                  <span>Open on YouTube Shorts</span>
+                  <span>Open on Your YouTube (@salviashu02)</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
