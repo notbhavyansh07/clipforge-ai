@@ -165,6 +165,25 @@ export async function GET(request: Request) {
     const accessToken = await getAccessToken();
     const recentOnChannel = await getRecentChannelVideos(accessToken);
 
+    // Fetch live trending gaming/viral video context from YouTube Data API
+    let liveTrendTitle: string | null = null;
+    try {
+      const trendRes = await fetch(
+        'https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=IN&videoCategoryId=20&maxResults=5',
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: AbortSignal.timeout(5000),
+        }
+      );
+      if (trendRes.ok) {
+        const trendData = await trendRes.json();
+        const firstTrend = trendData?.items?.[dayIndex % Math.max(1, (trendData?.items || []).length)];
+        if (firstTrend?.snippet?.title) {
+          liveTrendTitle = firstTrend.snippet.title;
+        }
+      }
+    } catch {}
+
     // Pick first clip in rotated pool that has NOT already been uploaded to the channel
     const rotatedPool = [...pool.slice(dayIndex % pool.length), ...pool.slice(0, dayIndex % pool.length)];
     let clip = INITIAL_CLIPS.find((c) => c.id === rotatedPool[0]) || INITIAL_CLIPS[0];
@@ -210,6 +229,7 @@ export async function GET(request: Request) {
     const seoDescription = [
       clip.hook_text ? `🔥 ${clip.hook_text}` : '',
       clip.description || clip.title,
+      liveTrendTitle ? `📈 Trending Radar: ${liveTrendTitle}` : '',
       '',
       'Subscribe for daily viral Shorts! 🚀',
       viralHashtags.map((t) => (t.startsWith('#') ? t : `#${t}`)).join(' '),
