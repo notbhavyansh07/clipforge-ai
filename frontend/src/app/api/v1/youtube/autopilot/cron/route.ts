@@ -58,6 +58,11 @@ async function uploadShortDirect(filePath: string, title: string, description: s
   const token = await getAccessToken();
   const fileSize = fs.statSync(filePath).size;
 
+  // Strictly enforce YouTube Shorts classification
+  const shortsTitle = (title.includes('#Shorts') ? title : `${title} #Shorts`).slice(0, 100);
+  const shortsTags = Array.from(new Set([...tags.map(t => t.replace(/^#/, '')), 'Shorts', 'shorts', 'Short', 'Viral', 'Gaming', 'FYP'])).slice(0, 15);
+  const shortsDescription = `${description}\n\n#Shorts #shorts #Viral #FYP #Gaming\n\nSubscribe for daily viral Shorts! 🚀`.slice(0, 5000);
+
   const initRes = await fetch(
     'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status',
     {
@@ -70,14 +75,16 @@ async function uploadShortDirect(filePath: string, title: string, description: s
       },
       body: JSON.stringify({
         snippet: {
-          title: (title.includes('#Shorts') ? title : `${title} #Shorts`).slice(0, 100),
-          description: description.slice(0, 5000),
-          tags: tags.length ? tags : ['Shorts', 'Viral', 'Gaming'],
+          title: shortsTitle,
+          description: shortsDescription,
+          tags: shortsTags,
           categoryId: '20',
+          defaultLanguage: 'en',
         },
         status: {
           privacyStatus: 'public',
           selfDeclaredMadeForKids: false,
+          madeForKids: false,
         },
       }),
     }

@@ -2,6 +2,8 @@ name: Daily 3-Slot Viral Auto-Pilot
 
 on:
   schedule:
+    # Warmup every 10 min to prevent Render cold starts (UTC)
+    - cron: '*/10 * * * *'
     # Slot #1: 1:30 PM IST (08:00 UTC) - CarryisLive Lunch Surge
     - cron: '0 8 * * *'
     # Slot #2: 6:00 PM IST (12:30 UTC) - IShowSpeed Global Golden Hour
@@ -11,18 +13,40 @@ on:
   workflow_dispatch:
     inputs:
       slot:
-        description: 'Optional slot number (1, 2, or 3)'
+        description: 'Optional slot number (1, 2, or 3). Leave empty for auto-detect.'
         required: false
         default: ''
 
 jobs:
+  warmup:
+    runs-on: ubuntu-latest
+    # Only run warmup on the */10 schedule (not on slot upload times)
+    if: github.event_name == 'schedule' && (github.event.schedule == '*/10 * * * *' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Keep Render Server Warm
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 https://clipforge-frontend-04i1.onrender.com/api/v1/warmup)
+          echo "Warmup ping status: $STATUS"
+
   trigger-autopilot:
     runs-on: ubuntu-latest
+    # Only run uploads on the 3 slot schedules or manual dispatch
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.schedule == '0 8 * * *' ||
+      github.event.schedule == '30 12 * * *' ||
+      github.event.schedule == '0 16 * * *'
     steps:
-      - name: Wake Render Free Tier
+      - name: Wake Render Server (Allow 30s for cold start recovery)
         run: |
-          curl -s -o /dev/null -w "Status: %{http_code}\n" https://clipforge-frontend-04i1.onrender.com/api/v1/youtube/status
-          sleep 10
+          echo "Pinging server to wake from cold start..."
+          for i in 1 2 3; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://clipforge-frontend-04i1.onrender.com/api/v1/warmup)
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then break; fi
+            sleep 10
+          done
+          sleep 5
 
       - name: Trigger Scheduled Auto-Pilot Slot
         run: |
@@ -30,4 +54,8 @@ jobs:
           if [ -n "${{ github.event.inputs.slot }}" ]; then
             SLOT_PARAM="?slot=${{ github.event.inputs.slot }}"
           fi
-          curl -sS -f "https://clipforge-frontend-04i1.onrender.com/api/v1/youtube/autopilot/cron${SLOT_PARAM}"
+          echo "Calling cron endpoint: /api/v1/youtube/autopilot/cron${SLOT_PARAM}"
+          RESPONSE=$(curl -sS --max-time 60 "https://clipforge-frontend-04i1.onrender.com/api/v1/youtube/autopilot/cron${SLOT_PARAM}")
+          echo "Response: $RESPONSE"
+          # Fail the job if upload errored
+          echo "$RESPONSE" | grep -q '"success":true' || (echo "Upload may have failed" && exit 1)

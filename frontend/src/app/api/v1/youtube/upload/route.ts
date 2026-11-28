@@ -89,16 +89,23 @@ async function uploadToYouTube(
   const fileStats = fs.statSync(filePath);
   const fileSize = fileStats.size;
 
+  // Force Shorts classification: title must have #Shorts, tags must include 'shorts'
+  const shortsTitle = (title.includes('#Shorts') ? title : `${title} #Shorts`).slice(0, 100);
+  const shortsTags = Array.from(new Set([...tags.map(t => t.replace(/^#/, '')), 'Shorts', 'shorts', 'Short', 'Viral', 'Gaming', 'FYP'])).slice(0, 15);
+  const shortsDescription = `${description}\n\n#Shorts #shorts #Viral #FYP #Gaming\n\nSubscribe for daily viral Shorts! 🚀`.slice(0, 5000);
+
   const metadata = {
     snippet: {
-      title: title.slice(0, 100),
-      description: description.slice(0, 5000),
-      tags: tags || ["Shorts", "Viral", "Gaming"],
-      categoryId: "20",
+      title: shortsTitle,
+      description: shortsDescription,
+      tags: shortsTags,
+      categoryId: '20',
+      defaultLanguage: 'en',
     },
     status: {
-      privacyStatus: "public",
+      privacyStatus: 'public',
       selfDeclaredMadeForKids: false,
+      madeForKids: false,
     },
   };
 
