@@ -853,8 +853,33 @@ export const api = {
 
   async getAutopilotStatus(autoExecuteDue: boolean = true): Promise<any> {
     const allClips = getStoredClips();
-    const ytStatus = await this.getYouTubeStatus();
+    const [ytStatus, channelData] = await Promise.all([
+      this.getYouTubeStatus(),
+      fetch(`${BASE_URL}/youtube/channel-videos`, { signal: AbortSignal.timeout(3500) })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]);
     const channelTitle = ytStatus.channel_title || '@salviashu02';
+    const uploadedNormTitles: string[] = Array.isArray(channelData?.normalized_titles)
+      ? channelData.normalized_titles
+      : [];
+
+    const normalizeTitle = (t: string) =>
+      t
+        .toLowerCase()
+        .replace(/#shorts?/gi, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const isAlreadyOnChannel = (clip: Clip) => {
+      const target = normalizeTitle(clip.title || '');
+      if (!target) return false;
+      return uploadedNormTitles.some(
+        (existing) => existing === target || (target.length > 12 && existing.includes(target))
+      );
+    };
+
     const { ist, todayISO, tomorrowISO, todayLabel, tomorrowLabel, istTime24 } = this._getISTParts();
     const dayIndex = Math.floor(ist.getTime() / 86400000);
 
@@ -865,11 +890,11 @@ export const api = {
       const len = poolIds.length;
       const rotated = [...poolIds.slice(dayIndex % len), ...poolIds.slice(0, dayIndex % len)];
       const resolved = rotated.map(findClipById).filter((c): c is Clip => Boolean(c));
-      // Prefer unpublished clips for Today, and pick a distinct clip for Tomorrow
-      const unpublished = resolved.filter((c) => c.status !== 'published');
-      const todayClip = unpublished[0] || resolved[0] || null;
+      // Filter out clips already uploaded on @salviashu02 OR marked published locally
+      const fresh = resolved.filter((c) => c.status !== 'published' && !isAlreadyOnChannel(c));
+      const todayClip = fresh[0] || resolved[0] || null;
       const tomorrowClip =
-        unpublished.find((c) => c.id !== todayClip?.id) ||
+        fresh.find((c) => c.id !== todayClip?.id) ||
         resolved.find((c) => c.id !== todayClip?.id) ||
         resolved[1] ||
         todayClip;
@@ -877,23 +902,25 @@ export const api = {
     };
 
     const { todayClip: todayCarry, tomorrowClip: tomorrowCarry } = pickTodayAndTomorrow([
-      'clip-inc-11-stunt',
-      'clip-inc-09-heist',
-      'clip-inc-02-chase',
-      'clip-inc-07-shootout',
       'clip-inc-10-graphics',
       'clip-inc-08-ai',
+      'clip-inc-07-shootout',
+      'clip-inc-06-freakout',
+      'clip-inc-11-stunt',
+      'clip-inc-02-chase',
+      'clip-inc-09-heist',
       'clip-tomorrow-carry-heist',
     ]);
 
     const { todayClip: todaySpeed, tomorrowClip: tomorrowSpeed } = pickTodayAndTomorrow([
       'clip-speed-robotdog',
-      'clip-speed-01-crash',
+      'clip-speed-08-deskslam',
+      'clip-speed-07-shock',
+      'clip-speed-05-jumpscare',
+      'clip-tomorrow-speed-ronaldo',
       'clip-speed-02-drift',
       'clip-speed-04-rage',
-      'clip-speed-05-jumpscare',
-      'clip-speed-08-deskslam',
-      'clip-tomorrow-speed-ronaldo',
+      'clip-speed-01-crash',
     ]);
 
     const { todayClip: todayTrend, tomorrowClip: tomorrowTrend } = pickTodayAndTomorrow([
