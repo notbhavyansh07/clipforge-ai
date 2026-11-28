@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { INITIAL_CLIPS } from '@/lib/seedData';
+import { getRecentChannelVideos, findMatchingChannelVideo } from '@/lib/youtubeDedup';
 import fs from 'fs';
 import path from 'path';
 
@@ -217,11 +218,23 @@ export async function POST(request: Request) {
       } else if (fileInfo && fs.existsSync(fileInfo.fullPath)) {
         try {
           const finalTitle = title.includes('#Shorts') ? title : `${title} #Shorts`;
-          ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags, cookieRefreshToken);
-          ytSuccess = true;
-          uploadedToChannel = true;
-          if (ytId) {
+          // Check real YouTube channel history so we never upload duplicate Shorts
+          const accessToken = await getGoogleAccessToken(cookieRefreshToken);
+          const recentOnChannel = await getRecentChannelVideos(accessToken);
+          const duplicateOnChannel = findMatchingChannelVideo(recentOnChannel, finalTitle);
+
+          if (duplicateOnChannel) {
+            ytId = duplicateOnChannel.videoId;
+            ytSuccess = true;
+            uploadedToChannel = true;
             uploadedClips.set(dedupKey, { ytId, timestamp: Date.now() });
+          } else {
+            ytId = await uploadToYouTube(fileInfo.fullPath, finalTitle, description, tags, cookieRefreshToken);
+            ytSuccess = true;
+            uploadedToChannel = true;
+            if (ytId) {
+              uploadedClips.set(dedupKey, { ytId, timestamp: Date.now() });
+            }
           }
         } catch (err: any) {
           console.error('[YouTube Upload Error]:', err.message);

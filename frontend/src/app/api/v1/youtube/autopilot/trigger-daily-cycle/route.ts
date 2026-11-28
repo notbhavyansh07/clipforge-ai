@@ -1,37 +1,27 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_CLIPS } from '@/lib/seedData';
 
 export async function POST(request: Request) {
   try {
-    let isTomorrow = false;
+    const reqUrl = new URL(request.url);
+    const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || reqUrl.host;
+    const forwardedProto =
+      request.headers.get('x-forwarded-proto') ||
+      (forwardedHost.includes('localhost') || forwardedHost.includes('127.0.0.1') ? 'http' : 'https');
+    const origin = `${forwardedProto}://${forwardedHost}`;
+
+    let slotParam = '';
     try {
       const body = await request.json();
-      isTomorrow = Boolean(body?.isTomorrow);
+      if (body?.slot) slotParam = `?slot=${encodeURIComponent(String(body.slot))}`;
     } catch {}
 
-    const targetIds = isTomorrow
-      ? ['clip-inc-11-stunt', 'clip-speed-robotdog', 'clip-trend-01-mrbeast']
-      : ['clip-tomorrow-carry-heist', 'clip-tomorrow-speed-ronaldo', 'clip-tomorrow-trend-yacht'];
-
-    const published = targetIds.map((id, idx) => {
-      const clip = INITIAL_CLIPS.find((c) => c.id === id);
-      const ytId = clip?.youtube_video_id || 'YqlbuN5v-tg';
-      return {
-        slot: idx + 1,
-        clip_id: id,
-        title: clip?.title || `Slot #${idx + 1}`,
-        youtube_video_id: ytId,
-        youtube_url: `https://youtube.com/shorts/${ytId}`,
-        status: 'published',
-        published_at: new Date().toISOString(),
-      };
+    const cronRes = await fetch(`${origin}/api/v1/youtube/autopilot/cron${slotParam}`, {
+      method: 'GET',
+      cache: 'no-store',
     });
+    const data = await cronRes.json();
 
-    return NextResponse.json({
-      success: true,
-      message: 'Autonomous Daily 3-Slot Auto-Pilot Cycle executed on server.',
-      published_clips: published,
-    });
+    return NextResponse.json(data, { status: cronRes.status });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message || 'Autopilot cycle failed' },

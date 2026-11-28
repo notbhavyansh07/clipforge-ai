@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { INITIAL_CLIPS } from '@/lib/seedData';
+import { getRecentChannelVideos, findMatchingChannelVideo } from '@/lib/youtubeDedup';
 import fs from 'fs';
 import path from 'path';
 
@@ -159,8 +160,36 @@ export async function GET(request: Request) {
     };
 
     const pool = slotPools[slotNum] || slotPools[1];
-    const chosenId = pool[dayIndex % pool.length];
-    const clip = INITIAL_CLIPS.find((c) => c.id === chosenId) || INITIAL_CLIPS[0];
+
+    // Query real YouTube channel uploads to skip any clip already uploaded to @salviashu02
+    const accessToken = await getAccessToken();
+    const recentOnChannel = await getRecentChannelVideos(accessToken);
+
+    // Pick first clip in rotated pool that has NOT already been uploaded to the channel
+    const rotatedPool = [...pool.slice(dayIndex % pool.length), ...pool.slice(0, dayIndex % pool.length)];
+    let clip = INITIAL_CLIPS.find((c) => c.id === rotatedPool[0]) || INITIAL_CLIPS[0];
+    let skippedDuplicates = true;
+
+    for (const candidateId of rotatedPool) {
+      const candidate = INITIAL_CLIPS.find((c) => c.id === candidateId);
+      if (!candidate) continue;
+      const alreadyOnChannel = findMatchingChannelVideo(recentOnChannel, candidate.title);
+      if (!alreadyOnChannel) {
+        clip = candidate;
+        skippedDuplicates = false;
+        break;
+      }
+    }
+
+    if (skippedDuplicates && !forcedSlot) {
+      uploadedToday.add(dedupeKey);
+      return NextResponse.json({
+        success: true,
+        skipped: true,
+        reason: `All clips in Slot #${slotNum} pool are already uploaded on @salviashu02.`,
+      });
+    }
+
     const mp4Path = resolveMp4Path(clip.output_path, clip.id);
 
     if (!mp4Path) {
