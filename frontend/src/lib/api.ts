@@ -893,9 +893,15 @@ export const api = {
       // Filter out clips already uploaded on @salviashu02 OR marked published locally
       const fresh = resolved.filter((c) => c.status !== 'published' && !isAlreadyOnChannel(c));
       const todayClip = fresh[0] || resolved[0] || null;
+      const todayNorm = normalizeTitle(todayClip?.title || '');
+      const todayPath = todayClip?.output_path || '';
+      const isDistinctFromToday = (c: Clip) =>
+        c.id !== todayClip?.id &&
+        (!todayPath || c.output_path !== todayPath) &&
+        (!todayNorm || normalizeTitle(c.title || '') !== todayNorm);
       const tomorrowClip =
-        fresh.find((c) => c.id !== todayClip?.id) ||
-        resolved.find((c) => c.id !== todayClip?.id) ||
+        fresh.find(isDistinctFromToday) ||
+        resolved.find(isDistinctFromToday) ||
         resolved[1] ||
         todayClip;
       return { todayClip, tomorrowClip };
@@ -939,7 +945,7 @@ export const api = {
         video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
         clip: todayCarry,
         status: (todayCarry?.status as any) || 'scheduled',
-        peak_strategy: 'High-energy Indian gaming lunch crowd with explosive retention',
+        peak_strategy: todayCarry?.virality_reason || todayCarry?.description || 'High-energy Indian gaming lunch crowd with explosive retention',
         youtube_video_id: todayCarry?.youtube_video_id || 'mZFaBmKB7qY',
         youtube_url: `https://youtube.com/shorts/${todayCarry?.youtube_video_id || 'mZFaBmKB7qY'}`,
       },
@@ -952,7 +958,7 @@ export const api = {
         video_id: 'vid-speed-gta-crash',
         clip: todaySpeed,
         status: (todaySpeed?.status as any) || 'scheduled',
-        peak_strategy: 'Historic global streaming moment: Speed meeting Cristiano Ronaldo IRL with 250M+ impressions',
+        peak_strategy: todaySpeed?.virality_reason || todaySpeed?.description || 'Top global viral streaming moment with explosive retention',
         youtube_video_id: todaySpeed?.youtube_video_id || 'friwdO_FIb0',
         youtube_url: `https://youtube.com/shorts/${todaySpeed?.youtube_video_id || 'friwdO_FIb0'}`,
       },
@@ -965,7 +971,7 @@ export const api = {
         video_id: 'vid-trending-daily-viral',
         clip: todayTrend,
         status: (todayTrend?.status as any) || 'scheduled',
-        peak_strategy: '$1 Billion Mega-Yacht challenge: Top viral internet phenomenon with maximum global retention hold',
+        peak_strategy: todayTrend?.virality_reason || todayTrend?.description || 'Top viral internet phenomenon with maximum global retention hold',
         youtube_video_id: todayTrend?.youtube_video_id || 'sHpEqeSByPI',
         youtube_url: `https://youtube.com/shorts/${todayTrend?.youtube_video_id || 'sHpEqeSByPI'}`,
       },
@@ -1030,10 +1036,10 @@ export const api = {
         creator_name: 'CarryisLive',
         video_id: 'a5d7460f-90e1-4e4e-9051-210d35430446',
         clip: tomorrowCarry,
-        status: tomorrowCarry?.id === 'clip-inc-11-stunt' && tomorrowCarry?.status === 'published' ? 'scheduled' : ((tomorrowCarry?.status as any) || 'scheduled'),
-        peak_strategy: '500ft Ramp Skyscraper Stunt Finale with massive Indian gaming midday audience',
-        youtube_video_id: tomorrowCarry?.youtube_video_id || 'YqlbuN5v-tg',
-        youtube_url: `https://youtube.com/shorts/${tomorrowCarry?.youtube_video_id || 'YqlbuN5v-tg'}`,
+        status: 'scheduled' as const,
+        peak_strategy: tomorrowCarry?.virality_reason || tomorrowCarry?.description || 'High-energy Indian gaming midday audience',
+        youtube_video_id: tomorrowCarry?.youtube_video_id || '',
+        youtube_url: tomorrowCarry?.youtube_video_id ? `https://youtube.com/shorts/${tomorrowCarry.youtube_video_id}` : '',
       },
       {
         slot_number: 2 as const,
@@ -1043,10 +1049,10 @@ export const api = {
         creator_name: 'IShowSpeed',
         video_id: 'vid-speed-gta-crash',
         clip: tomorrowSpeed,
-        status: tomorrowSpeed?.id === 'clip-speed-robotdog' && tomorrowSpeed?.status === 'published' ? 'scheduled' : ((tomorrowSpeed?.status as any) || 'scheduled'),
-        peak_strategy: 'Top global viral streaming moment: Robot Dog Flamethrower jumpscare with explosive retention',
-        youtube_video_id: tomorrowSpeed?.youtube_video_id || '1wzzrOvl_Jg',
-        youtube_url: `https://youtube.com/shorts/${tomorrowSpeed?.youtube_video_id || '1wzzrOvl_Jg'}`,
+        status: 'scheduled' as const,
+        peak_strategy: tomorrowSpeed?.virality_reason || tomorrowSpeed?.description || 'Top global viral streaming moment with explosive retention',
+        youtube_video_id: tomorrowSpeed?.youtube_video_id || '',
+        youtube_url: tomorrowSpeed?.youtube_video_id ? `https://youtube.com/shorts/${tomorrowSpeed.youtube_video_id}` : '',
       },
       {
         slot_number: 3 as const,
@@ -1056,10 +1062,10 @@ export const api = {
         creator_name: 'MrBeast (Internet Viral Radar)',
         video_id: 'vid-trending-daily-viral',
         clip: tomorrowTrend,
-        status: tomorrowTrend?.id === 'clip-trend-01-mrbeast' && tomorrowTrend?.status === 'published' ? 'scheduled' : ((tomorrowTrend?.status as any) || 'scheduled'),
-        peak_strategy: 'Top internet viral phenomenon: YouTube #1 creator clipped into hyper-retention Short',
-        youtube_video_id: tomorrowTrend?.youtube_video_id || 'dnbLdUyozKM',
-        youtube_url: `https://youtube.com/shorts/${tomorrowTrend?.youtube_video_id || 'dnbLdUyozKM'}`,
+        status: 'scheduled' as const,
+        peak_strategy: tomorrowTrend?.virality_reason || tomorrowTrend?.description || 'Top internet viral phenomenon clipped into hyper-retention Short',
+        youtube_video_id: tomorrowTrend?.youtube_video_id || '',
+        youtube_url: tomorrowTrend?.youtube_video_id ? `https://youtube.com/shorts/${tomorrowTrend.youtube_video_id}` : '',
       },
     ];
 
