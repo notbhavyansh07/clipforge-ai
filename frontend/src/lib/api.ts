@@ -855,42 +855,52 @@ export const api = {
     const allClips = getStoredClips();
     const ytStatus = await this.getYouTubeStatus();
     const channelTitle = ytStatus.channel_title || '@salviashu02';
-    const { todayISO, tomorrowISO, todayLabel, tomorrowLabel, istTime24 } = this._getISTParts();
+    const { ist, todayISO, tomorrowISO, todayLabel, tomorrowLabel, istTime24 } = this._getISTParts();
+    const dayIndex = Math.floor(ist.getTime() / 86400000);
 
-    // Today's Fresh Viral Lineup (CarryisLive, IShowSpeed, MrBeast)
-    const todayCarry =
-      allClips.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
-      allClips.find((c) => c.id === 'clip-inc-11-stunt') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-carry-heist') ||
-      null;
+    const findClipById = (id: string) =>
+      allClips.find((c) => c.id === id) || INITIAL_CLIPS.find((c) => c.id === id) || null;
 
-    const todaySpeed =
-      allClips.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
-      allClips.find((c) => c.id === 'clip-speed-robotdog') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-speed-ronaldo') ||
-      null;
+    const pickTodayAndTomorrow = (poolIds: string[]) => {
+      const len = poolIds.length;
+      const rotated = [...poolIds.slice(dayIndex % len), ...poolIds.slice(0, dayIndex % len)];
+      const resolved = rotated.map(findClipById).filter((c): c is Clip => Boolean(c));
+      // Prefer unpublished clips for Today, and pick a distinct clip for Tomorrow
+      const unpublished = resolved.filter((c) => c.status !== 'published');
+      const todayClip = unpublished[0] || resolved[0] || null;
+      const tomorrowClip =
+        unpublished.find((c) => c.id !== todayClip?.id) ||
+        resolved.find((c) => c.id !== todayClip?.id) ||
+        resolved[1] ||
+        todayClip;
+      return { todayClip, tomorrowClip };
+    };
 
-    const todayTrend =
-      allClips.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
-      allClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-tomorrow-trend-yacht') ||
-      null;
+    const { todayClip: todayCarry, tomorrowClip: tomorrowCarry } = pickTodayAndTomorrow([
+      'clip-inc-11-stunt',
+      'clip-inc-09-heist',
+      'clip-inc-02-chase',
+      'clip-inc-07-shootout',
+      'clip-inc-10-graphics',
+      'clip-inc-08-ai',
+      'clip-tomorrow-carry-heist',
+    ]);
 
-    // Tomorrow's Queued Viral Lineup
-    const tomorrowCarry =
-      allClips.find((c) => c.id === 'clip-inc-11-stunt') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-inc-11-stunt') ||
-      null;
+    const { todayClip: todaySpeed, tomorrowClip: tomorrowSpeed } = pickTodayAndTomorrow([
+      'clip-speed-robotdog',
+      'clip-speed-01-crash',
+      'clip-speed-02-drift',
+      'clip-speed-04-rage',
+      'clip-speed-05-jumpscare',
+      'clip-speed-08-deskslam',
+      'clip-tomorrow-speed-ronaldo',
+    ]);
 
-    const tomorrowSpeed =
-      allClips.find((c) => c.id === 'clip-speed-robotdog') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-speed-robotdog') ||
-      null;
-
-    const tomorrowTrend =
-      allClips.find((c) => c.id === 'clip-trend-01-mrbeast') ||
-      INITIAL_CLIPS.find((c) => c.id === 'clip-trend-01-mrbeast') ||
-      null;
+    const { todayClip: todayTrend, tomorrowClip: tomorrowTrend } = pickTodayAndTomorrow([
+      'clip-trend-mrbeast-squid',
+      'clip-trend-01-mrbeast',
+      'clip-tomorrow-trend-yacht',
+    ]);
 
     const slots = [
       {
